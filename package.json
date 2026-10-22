@@ -1,0 +1,21 @@
+{
+  "name": "pharmacy-erp-monorepo",
+  "version": "1.0.0",
+  "description": "Pharmacy Operations ERP - Monorepo (Frontend + Backend)",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && cmd /c npm run dev",
+    "dev:frontend": "cd frontend && cmd /c npm run dev",
+    "install:all": "cmd /c npm install --prefix backend && cmd /c npm install --prefix frontend",
+    "build:backend": "cd backend && cmd /c npm run build",
+    "build:frontend": "cd frontend && cmd /c npm run build"
+  },
+  "dependencies": {
+    "@neon/config": "^1.7.3",
+    "@neon/env": "^1.4.4"
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "entities": {
+    "Medicine": {
+      "title": "Medicine",
+      "description": "Master pharmaceutical product record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "genericName": { "type": "string" },
+        "brandName": { "type": "string" },
+        "category": { "type": "string" },
+        "dosageForm": { "type": "string" },
+        "strength": { "type": "string" },
+        "manufacturer": { "type": "string" },
+        "unitOfMeasure": { "type": "string" },
+        "reorderLevel": { "type": "number" },
+        "rackLocation": { "type": "string" },
+        "prescriptionRequired": { "type": "boolean" },
+        "taxRate": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "unitOfMeasure"]
+    },
+    "Batch": {
+      "title": "Batch",
+      "description": "Individual inventory batch tracking expiry and stock for FEFO management",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "medicineId": { "type": "string" },
+        "medicineName": { "type": "string" },
+        "batchNumber": { "type": "string" },
+        "manufacturingDate": { "type": "string" },
+        "expiryDate": { "type": "string" },
+        "purchasePrice": { "type": "number" },
+        "mrp": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "initialQuantity": { "type": "number" },
+        "currentStock": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "quarantined", "expired", "depleted"] },
+        "supplierId": { "type": "string" },
+        "barcode": { "type": "string" }
+      },
+      "required": ["id", "medicineId", "batchNumber", "expiryDate", "sellingPrice", "currentStock"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Point of sale completed checkout transaction with FEFO batch deductions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "date": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "prescriptionId": { "type": "string" },
+        "subtotal": { "type": "number" },
+        "discountTotal": { "type": "number" },
+        "taxTotal": { "type": "number" },
+        "grandTotal": { "type": "number" },
+        "totalCost": { "type": "number" },
+        "netProfit": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "cashierName": { "type": "string" }
+      },
+      "required": ["id", "invoiceNumber", "date", "grandTotal", "paymentMethod"]
+    },
+    "Purchase": {
+      "title": "Purchase",
+      "description": "Vendor purchase invoice adding inward batch stock",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "supplierId": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "purchaseDate": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "paidAmount": { "type": "number" }
+      },
+      "required": ["id", "invoiceNumber", "supplierName", "totalAmount"]
+    },
+    "Prescription": {
+      "title": "Prescription",
+      "description": "Doctor prescription logged for direct dispensing through POS",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "prescriptionNumber": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "patientPhone": { "type": "string" },
+        "doctorName": { "type": "string" },
+        "doctorRegNumber": { "type": "string" },
+        "clinicHospital": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["id", "prescriptionNumber", "patientName", "doctorName", "date"]
+    },
+    "Return": {
+      "title": "Return",
+      "description": "Customer return order with inventory restock or discard options",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "returnNumber": { "type": "string" },
+        "originalInvoiceNumber": { "type": "string" },
+        "date": { "type": "string" },
+        "customerName": { "type": "string" },
+        "totalRefund": { "type": "number" },
+        "refundMethod": { "type": "string" }
+      },
+      "required": ["id", "returnNumber", "originalInvoiceNumber", "totalRefund"]
+    }
+  },
+  "firestore": {
+    "/medicines/{medicineId}": {
+      "schema": { "$ref": "Medicine" },
+      "description": "Master catalog of pharmaceutical products"
+    },
+    "/batches/{batchId}": {
+      "schema": { "$ref": "Batch" },
+      "description": "Inventory batches with expiry dates and physical stock levels"
+    },
+    "/sales/{saleId}": {
+      "schema": { "$ref": "Sale" },
+      "description": "Point of sale completed receipts and itemizations"
+    },
+    "/purchases/{purchaseId}": {
+      "schema": { "$ref": "Purchase" },
+      "description": "Inward purchase invoices from pharmaceutical suppliers"
+    },
+    "/prescriptions/{prescriptionId}": {
+      "schema": { "$ref": "Prescription" },
+      "description": "Patient prescriptions for pharmacy dispensing"
+    },
+    "/returns/{returnId}": {
+      "schema": { "$ref": "Return" },
+      "description": "Returned items and credit notes"
+    }
+  }
+}

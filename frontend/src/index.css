@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* ── Dark mode: respond to .dark class (not OS preference) ── */
+@variant dark (&:where(.dark, .dark *));
+
+/* ── Smooth theme transitions ── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "PharmaPulse OS Enterprise",
+  "description": "Enterprise pharmacy and hospital inventory system featuring CEO/Owner Executive Dashboard, AI Sales Forecasting (14-day demand), AI Stock Intelligence, Financial Anomaly Radar, batch-wise FEFO tracking, and multi-branch management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
