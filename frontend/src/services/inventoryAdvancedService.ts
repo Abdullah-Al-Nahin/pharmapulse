@@ -15,16 +15,17 @@ import {
 } from '../types/inventoryAdvanced';
 import { PharmacyService } from './pharmacyService';
 import { Batch, Medicine } from '../types/pharmacy';
+import { transferApi } from '../lib/api';
 
 const STORAGE_KEYS = {
-  RACK_LOCATIONS: 'rx_rack_locations_v2',
-  STOCK_TRANSFERS: 'rx_stock_transfers_v2',
-  QUARANTINE_RECORDS: 'rx_quarantine_records_v2',
-  DAMAGED_RECORDS: 'rx_damaged_records_v2',
-  BONUS_RECORDS: 'rx_bonus_records_v2',
-  RESERVED_RECORDS: 'rx_reserved_records_v2',
-  NEGATIVE_STOCK_CONFIG: 'rx_negative_stock_config_v2',
-  NEGATIVE_OVERRIDES: 'rx_negative_overrides_v2'
+  RACK_LOCATIONS: 'rx_rack_locations_db_v3',
+  STOCK_TRANSFERS: 'rx_stock_transfers_db_v3',
+  QUARANTINE_RECORDS: 'rx_quarantine_records_db_v3',
+  DAMAGED_RECORDS: 'rx_damaged_records_db_v3',
+  BONUS_RECORDS: 'rx_bonus_records_db_v3',
+  RESERVED_RECORDS: 'rx_reserved_records_db_v3',
+  NEGATIVE_STOCK_CONFIG: 'rx_negative_stock_config_db_v3',
+  NEGATIVE_OVERRIDES: 'rx_negative_overrides_db_v3'
 };
 
 const INITIAL_RACK_LOCATIONS: RackBinLocation[] = [
@@ -63,270 +64,13 @@ const INITIAL_RACK_LOCATIONS: RackBinLocation[] = [
     currentOccupancy: 120,
     temperatureRange: '2°C - 8°C (Monitored)',
     notes: 'Insulins, Prostaglandin Eye Drops, Vaccines'
-  },
-  {
-    id: 'loc-04',
-    aisle: 'Ophthalmic Bay',
-    rack: 'Rack E',
-    shelf: 'Shelf 1',
-    bin: 'Eye Bin E-10',
-    zone: 'ophthalmic_bay',
-    capacityUnits: 400,
-    currentOccupancy: 285,
-    temperatureRange: '15°C - 25°C Protect from light',
-    notes: 'Sterile Tobramycin, Moxifloxacin & Dexamethasone Drops'
-  },
-  {
-    id: 'loc-05',
-    aisle: 'Ophthalmic Bay',
-    rack: 'Rack O',
-    shelf: 'Shelf 2',
-    bin: 'Ointment Bin O-01',
-    zone: 'ophthalmic_bay',
-    capacityUnits: 300,
-    currentOccupancy: 160,
-    temperatureRange: '15°C - 25°C',
-    notes: 'Sterile Eye Ointments 3.5gm tubes'
-  },
-  {
-    id: 'loc-06',
-    aisle: 'Controlled Drug Safe',
-    rack: 'Narcotic Vault N-1',
-    shelf: 'Shelf Double Lock',
-    bin: 'Secure Drawer 1',
-    zone: 'narcotic_vault',
-    capacityUnits: 100,
-    currentOccupancy: 42,
-    temperatureRange: '15°C - 25°C Biometric / Double Key',
-    notes: 'Schedule VIII / Controlled Sedatives & Opioids'
-  },
-  {
-    id: 'loc-07',
-    aisle: 'Inpatient Hospital Ward',
-    rack: 'Emergency Crash Cart',
-    shelf: 'Tier 1 Critical',
-    bin: 'OT-Crash-01',
-    zone: 'ot_emergency_cart',
-    capacityUnits: 80,
-    currentOccupancy: 35,
-    temperatureRange: 'Ambient Ward Condition',
-    notes: 'Operation Theatre Emergency & Resuscitation stock'
   }
 ];
 
-const INITIAL_TRANSFERS: StockTransfer[] = [
-  {
-    id: 'trf-01',
-    transferNumber: 'TRF-2026-0042',
-    transferType: 'branch_to_branch',
-    fromBranchId: 'br-head',
-    fromBranchName: 'Head Office (Central Depot)',
-    toBranchId: 'br-dhan',
-    toBranchName: 'Dhanmondi Main Branch',
-    status: 'received',
-    totalUnits: 150,
-    totalValue: 975.00,
-    isColdChain: false,
-    challanNumber: 'CH-DEPOT-8891',
-    requestedBy: 'Dr. Kabir (Dhanmondi Branch In-Charge)',
-    dispatchedBy: 'Saeed Anwar (Central Logistics)',
-    receivedBy: 'Farhana Yeasmin (Dhanmondi Pharmacist)',
-    requestedAt: '2026-09-08T09:00:00Z',
-    dispatchedAt: '2026-09-08T11:30:00Z',
-    receivedAt: '2026-09-08T15:45:00Z',
-    items: [
-      {
-        id: 'ti-01',
-        medicineId: 'med-01',
-        medicineName: 'Amoxicillin + Clavulanate 625mg',
-        dosageForm: 'Tablet',
-        batchId: 'bat-01-fresh',
-        batchNumber: 'AMX-2025-08',
-        expiryDate: '2027-11-04',
-        quantity: 100,
-        unitCost: 6.50,
-        totalCost: 650.00,
-        fromRackLocation: 'Rack A-01',
-        toRackLocation: 'Rack DHAN-A-02'
-      },
-      {
-        id: 'ti-02',
-        medicineId: 'med-05',
-        medicineName: 'Azithromycin 500mg',
-        dosageForm: 'Tablet',
-        batchId: 'bat-05-01',
-        batchNumber: 'AZI-25-001',
-        expiryDate: '2027-08-10',
-        quantity: 50,
-        unitCost: 6.50,
-        totalCost: 325.00,
-        fromRackLocation: 'Rack A-03',
-        toRackLocation: 'Rack DHAN-A-04'
-      }
-    ],
-    notes: 'Urgent weekend replenishment for Dhanmondi OPD demand.'
-  },
-  {
-    id: 'trf-02',
-    transferNumber: 'TRF-2026-0043',
-    transferType: 'department_transfer',
-    fromBranchId: 'br-head',
-    fromBranchName: 'Central Pharmacy Store',
-    toBranchId: 'br-hosp',
-    toBranchName: 'Madina Eye Hospital Inpatient Ward',
-    status: 'in_transit',
-    totalUnits: 40,
-    totalValue: 8800.00,
-    isColdChain: true,
-    transitTemperature: '3.8°C Monitored Cold Box',
-    challanNumber: 'CH-COLD-9021',
-    requestedBy: 'Sister Philomena (OT Charge Nurse)',
-    dispatchedBy: 'Saeed Anwar (Central Logistics)',
-    requestedAt: '2026-09-10T08:15:00Z',
-    dispatchedAt: '2026-09-10T10:00:00Z',
-    items: [
-      {
-        id: 'ti-03',
-        medicineId: 'med-oph-01',
-        medicineName: 'Tobradex Ophthalmic Drop 5ml',
-        dosageForm: 'Ophthalmic Drop',
-        batchId: 'bat-oph-01',
-        batchNumber: 'TOB-2025-01',
-        expiryDate: '2027-05-20',
-        quantity: 25,
-        unitCost: 155.00,
-        totalCost: 3875.00,
-        fromRackLocation: 'Ophthalmic Bay Rack E-01',
-        toRackLocation: 'OT Crash Cart Bin 1'
-      },
-      {
-        id: 'ti-04',
-        medicineId: 'med-oph-03',
-        medicineName: 'Moxicin Eye Drop 5ml',
-        dosageForm: 'Ophthalmic Drop',
-        batchId: 'bat-oph-03',
-        batchNumber: 'MOX-2025-04',
-        expiryDate: '2027-06-30',
-        quantity: 15,
-        unitCost: 160.00,
-        totalCost: 2400.00,
-        fromRackLocation: 'Ophthalmic Bay Rack E-02',
-        toRackLocation: 'Post-Op Ward Fridge'
-      }
-    ],
-    notes: 'Cold chain verified before dispatch. Digital logger active.'
-  }
-];
-
-const INITIAL_QUARANTINE_RECORDS: QuarantineRecord[] = [
-  {
-    id: 'qrec-01',
-    recordNumber: 'QRN-2026-001',
-    medicineId: 'med-02',
-    medicineName: 'Paracetamol 650mg',
-    batchId: 'bat-02-expired',
-    batchNumber: 'PAR-2023-EX',
-    expiryDate: '2026-08-25',
-    quantity: 14,
-    unitCost: 1.10,
-    totalValue: 15.40,
-    reason: 'quality_inspection_pending',
-    reasonDetails: 'Batch expired 15 days ago. Immediate safety lock-out from active dispensing shelves.',
-    quarantinedAt: '2026-08-26T10:00:00Z',
-    quarantinedBy: 'Chief Pharmacist Farhana Islam',
-    status: 'quarantined'
-  },
-  {
-    id: 'qrec-02',
-    recordNumber: 'QRN-2026-002',
-    medicineId: 'med-08',
-    medicineName: 'Insulin Glargine 100 IU/ml',
-    batchId: 'bat-ins-99',
-    batchNumber: 'INS-2024-EXC',
-    expiryDate: '2026-12-15',
-    quantity: 12,
-    unitCost: 450.00,
-    totalValue: 5400.00,
-    reason: 'cold_chain_breach',
-    reasonDetails: 'Transit data logger registered 14.5°C for 5 hours during courier van delay. Cold chain integrity test pending.',
-    quarantinedAt: '2026-09-07T14:30:00Z',
-    quarantinedBy: 'Quality Assurance Officer Nadia',
-    status: 'quarantined'
-  }
-];
-
-const INITIAL_DAMAGED_RECORDS: DamagedStockRecord[] = [
-  {
-    id: 'dam-01',
-    recordNumber: 'DMG-2026-001',
-    medicineId: 'med-oph-01',
-    medicineName: 'Tobradex Ophthalmic Drop 5ml',
-    batchId: 'bat-oph-01',
-    batchNumber: 'TOB-2025-01',
-    quantity: 3,
-    unitCost: 155.00,
-    totalLossValue: 465.00,
-    type: 'broken_vial_ampoule',
-    location: 'Ophthalmic Bay Rack E-01',
-    reportedAt: '2026-09-05T11:20:00Z',
-    reportedBy: 'Staff Pharmacist Rafiq',
-    disposalStatus: 'pending_disposal'
-  },
-  {
-    id: 'dam-02',
-    recordNumber: 'DMG-2026-002',
-    medicineId: 'med-01',
-    medicineName: 'Amoxicillin + Clavulanate 625mg',
-    batchId: 'bat-01-fresh',
-    batchNumber: 'AMX-2025-08',
-    quantity: 5,
-    unitCost: 6.50,
-    totalLossValue: 32.50,
-    type: 'seal_damaged',
-    location: 'Rack A-01',
-    reportedAt: '2026-09-02T16:00:00Z',
-    reportedBy: 'Storekeeper Alamgir',
-    disposalStatus: 'vendor_debit_claimed',
-    vendorCreditNote: 'DBN-GSK-2026-441'
-  }
-];
-
-const INITIAL_BONUS_RECORDS: BonusStockRecord[] = [
-  {
-    id: 'bon-01',
-    poNumber: 'PO-2026-0038',
-    supplierId: 'sup-03',
-    supplierName: 'Square Pharmaceuticals Wholesale Depot',
-    medicineId: 'med-oph-03',
-    medicineName: 'Moxicin Eye Drop 5ml',
-    batchNumber: 'MOX-2025-04',
-    dealRatio: '50 + 5 Free (10% Trade Bonus)',
-    purchasedQuantity: 50,
-    bonusQuantity: 5,
-    standardPurchasePrice: 176.00,
-    effectiveAverageCost: 160.00, // Diluted: (50 * 176) / 55 = 160.00
-    remainingBonusStock: 4,
-    receivedDate: '2026-08-28',
-    notes: 'Institutional promo scheme for eye surgery camps.'
-  },
-  {
-    id: 'bon-02',
-    poNumber: 'PO-2026-0035',
-    supplierId: 'sup-02',
-    supplierName: 'Aristopharma Distribution Centre',
-    medicineId: 'med-02',
-    medicineName: 'Paracetamol 650mg',
-    batchNumber: 'PAR-2025-12',
-    dealRatio: '100 + 10 Free (10% Bonus)',
-    purchasedQuantity: 500,
-    bonusQuantity: 50,
-    standardPurchasePrice: 1.375,
-    effectiveAverageCost: 1.25, // Diluted: (500 * 1.375) / 550 = 1.25
-    remainingBonusStock: 35,
-    receivedDate: '2026-08-15',
-    notes: 'Standard manufacturer seasonal volume incentive.'
-  }
-];
+const INITIAL_TRANSFERS: StockTransfer[] = [];
+const INITIAL_QUARANTINE_RECORDS: QuarantineRecord[] = [];
+const INITIAL_DAMAGED_RECORDS: DamagedStockRecord[] = [];
+const INITIAL_BONUS_RECORDS: BonusStockRecord[] = [];
 
 const INITIAL_RESERVED_RECORDS: ReservedStockRecord[] = [
   {
@@ -359,7 +103,22 @@ const INITIAL_RESERVED_RECORDS: ReservedStockRecord[] = [
   }
 ];
 
+type InventoryListener = () => void;
+
 export class InventoryAdvancedService {
+  private static listeners: InventoryListener[] = [];
+
+  public static subscribe(listener: InventoryListener): () => void {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  private static emitChange(): void {
+    this.listeners.forEach((l) => l());
+  }
+
   private static getLocal<T>(key: string, fallback: T): T {
     try {
       const val = localStorage.getItem(key);
@@ -373,6 +132,7 @@ export class InventoryAdvancedService {
   private static setLocal<T>(key: string, val: T): void {
     try {
       localStorage.setItem(key, JSON.stringify(val));
+      this.emitChange();
     } catch {
       // fallback
     }
@@ -395,7 +155,28 @@ export class InventoryAdvancedService {
   }
 
   // --- STOCK TRANSFERS (BRANCH & DEPARTMENT) ---
+  private static isSyncing = false;
+
+  public static async syncFromDB(): Promise<void> {
+    if (this.isSyncing) return;
+    this.isSyncing = true;
+    try {
+      const dbTransfers = await transferApi.getTransfers();
+      if (Array.isArray(dbTransfers)) {
+        this.setLocal(STORAGE_KEYS.STOCK_TRANSFERS, dbTransfers);
+      }
+    } catch (e) {
+      console.error('Failed to sync transfers from database:', e);
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
   public static getTransfers(): StockTransfer[] {
+    if (!this.isSyncing && typeof window !== 'undefined' && !sessionStorage.getItem('trf_synced')) {
+      sessionStorage.setItem('trf_synced', 'true');
+      this.syncFromDB();
+    }
     return this.getLocal<StockTransfer[]>(STORAGE_KEYS.STOCK_TRANSFERS, INITIAL_TRANSFERS);
   }
 
@@ -403,6 +184,7 @@ export class InventoryAdvancedService {
     const list = this.getTransfers();
     list.unshift(transfer);
     this.setLocal(STORAGE_KEYS.STOCK_TRANSFERS, list);
+    transferApi.createTransfer(transfer).catch(e => console.error('Failed to save transfer to DB:', e));
   }
 
   public static dispatchTransfer(transferId: string, dispatcherName: string): void {

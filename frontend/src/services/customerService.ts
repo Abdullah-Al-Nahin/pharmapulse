@@ -15,15 +15,31 @@ import {
 } from '../lib/customerInitialData';
 import { PharmacyService } from './pharmacyService';
 import { AccountingTransaction } from '../types/pharmacy';
+import { customerApi } from '../lib/api';
 
 const STORAGE_KEYS = {
-  CUSTOMERS: 'rx_customers_v1',
-  CUSTOMER_LEDGERS: 'rx_customer_ledgers_v1',
-  LOYALTY_HISTORY: 'rx_loyalty_history_v1',
-  LOYALTY_CONFIG: 'rx_loyalty_config_v1',
+  CUSTOMERS: 'rx_customers_db_v2',
+  CUSTOMER_LEDGERS: 'rx_customer_ledgers_db_v2',
+  LOYALTY_HISTORY: 'rx_loyalty_history_db_v2',
+  LOYALTY_CONFIG: 'rx_loyalty_config_db_v2',
 };
 
+type CustomerListener = () => void;
+
 export class CustomerService {
+  private static listeners: CustomerListener[] = [];
+
+  public static subscribe(listener: CustomerListener): () => void {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  private static emitChange(): void {
+    this.listeners.forEach((l) => l());
+  }
+
   private static getLocal<T>(key: string, fallback: T): T {
     try {
       const data = localStorage.getItem(key);
@@ -37,12 +53,35 @@ export class CustomerService {
   private static setLocal<T>(key: string, data: T): void {
     try {
       localStorage.setItem(key, JSON.stringify(data));
+      this.emitChange();
     } catch {
       // LocalStorage error fallback
     }
   }
 
+  private static isSyncing = false;
+
+  public static async syncFromDB(): Promise<void> {
+    if (this.isSyncing) return;
+    this.isSyncing = true;
+    try {
+      const dbCustomers = await customerApi.getCustomers();
+      if (Array.isArray(dbCustomers) && dbCustomers.length > 0) {
+        this.setLocal(STORAGE_KEYS.CUSTOMERS, dbCustomers);
+      }
+    } catch (e) {
+      console.error('Failed to sync customers from database:', e);
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
   public static initialize(): void {
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('cust_synced_v2')) {
+      sessionStorage.setItem('cust_synced_v2', 'true');
+      this.syncFromDB();
+    }
+
     if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
       this.setLocal(STORAGE_KEYS.CUSTOMERS, INITIAL_CUSTOMERS);
     }
@@ -139,6 +178,7 @@ export class CustomerService {
 
     list.unshift(newCustomer);
     this.setLocal(STORAGE_KEYS.CUSTOMERS, list);
+    customerApi.createCustomer(newCustomer).catch((e) => console.error('Failed to save customer to DB:', e));
     return newCustomer;
   }
 
@@ -149,6 +189,7 @@ export class CustomerService {
 
     list[idx] = { ...list[idx], ...updates };
     this.setLocal(STORAGE_KEYS.CUSTOMERS, list);
+    customerApi.updateCustomer(id, updates).catch((e) => console.error('Failed to update customer in DB:', e));
     return list[idx];
   }
 

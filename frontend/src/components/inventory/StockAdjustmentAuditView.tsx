@@ -105,6 +105,9 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
   useEffect(() => {
     refreshData();
+    StockAdjustmentService.syncFromDB();
+    const unsubscribe = StockAdjustmentService.subscribe(refreshData);
+    return () => unsubscribe();
   }, []);
 
   // Selected Medicine and Batches

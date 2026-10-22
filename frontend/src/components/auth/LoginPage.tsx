@@ -64,36 +64,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  // Quick Demo Profiles
+  // Quick Authorization Profiles
   const quickProfiles = [
     {
       role: 'Super Admin',
-      name: 'Dr. Alexander Wright',
-      email: 'admin@phamerp.io',
-      pass: 'admin123',
+      name: 'nahin3',
+      email: 'nahin3@phamerp.io',
+      pass: 'pharma123',
       color: 'border-purple-500/40 bg-purple-950/30 text-purple-300 hover:border-purple-400',
       badgeColor: 'bg-purple-500/20 text-purple-300',
     },
     {
-      role: 'Pharmacy Manager',
-      name: 'Sarah Conner, PharmD',
-      email: 's.conner@phamerp.io',
+      role: 'Super Admin (HQ)',
+      name: 'nahin1',
+      email: 'nahin1.admin@phamerp.io',
       pass: 'pharma123',
       color: 'border-indigo-500/40 bg-indigo-950/30 text-indigo-300 hover:border-indigo-400',
       badgeColor: 'bg-indigo-500/20 text-indigo-300',
     },
     {
-      role: 'Pharmacist',
-      name: 'Marcus Vance, BPharm',
-      email: 'm.vance@phamerp.io',
+      role: 'Accountant',
+      name: 'nahin1',
+      email: 'nahin1@phamerp.io',
       pass: 'pharma123',
       color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:border-emerald-400',
       badgeColor: 'bg-emerald-500/20 text-emerald-300',
     },
     {
       role: 'Cashier',
-      name: 'Emily Davis',
-      email: 'e.davis@phamerp.io',
+      name: 'nahin',
+      email: 'nahin@phamerp.io',
       pass: 'pharma123',
       color: 'border-amber-500/40 bg-amber-950/30 text-amber-300 hover:border-amber-400',
       badgeColor: 'bg-amber-500/20 text-amber-300',

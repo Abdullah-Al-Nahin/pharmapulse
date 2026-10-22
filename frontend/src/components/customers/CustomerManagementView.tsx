@@ -72,6 +72,9 @@ export const CustomerManagementView: React.FC = () => {
 
   useEffect(() => {
     loadCustomers();
+    CustomerService.syncFromDB();
+    const unsubscribe = CustomerService.subscribe(loadCustomers);
+    return () => unsubscribe();
   }, []);
 
   // Sync pricing tier default when type changes

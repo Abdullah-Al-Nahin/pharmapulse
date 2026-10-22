@@ -88,4 +88,89 @@ export const supplierApi = {
   },
 };
 
+// Users & Staff Directory
+export const userApi = {
+  getUsers: async () => {
+    const res = await api.get('/users');
+    return res.data;
+  },
+  createUser: async (data: any) => {
+    const res = await api.post('/users', data);
+    return res.data;
+  },
+  updateUser: async (id: string, data: any) => {
+    const res = await api.put(`/users/${id}`, data);
+    return res.data;
+  },
+  deleteUser: async (id: string) => {
+    const res = await api.delete(`/users/${id}`);
+    return res.data;
+  },
+  getRoles: async () => {
+    const res = await api.get('/users/roles');
+    return res.data;
+  },
+};
+
+// Branches
+export const branchApi = {
+  getBranches: async () => {
+    const res = await api.get('/branches');
+    return res.data;
+  },
+  createBranch: async (data: any) => {
+    const res = await api.post('/branches', data);
+    return res.data;
+  },
+  updateBranch: async (id: string, data: any) => {
+    const res = await api.put(`/branches/${id}`, data);
+    return res.data;
+  },
+  deleteBranch: async (id: string) => {
+    const res = await api.delete(`/branches/${id}`);
+    return res.data;
+  },
+};
+
+// Customers & Dues
+export const customerApi = {
+  getCustomers: async (params?: any) => {
+    const res = await api.get('/customers', { params });
+    return res.data;
+  },
+  createCustomer: async (data: any) => {
+    const res = await api.post('/customers', data);
+    return res.data;
+  },
+  updateCustomer: async (id: string, data: any) => {
+    const res = await api.put(`/customers/${id}`, data);
+    return res.data;
+  },
+};
+
+// Stock Adjustments
+export const adjustmentApi = {
+  getAdjustments: async () => {
+    const res = await api.get('/adjustments');
+    return res.data;
+  },
+  createAdjustment: async (data: any) => {
+    const res = await api.post('/adjustments', data);
+    return res.data;
+  },
+};
+
+// Stock Transfers
+export const transferApi = {
+  getTransfers: async () => {
+    const res = await api.get('/transfers');
+    return res.data;
+  },
+  createTransfer: async (data: any) => {
+    const res = await api.post('/transfers', data);
+    return res.data;
+  },
+};
+
 export default api;
+

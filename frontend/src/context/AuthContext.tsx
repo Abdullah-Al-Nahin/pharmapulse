@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { AuthUser, RoleDefinition, Permission, PredefinedRoleCode } from '../types/rbac';
 import { PRECONFIGURED_ROLES, PRECONFIGURED_USERS, evaluatePermission } from '../services/rbacDefaults';
 import { generateJwtToken } from '../utils/tokenHelper';
+import { userApi } from '../lib/api';
 
 export interface EmployeeCreateInput {
   name: string;
@@ -45,12 +46,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY_ROLES = 'pharmerp_roles_dynamic_v2';
-const STORAGE_KEY_EMPLOYEES = 'pharmerp_employees_dynamic_v2';
-const STORAGE_KEY_USER_ID = 'pharmerp_current_user_id_v2';
-const STORAGE_KEY_AUTH_SESSION = 'pharmerp_auth_session_v2';
+const STORAGE_KEY_ROLES = 'pharmerp_roles_db_v3';
+const STORAGE_KEY_EMPLOYEES = 'pharmerp_employees_db_v3';
+const STORAGE_KEY_USER_ID = 'pharmerp_current_user_id_v3';
+const STORAGE_KEY_AUTH_SESSION = 'pharmerp_auth_session_v3';
+
+const LEGACY_MOCK_IDS = new Set([
+  'user-super-admin',
+  'user-manager',
+  'user-pharmacist',
+  'user-cashier',
+  'user-storekeeper',
+  'user-purchase',
+  'user-accountant',
+  'user-auditor',
+]);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Clear legacy v2 storage if present
+  try {
+    localStorage.removeItem('pharmerp_employees_dynamic_v2');
+  } catch {}
+
   // Load roles (preconfigured + custom + saved modifications in localStorage)
   const [allRoles, setAllRoles] = useState<RoleDefinition[]>(() => {
     try {
@@ -81,14 +98,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingIds = new Set(parsed.map((u: any) => u.id));
+          // Filter out any mock personas
+          const cleanUsers = parsed.filter((u: any) => !LEGACY_MOCK_IDS.has(u.id));
+          const existingIds = new Set(cleanUsers.map((u: any) => u.id));
           const missing = PRECONFIGURED_USERS.filter((pu) => !existingIds.has(pu.id));
-          if (missing.length > 0) {
-            const merged = [...parsed, ...missing];
-            localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(merged));
-            return merged;
-          }
-          return parsed;
+          const merged = [...cleanUsers, ...missing];
+          return merged.length > 0 ? merged : PRECONFIGURED_USERS;
         }
       }
     } catch {
@@ -101,7 +116,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_USER_ID);
-      if (saved) {
+      if (saved && !LEGACY_MOCK_IDS.has(saved)) {
         return saved;
       }
     } catch {
@@ -142,6 +157,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Generate real JWT token for the user
   const [token, setToken] = useState<string>(() => generateJwtToken(currentUser));
+
+  // Sync users directly from Neon PostgreSQL Database on mount & poll every 20s
+  useEffect(() => {
+    const syncUsersFromDB = () => {
+      userApi.getUsers().then((dbUsers: any) => {
+        if (Array.isArray(dbUsers) && dbUsers.length > 0) {
+          setAllUsers(dbUsers);
+          try {
+            localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(dbUsers));
+          } catch {}
+        }
+      }).catch((e) => console.error('Database user sync failed:', e));
+    };
+
+    syncUsersFromDB();
+    const interval = setInterval(syncUsersFromDB, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setToken(generateJwtToken(currentUser));
@@ -341,8 +374,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       password: data.password?.trim() || 'pharma123',
       roleCode: role.code,
       roleName: role.name,
-      branchId: data.branchId || 'HQ-MAIN',
-      branchName: data.branchName || 'Madina Eye Hospital & Pharmacy (Main)',
+      branchId: data.branchId || 'br-snakra',
+      branchName: data.branchName || 'snakra',
       licenseNumber: data.licenseNumber?.trim() || undefined,
       maxDiscountPercent: role.maxDiscountPercent,
       canViewPurchaseCosts: role.canViewPurchaseCosts,
@@ -354,9 +387,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const next = [...allUsers, newUser];
     persistUsers(next);
 
+    // Save directly to Neon Database
+    userApi.createUser(newUser).catch((e) => console.error('Failed to create user in database:', e));
+
     return {
       success: true,
-      message: `Employee '${newUser.name}' created with password and assigned role '${role.name}'.`,
+      message: `Employee '${newUser.name}' created and saved to database.`,
       user: newUser,
     };
   };
@@ -382,7 +418,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return u;
     });
     persistUsers(next);
-    return { success: true, message: 'Employee updated successfully.' };
+
+    // Save directly to Neon Database
+    userApi.updateUser(userId, updates).catch((e) => console.error('Failed to update user in database:', e));
+
+    return { success: true, message: 'Employee updated successfully in database.' };
   };
 
   const deleteEmployee = (userId: string): { success: boolean; message?: string } => {
@@ -391,10 +431,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     const next = allUsers.filter((u) => u.id !== userId);
     persistUsers(next);
+
+    // Delete directly from Neon Database
+    userApi.deleteUser(userId).catch((e) => console.error('Failed to delete user in database:', e));
+
     if (currentUserId === userId) {
       switchUser(PRECONFIGURED_USERS[0].id);
     }
-    return { success: true, message: 'Employee removed from directory.' };
+    return { success: true, message: 'Employee removed from directory and database.' };
   };
 
   const assignRoleToUser = (userId: string, roleCode: string): { success: boolean; message?: string } => {

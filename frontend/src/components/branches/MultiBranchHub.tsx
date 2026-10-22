@@ -35,6 +35,9 @@ import {
 } from '../../types/pharmapulse';
 import { BranchService } from '../../services/branchService';
 import { PharmacyService } from '../../services/pharmacyService';
+import { transferApi } from '../../lib/api';
+
+const IBT_STORAGE_KEY = 'pharmerp_ibt_transfers_db_v3';
 
 interface MultiBranchHubProps {
   currentBranchId?: BranchId;
@@ -55,7 +58,56 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
     return initial.length > 0 ? initial[0].id : 'all';
   });
 
-  const [transfers, setTransfers] = useState<InterBranchTransfer[]>([]);
+  const [transfers, setTransfers] = useState<InterBranchTransfer[]>(() => {
+    try {
+      const saved = localStorage.getItem(IBT_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+
+  useEffect(() => {
+    transferApi.getTransfers().then((dbTransfers) => {
+      if (Array.isArray(dbTransfers) && dbTransfers.length > 0) {
+        const mapped: InterBranchTransfer[] = dbTransfers.map((t: any) => ({
+          id: t.id,
+          transferNumber: t.transferNumber,
+          requisitionNumber: t.challanNumber || `TRQ-${t.id.slice(-4)}`,
+          fromBranchId: t.fromBranchId,
+          fromBranchName: t.fromBranchName,
+          toBranchId: t.toBranchId,
+          toBranchName: t.toBranchName,
+          requestDate: t.requestedAt ? new Date(t.requestedAt).toLocaleString() : new Date().toLocaleString(),
+          dispatchDate: t.dispatchedAt ? new Date(t.dispatchedAt).toLocaleString() : undefined,
+          receiveDate: t.receivedAt ? new Date(t.receivedAt).toLocaleString() : undefined,
+          status: (t.status || 'REQUESTED').toUpperCase(),
+          urgency: 'Routine',
+          requestedBy: t.requestedBy || 'Branch Dispenser',
+          dispatchedBy: t.dispatchedBy,
+          receivedBy: t.receivedBy,
+          transferChallanNo: t.challanNumber,
+          coldChainVerified: Boolean(t.isColdChain),
+          notes: t.notes,
+          items: Array.isArray(t.items) ? t.items.map((it: any) => ({
+            medicineId: it.medicineId || 'med-01',
+            medicineName: it.medicineName || 'Medicine',
+            strength: it.strength || '',
+            batchNumber: it.batchNumber || 'BAT-01',
+            expiryDate: it.expiryDate || '12/2026',
+            requestedQty: it.quantity || 10,
+            approvedQty: it.quantity || 10,
+            receivedQty: it.quantity || 10,
+            unitPrice: it.unitPrice || 100,
+            totalValue: it.totalCost || (it.quantity ? it.quantity * 100 : 1000)
+          })) : []
+        }));
+        setTransfers(mapped);
+        try {
+          localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(mapped));
+        } catch {}
+      }
+    }).catch(e => console.error('Failed to load transfers from DB:', e));
+  }, []);
 
   // Sub-tabs: 'overview' | 'transfers' | 'comparison'
   const [subTab, setSubTab] = useState<'overview' | 'transfers' | 'comparison'>('overview');
@@ -233,12 +285,12 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
 
   // Transfer Handlers
   const handleApproveTransfer = (transferId: string) => {
-    setTransfers((prev) =>
-      prev.map((t) => {
+    setTransfers((prev) => {
+      const updated = prev.map((t) => {
         if (t.id === transferId) {
           return {
             ...t,
-            status: 'IN_TRANSIT',
+            status: 'IN_TRANSIT' as const,
             dispatchDate: new Date().toLocaleString(),
             approvedBy: 'Head Office Dispatch Manager',
             transferChallanNo: `TC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -250,8 +302,12 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
           };
         }
         return t;
-      })
-    );
+      });
+      try {
+        localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
   };
 
   const handleReceiveTransfer = (transferId: string) => {
@@ -272,12 +328,12 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
       });
     }
 
-    setTransfers((prev) =>
-      prev.map((t) => {
+    setTransfers((prev) => {
+      const updated = prev.map((t) => {
         if (t.id === transferId) {
           return {
             ...t,
-            status: 'RECEIVED',
+            status: 'RECEIVED' as const,
             receiveDate: new Date().toLocaleString(),
             receivedBy: 'Branch Pharmacist On-Duty',
             items: t.items.map((it) => ({
@@ -287,8 +343,12 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
           };
         }
         return t;
-      })
-    );
+      });
+      try {
+        localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
 
     setFeedbackMsg({
       type: 'success',
@@ -338,7 +398,27 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
       ],
     };
 
-    setTransfers([newTransfer, ...transfers]);
+    const updated = [newTransfer, ...transfers];
+    setTransfers(updated);
+    try {
+      localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(updated));
+    } catch {}
+
+    transferApi.createTransfer({
+      transferType: 'branch_to_branch',
+      fromBranchId: newTransfer.fromBranchId,
+      fromBranchName: newTransfer.fromBranchName,
+      toBranchId: newTransfer.toBranchId,
+      toBranchName: newTransfer.toBranchName,
+      totalUnits: Number(qty),
+      totalValue: Number(qty) * 120.0,
+      isColdChain: false,
+      challanNumber: newTransfer.requisitionNumber,
+      requestedBy: newTransfer.requestedBy,
+      items: newTransfer.items,
+      notes: newTransfer.notes
+    }).catch(e => console.error('Failed to sync transfer to DB:', e));
+
     setShowNewTransferModal(false);
     setNotes('');
     setFeedbackMsg({

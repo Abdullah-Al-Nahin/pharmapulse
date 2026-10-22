@@ -6,9 +6,12 @@
 import { StockAdjustment, StockAdjustmentType } from '../types/stockAdjustment';
 import { PharmacyService } from './pharmacyService';
 import { AuditService } from './auditService';
+import { adjustmentApi } from '../lib/api';
 
-const ADJUSTMENT_STORAGE_KEY = 'rx_stock_adjustments_v1';
+const ADJUSTMENT_STORAGE_KEY = 'rx_stock_adjustments_db_v2';
 const APPROVAL_THRESHOLD = 100.00; // Monetary value threshold in USD / 10,000 BDT
+
+type AdjustmentListener = () => void;
 
 function initializeStockAdjustments(): StockAdjustment[] {
   const existing = localStorage.getItem(ADJUSTMENT_STORAGE_KEY);
@@ -20,121 +23,53 @@ function initializeStockAdjustments(): StockAdjustment[] {
     }
   }
 
-  const initial: StockAdjustment[] = [
-    {
-      id: 'ADJ-20260908-01',
-      adjustmentNumber: 'ADJ-20260908-001',
-      medicineId: 'med-01',
-      medicineName: 'Paracetamol 500mg',
-      genericName: 'Acetaminophen',
-      batchId: 'batch-01',
-      batchNumber: 'PARA-2024-01',
-      expiryDate: '2026-11-30',
-      rackLocation: 'Rack A-01',
-      type: 'physical_damage',
-      direction: 'decrease',
-      quantityAdjusted: 15,
-      quantityChange: -15,
-      previousStock: 450,
-      newStock: 435,
-      unitCost: 1.20,
-      totalMonetaryValue: 18.00,
-      reason: 'Water leakage from AC unit damaged 15 blister packs on lower shelf',
-      notes: 'Logged during routine morning shelf audit. Damaged packages discarded safely.',
-      status: 'approved',
-      requiresApproval: false,
-      requestedBy: {
-        userId: 'usr-cashier-01',
-        userName: 'Tanvir Ahmed',
-        userRole: 'Chief Pharmacist'
-      },
-      approvedBy: {
-        userId: 'usr-mgr-01',
-        userName: 'Dr. Shahabuddin Ahmed',
-        userRole: 'Pharmacy Manager',
-        approvedAt: '2026-09-08T10:15:00.000Z'
-      },
-      createdAt: '2026-09-08T09:30:00.000Z',
-      updatedAt: '2026-09-08T10:15:00.000Z'
-    },
-    {
-      id: 'ADJ-20260908-02',
-      adjustmentNumber: 'ADJ-20260908-002',
-      medicineId: 'med-04',
-      medicineName: 'Azithromycin 500mg',
-      genericName: 'Azithromycin',
-      batchId: 'batch-06',
-      batchNumber: 'AZI-2024-A1',
-      expiryDate: '2025-10-15',
-      rackLocation: 'Rack B-02',
-      type: 'inventory_reconciliation',
-      direction: 'increase',
-      quantityAdjusted: 20,
-      quantityChange: 20,
-      previousStock: 80,
-      newStock: 100,
-      unitCost: 6.50,
-      totalMonetaryValue: 130.00,
-      reason: 'Physical count surplus discovered during quarterly stock audit',
-      notes: 'Unopened manufacturer box misplaced behind Vitamin rack found intact.',
-      status: 'pending_approval',
-      requiresApproval: true,
-      requestedBy: {
-        userId: 'usr-cashier-01',
-        userName: 'Tanvir Ahmed',
-        userRole: 'Staff Pharmacist'
-      },
-      createdAt: '2026-09-08T14:20:00.000Z',
-      updatedAt: '2026-09-08T14:20:00.000Z'
-    },
-    {
-      id: 'ADJ-20260907-03',
-      adjustmentNumber: 'ADJ-20260907-003',
-      medicineId: 'med-03',
-      medicineName: 'Amoxicillin + Clavulanic Acid 625mg',
-      genericName: 'Amoxicillin + Clavulanate',
-      batchId: 'batch-04',
-      batchNumber: 'MOX-2024-C2',
-      expiryDate: '2025-08-30',
-      rackLocation: 'Fridge-A (Cold Chain)',
-      type: 'quarantine',
-      direction: 'decrease',
-      quantityAdjusted: 10,
-      quantityChange: -10,
-      previousStock: 120,
-      newStock: 110,
-      unitCost: 8.00,
-      totalMonetaryValue: 80.00,
-      reason: 'Temporary cold chain temperature fluctuation logged on data logger',
-      notes: 'Quarantined for stability verification as per DGDA standard operating procedure.',
-      status: 'approved',
-      requiresApproval: false,
-      requestedBy: {
-        userId: 'usr-mgr-01',
-        userName: 'Dr. Shahabuddin Ahmed',
-        userRole: 'Pharmacy Manager'
-      },
-      approvedBy: {
-        userId: 'user-super-admin',
-        userName: 'Dr. Alexander Wright',
-        userRole: 'Super Admin',
-        approvedAt: '2026-09-07T11:45:00.000Z'
-      },
-      createdAt: '2026-09-07T11:00:00.000Z',
-      updatedAt: '2026-09-07T11:45:00.000Z'
-    }
-  ];
-
+  const initial: StockAdjustment[] = [];
   localStorage.setItem(ADJUSTMENT_STORAGE_KEY, JSON.stringify(initial));
   return initial;
 }
 
 export class StockAdjustmentService {
+  private static listeners: AdjustmentListener[] = [];
+
+  public static subscribe(listener: AdjustmentListener): () => void {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
+  }
+
+  private static emitChange(): void {
+    this.listeners.forEach((l) => l());
+  }
+
   public static getApprovalThreshold(): number {
     return APPROVAL_THRESHOLD;
   }
 
+  private static isSyncing = false;
+
+  public static async syncFromDB(): Promise<void> {
+    if (this.isSyncing) return;
+    this.isSyncing = true;
+    try {
+      const dbAdjustments = await adjustmentApi.getAdjustments();
+      if (Array.isArray(dbAdjustments)) {
+        localStorage.setItem(ADJUSTMENT_STORAGE_KEY, JSON.stringify(dbAdjustments));
+        this.emitChange();
+      }
+    } catch (e) {
+      console.error('Failed to sync adjustments from database:', e);
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
   public static getAdjustments(): StockAdjustment[] {
+    if (!this.isSyncing && typeof window !== 'undefined' && !sessionStorage.getItem('adj_synced_v2')) {
+      sessionStorage.setItem('adj_synced_v2', 'true');
+      this.syncFromDB();
+    }
+
     const raw = localStorage.getItem(ADJUSTMENT_STORAGE_KEY);
     if (!raw) {
       return initializeStockAdjustments();
@@ -283,6 +218,16 @@ export class StockAdjustmentService {
     const list = this.getAdjustments();
     list.unshift(newAdjustment);
     localStorage.setItem(ADJUSTMENT_STORAGE_KEY, JSON.stringify(list));
+
+    adjustmentApi.createAdjustment({
+      batchId: params.batchId,
+      type: params.type,
+      direction: params.direction,
+      quantityAdjusted: params.quantityAdjusted,
+      reason: params.reason,
+      notes: params.notes,
+      userId: params.requester.userId
+    }).catch(e => console.error('Failed to create adjustment in database:', e));
 
     return {
       adjustment: newAdjustment,
