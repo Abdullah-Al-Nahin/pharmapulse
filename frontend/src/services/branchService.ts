@@ -110,6 +110,84 @@ const DEFAULT_BRANCHES: BranchInfo[] = [
       activeSuppliers: 10,
       registeredCustomers: 65,
     }
+  },
+  {
+    id: 'br-snakra',
+    name: 'snakra',
+    bnName: 'শাঁকরা ব্রাঞ্চ',
+    code: '1234',
+    type: 'retail_branch',
+    address: 'Shankra Main Road, Keraniganj',
+    phone: '+880 1919-191919',
+    managerName: 'nahin3',
+    licenseNo: 'BR-177324194412969-52',
+    color: '#10b981',
+    metrics: {
+      stockCount: 0,
+      stockValue: 0,
+      todaySales: 0,
+      monthSales: 0,
+      monthlyPurchase: 0,
+      cashBalance: 2420.50,
+      monthlyExpense: 0,
+      monthlyProfit: 0,
+      profitMargin: 0,
+      staffCount: 1,
+      activeSuppliers: 5,
+      registeredCustomers: 25,
+    }
+  },
+  {
+    id: 'br-dhaka-central',
+    name: 'Dhaka Central Hub',
+    bnName: 'ঢাকা সেন্ট্রাল হাব',
+    code: 'BR-DHAKA-CENTRAL',
+    type: 'head_office',
+    address: 'Motijheel C/A, Dhaka',
+    phone: '+880 1711-223344',
+    managerName: 'nahin1',
+    licenseNo: 'DGDA-DH-99120',
+    color: '#3b82f6',
+    metrics: {
+      stockCount: 0,
+      stockValue: 0,
+      todaySales: 0,
+      monthSales: 0,
+      monthlyPurchase: 0,
+      cashBalance: 0,
+      monthlyExpense: 0,
+      monthlyProfit: 0,
+      profitMargin: 0,
+      staffCount: 2,
+      activeSuppliers: 8,
+      registeredCustomers: 40,
+    }
+  },
+  {
+    id: 'br-sylhet',
+    name: 'Sylhet Care Center',
+    bnName: 'সিলেট কেয়ার সেন্টার',
+    code: 'BR-SYLHET',
+    type: 'retail_branch',
+    address: 'Zindabazar, Sylhet',
+    phone: '+880 1819-334455',
+    managerName: 'nahin',
+    licenseNo: 'DGDA-SY-33102',
+    color: '#8b5cf6',
+    metrics: {
+      stockCount: 0,
+      stockValue: 0,
+      todaySales: 0,
+      monthSales: 0,
+      monthlyPurchase: 0,
+      cashBalance: 0,
+      monthlyExpense: 0,
+      monthlyProfit: 0,
+      profitMargin: 0,
+      staffCount: 1,
+      activeSuppliers: 4,
+      registeredCustomers: 15,
+    }
   }
 ];
 
@@ -134,6 +212,13 @@ export class BranchService {
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
+            const existingIds = new Set(parsed.map((b: BranchInfo) => b.id));
+            const missing = DEFAULT_BRANCHES.filter((b) => !existingIds.has(b.id));
+            if (missing.length > 0) {
+              const merged = [...parsed, ...missing];
+              localStorage.setItem(STORAGE_KEY_BRANCHES, JSON.stringify(merged));
+              return merged;
+            }
             return parsed;
           }
         }

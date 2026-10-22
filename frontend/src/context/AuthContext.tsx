@@ -81,6 +81,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingIds = new Set(parsed.map((u: any) => u.id));
+          const missing = PRECONFIGURED_USERS.filter((pu) => !existingIds.has(pu.id));
+          if (missing.length > 0) {
+            const merged = [...parsed, ...missing];
+            localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(merged));
+            return merged;
+          }
           return parsed;
         }
       }
@@ -90,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return PRECONFIGURED_USERS;
   });
 
-  // Load current active user ID
+  // Load current active user ID (defaults to nahin3 if available)
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_USER_ID);
@@ -100,7 +107,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch {
       // Fallback
     }
-    return PRECONFIGURED_USERS[0].id; // Default: Super Admin
+    return PRECONFIGURED_USERS.find((u) => u.id === 'user-nahin3-superadmin')?.id || PRECONFIGURED_USERS[0].id;
   });
 
   // Load authentication status (defaults to true if session flag is set)
