@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -19,7 +19,7 @@ app.use(helmet());
 app.use(express.json());
 
 // Health Check
-app.get('/health', async (_req, res) => {
+app.get('/health', async (_req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.status(200).json({ status: 'ok', database: 'connected', version: '1.0.0' });
