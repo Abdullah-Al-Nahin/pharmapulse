@@ -172,7 +172,7 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
       if (!fromBranch) setFromBranch(branches[0].id);
       if (!toBranch) setToBranch(branches[0].id);
     }
-  }, [branches]);
+  }, [branches.length, fromBranch, toBranch]);
 
   // Active branch resolution
   const activeBranch = useMemo(() => {

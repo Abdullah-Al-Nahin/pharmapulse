@@ -137,9 +137,13 @@ export class BranchService {
       const dbBranches = await branchApi.getBranches();
       if (Array.isArray(dbBranches) && dbBranches.length > 0) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem(STORAGE_KEY_BRANCHES, JSON.stringify(dbBranches));
+          const prev = localStorage.getItem(STORAGE_KEY_BRANCHES);
+          const next = JSON.stringify(dbBranches);
+          if (prev !== next) {
+            localStorage.setItem(STORAGE_KEY_BRANCHES, next);
+            this.emitChange();
+          }
         }
-        this.emitChange();
       }
     } catch (e) {
       console.error('Failed to sync branches from database:', e);

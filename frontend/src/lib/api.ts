@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const defaultBaseURL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3001/api'
+  : 'https://pharmapulse-backend-wjf5.onrender.com/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://pharmapulse-backend-wjf5.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
 });
 
 // Medicines

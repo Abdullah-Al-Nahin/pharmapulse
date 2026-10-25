@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { AuthUser, RoleDefinition, Permission, PredefinedRoleCode } from '../types/rbac';
 import { PRECONFIGURED_ROLES, PRECONFIGURED_USERS, evaluatePermission } from '../services/rbacDefaults';
 import { generateJwtToken } from '../utils/tokenHelper';
@@ -145,7 +145,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const activeRole = allRoles.find((r) => r.code === baseUser.roleCode) || allRoles[0];
 
   // Effective user incorporating dynamic role definition
-  const currentUser: AuthUser = {
+  const currentUser: AuthUser = useMemo(() => ({
     ...baseUser,
     roleName: activeRole.name,
     permissions: activeRole.permissions,
@@ -153,27 +153,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     canViewPurchaseCosts: activeRole.canViewPurchaseCosts,
     canViewProfitMargins: activeRole.canViewProfitMargins,
     canViewAccounting: activeRole.canViewAccounting,
-  };
+  }), [baseUser, activeRole]);
 
   // Generate real JWT token for the user
   const [token, setToken] = useState<string>(() => generateJwtToken(currentUser));
 
-  // Sync users directly from Neon PostgreSQL Database on mount & poll every 20s
+  // Sync users directly from Neon PostgreSQL Database on mount & poll every 30s
   useEffect(() => {
+    let isMounted = true;
     const syncUsersFromDB = () => {
       userApi.getUsers().then((dbUsers: any) => {
+        if (!isMounted) return;
         if (Array.isArray(dbUsers) && dbUsers.length > 0) {
-          setAllUsers(dbUsers);
-          try {
-            localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(dbUsers));
-          } catch {}
+          setAllUsers((prev) => {
+            if (JSON.stringify(prev) === JSON.stringify(dbUsers)) {
+              return prev;
+            }
+            try {
+              localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(dbUsers));
+            } catch {}
+            return dbUsers;
+          });
         }
       }).catch((e) => console.error('Database user sync failed:', e));
     };
 
     syncUsersFromDB();
-    const interval = setInterval(syncUsersFromDB, 20000);
-    return () => clearInterval(interval);
+    const interval = setInterval(syncUsersFromDB, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {

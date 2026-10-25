@@ -131,8 +131,12 @@ export class InventoryAdvancedService {
 
   private static setLocal<T>(key: string, val: T): void {
     try {
-      localStorage.setItem(key, JSON.stringify(val));
-      this.emitChange();
+      const prev = localStorage.getItem(key);
+      const next = JSON.stringify(val);
+      if (prev !== next) {
+        localStorage.setItem(key, next);
+        this.emitChange();
+      }
     } catch {
       // fallback
     }

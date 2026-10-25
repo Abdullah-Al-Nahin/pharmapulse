@@ -108,13 +108,18 @@ export class PharmacyService {
     this.listeners.forEach(listener => listener());
   }
 
+  private static isInitialized = false;
+
   // --- Initializer & Global Database Sync ---
   public static async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    this.isInitialized = true;
+
     // Attempt to load from API Database
     await this.syncDatabase();
     
-    // Poll the database every 15 seconds to catch changes made by other branches/terminals
-    setInterval(() => this.syncDatabase(), 15000);
+    // Poll the database every 30 seconds to catch changes made by other branches/terminals
+    setInterval(() => this.syncDatabase(), 30000);
   }
 
   public static async syncDatabase(): Promise<void> {
@@ -130,22 +135,34 @@ export class PharmacyService {
         supplierApi.getSuppliers().catch(() => []),
       ]);
 
-      // Note: We use INITIAL_* as placeholders for tables that might not have full API routes yet.
-      // Once we implement backend routes for Sales, Purchases, etc., we fetch them above.
+      const newMedicines = (apiMedicines.length > 0 ? apiMedicines : INITIAL_MEDICINES).map((m: any) => ({
+        ...m,
+        manufacturer: typeof m.manufacturer === 'object' && m.manufacturer ? m.manufacturer.name : (m.manufacturer || ''),
+        genericName: typeof m.generic === 'object' && m.generic ? m.generic.name : (m.genericName || m.generic || ''),
+        category: typeof m.category === 'object' && m.category ? m.category.name : (m.category || ''),
+      }));
+
+      const newBatches = (apiBatches.length > 0 ? apiBatches : INITIAL_BATCHES).map((b: any) => ({
+        ...b,
+        medicineId: b.medicineId || b.productId, // map Prisma's productId to frontend's medicineId
+        sellingPrice: b.sellingPrice !== undefined ? b.sellingPrice : b.unitSellingPrice // map Prisma's unitSellingPrice to frontend's sellingPrice
+      }));
+
+      const newSuppliers = apiSuppliers.length > 0 ? apiSuppliers : INITIAL_SUPPLIERS;
+
+      const hasChanged = 
+        JSON.stringify(newMedicines) !== JSON.stringify(this.cache.medicines) ||
+        JSON.stringify(newBatches) !== JSON.stringify(this.cache.batches) ||
+        JSON.stringify(newSuppliers) !== JSON.stringify(this.cache.suppliers);
+
+      if (!hasChanged) {
+        return;
+      }
 
       this.cache = {
-        medicines: (apiMedicines.length > 0 ? apiMedicines : INITIAL_MEDICINES).map((m: any) => ({
-          ...m,
-          manufacturer: typeof m.manufacturer === 'object' && m.manufacturer ? m.manufacturer.name : (m.manufacturer || ''),
-          genericName: typeof m.generic === 'object' && m.generic ? m.generic.name : (m.genericName || m.generic || ''),
-          category: typeof m.category === 'object' && m.category ? m.category.name : (m.category || ''),
-        })),
-        batches: (apiBatches.length > 0 ? apiBatches : INITIAL_BATCHES).map((b: any) => ({
-          ...b,
-          medicineId: b.medicineId || b.productId, // map Prisma's productId to frontend's medicineId
-          sellingPrice: b.sellingPrice !== undefined ? b.sellingPrice : b.unitSellingPrice // map Prisma's unitSellingPrice to frontend's sellingPrice
-        })),
-        suppliers: apiSuppliers.length > 0 ? apiSuppliers : INITIAL_SUPPLIERS,
+        medicines: newMedicines,
+        batches: newBatches,
+        suppliers: newSuppliers,
         prescriptions: INITIAL_PRESCRIPTIONS,
         purchases: this.cache.purchases.length > 0 ? this.cache.purchases : INITIAL_PURCHASES,
         sales: this.cache.sales.length > 0 ? this.cache.sales : INITIAL_SALES,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { PharmacyService } from '../../services/pharmacyService';
@@ -112,17 +112,22 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
   // Selected Medicine and Batches
   const selectedMed = medicines.find(m => m.id === selectedMedicineId);
-  const availableBatchesForMed = batches.filter(b => b.medicineId === selectedMedicineId);
+  const availableBatchesForMed = useMemo(() => {
+    if (!selectedMedicineId) return [];
+    return batches.filter(b => b.medicineId === selectedMedicineId);
+  }, [batches, selectedMedicineId]);
   const selectedBatch = availableBatchesForMed.find(b => b.id === selectedBatchId);
 
   // Auto-select first batch if medicine changes
   useEffect(() => {
-    if (availableBatchesForMed.length > 0 && (!selectedBatchId || !availableBatchesForMed.some(b => b.id === selectedBatchId))) {
-      setSelectedBatchId(availableBatchesForMed[0].id);
-    } else if (availableBatchesForMed.length === 0) {
+    if (availableBatchesForMed.length > 0) {
+      if (!selectedBatchId || !availableBatchesForMed.some(b => b.id === selectedBatchId)) {
+        setSelectedBatchId(availableBatchesForMed[0].id);
+      }
+    } else if (selectedBatchId !== '') {
       setSelectedBatchId('');
     }
-  }, [selectedMedicineId, availableBatchesForMed]);
+  }, [selectedMedicineId, availableBatchesForMed, selectedBatchId]);
 
   // Calculations for Form
   const qty = parseInt(quantityInput, 10) || 0;

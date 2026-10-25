@@ -54,8 +54,12 @@ export class StockAdjustmentService {
     try {
       const dbAdjustments = await adjustmentApi.getAdjustments();
       if (Array.isArray(dbAdjustments)) {
-        localStorage.setItem(ADJUSTMENT_STORAGE_KEY, JSON.stringify(dbAdjustments));
-        this.emitChange();
+        const prev = localStorage.getItem(ADJUSTMENT_STORAGE_KEY);
+        const next = JSON.stringify(dbAdjustments);
+        if (prev !== next) {
+          localStorage.setItem(ADJUSTMENT_STORAGE_KEY, next);
+          this.emitChange();
+        }
       }
     } catch (e) {
       console.error('Failed to sync adjustments from database:', e);

@@ -50,10 +50,16 @@ export class CustomerService {
     return fallback;
   }
 
+  private static isInitialized = false;
+
   private static setLocal<T>(key: string, data: T): void {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
-      this.emitChange();
+      const prev = localStorage.getItem(key);
+      const next = JSON.stringify(data);
+      if (prev !== next) {
+        localStorage.setItem(key, next);
+        this.emitChange();
+      }
     } catch {
       // LocalStorage error fallback
     }
@@ -67,7 +73,12 @@ export class CustomerService {
     try {
       const dbCustomers = await customerApi.getCustomers();
       if (Array.isArray(dbCustomers) && dbCustomers.length > 0) {
-        this.setLocal(STORAGE_KEYS.CUSTOMERS, dbCustomers);
+        const current = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
+        const next = JSON.stringify(dbCustomers);
+        if (current !== next) {
+          localStorage.setItem(STORAGE_KEYS.CUSTOMERS, next);
+          this.emitChange();
+        }
       }
     } catch (e) {
       console.error('Failed to sync customers from database:', e);
@@ -77,23 +88,28 @@ export class CustomerService {
   }
 
   public static initialize(): void {
+    if (this.isInitialized) return;
+    this.isInitialized = true;
+
     if (typeof window !== 'undefined' && !sessionStorage.getItem('cust_synced_v2')) {
       sessionStorage.setItem('cust_synced_v2', 'true');
       this.syncFromDB();
     }
 
-    if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
-      this.setLocal(STORAGE_KEYS.CUSTOMERS, INITIAL_CUSTOMERS);
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.CUSTOMER_LEDGERS)) {
-      this.setLocal(STORAGE_KEYS.CUSTOMER_LEDGERS, INITIAL_CUSTOMER_LEDGERS);
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.LOYALTY_HISTORY)) {
-      this.setLocal(STORAGE_KEYS.LOYALTY_HISTORY, INITIAL_LOYALTY_TRANSACTIONS);
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.LOYALTY_CONFIG)) {
-      this.setLocal(STORAGE_KEYS.LOYALTY_CONFIG, DEFAULT_LOYALTY_CONFIG);
-    }
+    try {
+      if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.CUSTOMER_LEDGERS)) {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMER_LEDGERS, JSON.stringify(INITIAL_CUSTOMER_LEDGERS));
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.LOYALTY_HISTORY)) {
+        localStorage.setItem(STORAGE_KEYS.LOYALTY_HISTORY, JSON.stringify(INITIAL_LOYALTY_TRANSACTIONS));
+      }
+      if (!localStorage.getItem(STORAGE_KEYS.LOYALTY_CONFIG)) {
+        localStorage.setItem(STORAGE_KEYS.LOYALTY_CONFIG, JSON.stringify(DEFAULT_LOYALTY_CONFIG));
+      }
+    } catch {}
   }
 
   // ==========================================
