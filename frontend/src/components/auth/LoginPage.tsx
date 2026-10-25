@@ -68,7 +68,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <button
             type="button"
             onClick={() => setShowInfo(!showInfo)}
-            className="w-6 h-6 rounded-full border-[1.5px] border-[#0090e7] text-[#0090e7] hover:bg-[#0090e7]/10 flex items-center justify-center font-bold text-xs transition-colors cursor-pointer select-none"
+            className="w-6 h-6 rounded-full border-[1.5px] border-[#0d9488] text-[#0d9488] hover:bg-[#0d9488]/10 flex items-center justify-center font-bold text-xs transition-colors cursor-pointer select-none"
             aria-label="About Us Information"
           >
             i
@@ -84,7 +84,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             <div className="absolute -top-1.5 right-2 w-3 h-3 bg-white border-t border-l border-slate-200/90 rotate-45" />
 
             <div className="relative z-10 space-y-1">
-              <h4 className="text-[11px] font-black tracking-wide text-[#0090e7] uppercase">
+              <h4 className="text-[11px] font-black tracking-wide text-[#0d9488] uppercase">
                 ABOUT US
               </h4>
               <p className="text-xs font-bold text-slate-800 leading-snug">
@@ -96,7 +96,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         {/* Brand Logo & Header */}
         <div className="text-center pt-2 pb-5">
-          {/* Logo SVG Icon */}
+          {/* Logo SVG Icon with Teal Palettes */}
           <div className="flex justify-center mb-3">
             <svg 
               width="64" 
@@ -106,17 +106,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               xmlns="http://www.w3.org/2000/svg"
               className="transition-transform duration-300 hover:scale-105"
             >
-              {/* Outer Cyan Arc */}
+              {/* Outer Teal Arc */}
               <path 
                 d="M 32 8 A 24 24 0 1 0 56 32" 
-                stroke="#0090e7" 
+                stroke="#0d9488" 
                 strokeWidth="4.5" 
                 strokeLinecap="round" 
               />
-              {/* Inner Cyan Arc */}
+              {/* Inner Light Teal Arc */}
               <path 
                 d="M 32 17 A 15 15 0 1 0 47 32" 
-                stroke="#00b4d8" 
+                stroke="#14b8a6" 
                 strokeWidth="3.5" 
                 strokeLinecap="round" 
               />
@@ -138,9 +138,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </svg>
           </div>
 
-          {/* Titles */}
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 font-sans">
-            OPTISTOCK <span className="text-[#0090e7]">PRO</span>
+          {/* Titles: PHARMA (black) PLUS (teal & tilted) */}
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-950 font-sans">
+            PHARMA <span className="text-[#0d9488] italic">PLUS</span>
           </h1>
           <p className="text-[10px] tracking-[0.25em] font-bold text-slate-500 uppercase mt-1">
             SECURE ACCESS PORTAL
@@ -169,7 +169,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               placeholder="e.g. admin"
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0090e7] focus:bg-white focus:ring-2 focus:ring-[#0090e7]/20 transition-all font-medium"
+              className="w-full px-3.5 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-medium"
             />
           </div>
 
@@ -185,7 +185,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-3.5 pr-10 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0090e7] focus:bg-white focus:ring-2 focus:ring-[#0090e7]/20 transition-all font-mono"
+                className="w-full pl-3.5 pr-10 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-mono"
               />
               <button
                 type="button"
@@ -198,11 +198,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {/* Single-Click Login Button */}
+          {/* Single-Click Login Button in Teal */}
           <div className="pt-1">
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-[#0090e7] hover:bg-[#007ecb] active:bg-[#0072b8] text-white rounded-xl font-bold text-xs tracking-wide shadow-md shadow-sky-500/25 transition-all cursor-pointer flex items-center justify-center text-center"
+              className="w-full py-3 px-4 bg-[#0d9488] hover:bg-[#0f766e] active:bg-[#115e59] text-white rounded-xl font-bold text-xs tracking-wide shadow-md shadow-teal-600/25 transition-all cursor-pointer flex items-center justify-center text-center"
             >
               লগইন করুন (LOGIN)
             </button>
@@ -212,10 +212,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         {/* Divider */}
         <div className="border-t border-slate-200/80 my-5" />
 
-        {/* Footer Brand */}
+        {/* Footer Brand with Teal Accent */}
         <div className="text-center">
           <p className="text-[10px] tracking-[0.25em] font-extrabold text-slate-500 uppercase">
-            A <span className="text-[#0090e7] font-black">QUANTUM</span> PROJECT
+            A <span className="text-[#0d9488] font-black">QUANTUM</span> PROJECT
           </p>
         </div>
 
