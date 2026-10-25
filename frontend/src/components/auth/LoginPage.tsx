@@ -96,45 +96,56 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         {/* Brand Logo & Header */}
         <div className="text-center pt-2 pb-5">
-          {/* Logo SVG Icon with Teal Palettes */}
-          <div className="flex justify-center mb-3">
+          {/* Custom PHARMA PLUS Pharmaceutical Cross & Vital Pulse Emblem */}
+          <div className="flex justify-center mb-3.5">
             <svg 
-              width="64" 
-              height="64" 
-              viewBox="0 0 64 64" 
+              width="68" 
+              height="68" 
+              viewBox="0 0 68 68" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
-              className="transition-transform duration-300 hover:scale-105"
+              className="transition-transform duration-300 hover:scale-105 drop-shadow-sm select-none"
             >
-              {/* Outer Teal Arc */}
-              <path 
-                d="M 32 8 A 24 24 0 1 0 56 32" 
-                stroke="#0d9488" 
-                strokeWidth="4.5" 
-                strokeLinecap="round" 
-              />
-              {/* Inner Light Teal Arc */}
-              <path 
-                d="M 32 17 A 15 15 0 1 0 47 32" 
-                stroke="#14b8a6" 
-                strokeWidth="3.5" 
-                strokeLinecap="round" 
-              />
-              {/* Green Horizontal Connection & Arrow */}
-              <circle cx="32" cy="32" r="4.5" fill="#22c55e" />
-              <path 
-                d="M 32 32 L 53 32" 
-                stroke="#22c55e" 
-                strokeWidth="3.5" 
-                strokeLinecap="round" 
-              />
-              <path 
-                d="M 48 26 L 53 32 L 48 38" 
-                stroke="#22c55e" 
-                strokeWidth="3.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-              />
+              <defs>
+                <linearGradient id="pharmaTealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#14b8a6" />
+                  <stop offset="100%" stopColor="#0d9488" />
+                </linearGradient>
+                <linearGradient id="pharmaPillGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#0f766e" />
+                  <stop offset="100%" stopColor="#14b8a6" />
+                </linearGradient>
+                <filter id="logoDepthShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#0d9488" floodOpacity="0.22" />
+                </filter>
+              </defs>
+
+              {/* Ambient Background Circle Badge */}
+              <circle cx="34" cy="34" r="32" fill="#f0fdfa" stroke="#ccfbf1" strokeWidth="1.5" />
+
+              {/* Pharmaceutical Medical Plus & Capsule Form */}
+              <g filter="url(#logoDepthShadow)">
+                {/* Vertical Capsule Pillar */}
+                <rect x="27.5" y="11" width="13" height="46" rx="6.5" fill="url(#pharmaTealGrad)" />
+
+                {/* Horizontal Capsule Pillar */}
+                <rect x="11" y="27.5" width="46" height="13" rx="6.5" fill="url(#pharmaTealGrad)" />
+
+                {/* Center Core Node with Deep Teal Contrast */}
+                <rect x="25.5" y="25.5" width="17" height="17" rx="5" fill="url(#pharmaPillGrad)" />
+
+                {/* Clinical Vital ECG Heartbeat Waveform across the Plus */}
+                <path 
+                  d="M 16 34 L 25 34 L 28 27 L 32 41 L 36 29 L 39 37 L 42 34 L 52 34" 
+                  stroke="#ffffff" 
+                  strokeWidth="2.4" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                />
+
+                {/* Top-Right Emerald Healing Node */}
+                <circle cx="51.5" cy="16.5" r="3.5" fill="#10b981" stroke="#ffffff" strokeWidth="1" />
+              </g>
             </svg>
           </div>
 
