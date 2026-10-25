@@ -46,7 +46,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center p-4 select-none relative font-sans"
+      className="min-h-screen w-full flex items-center justify-center p-4 select-none relative font-sans overflow-hidden"
       style={{
         backgroundColor: '#f8fafc',
         backgroundImage: `
@@ -56,8 +56,118 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         backgroundSize: '24px 24px'
       }}
     >
+      <style>{`
+        @keyframes orbDrift1 {
+          0% { transform: translate(0px, 0px) scale(1); }
+          50% { transform: translate(45px, -35px) scale(1.08); }
+          100% { transform: translate(-25px, 30px) scale(0.94); }
+        }
+        @keyframes orbDrift2 {
+          0% { transform: translate(0px, 0px) scale(1); }
+          50% { transform: translate(-40px, 40px) scale(1.1); }
+          100% { transform: translate(35px, -25px) scale(0.92); }
+        }
+        @keyframes ekgSweep {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes floatCrossA {
+          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.25; }
+          50% { transform: translateY(-18px) rotate(45deg); opacity: 0.55; }
+        }
+        @keyframes floatCrossB {
+          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+          50% { transform: translateY(-22px) rotate(-45deg); opacity: 0.5; }
+        }
+        @keyframes pulseRadial {
+          0%, 100% { opacity: 0.12; transform: scale(0.96); }
+          50% { opacity: 0.22; transform: scale(1.04); }
+        }
+      `}</style>
+
+      {/* Aesthetic Animated Background System */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+        {/* Calming Radial Breath Glow behind Central Card */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-radial from-teal-400/20 via-emerald-300/10 to-transparent blur-[80px]"
+          style={{ animation: 'pulseRadial 8s ease-in-out infinite' }}
+        />
+
+        {/* Ambient Floating Soft Teal Orb (Top Left) */}
+        <div 
+          className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full bg-teal-300/15 blur-[100px]"
+          style={{ animation: 'orbDrift1 18s ease-in-out infinite alternate' }}
+        />
+
+        {/* Ambient Floating Soft Mint/Emerald Orb (Bottom Right) */}
+        <div 
+          className="absolute -bottom-28 -right-28 w-[540px] h-[540px] rounded-full bg-emerald-300/15 blur-[110px]"
+          style={{ animation: 'orbDrift2 22s ease-in-out infinite alternate' }}
+        />
+
+        {/* Subtle Clinical ECG Waveform Telemetry Strip in Background */}
+        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-20 opacity-30 flex items-center justify-center overflow-hidden">
+          <svg className="w-full h-16 min-w-[1200px]" viewBox="0 0 1200 64" fill="none" preserveAspectRatio="none">
+            <path 
+              d="M 0 32 L 380 32 L 395 18 L 408 48 L 424 10 L 440 42 L 452 28 L 468 32 L 740 32 L 755 18 L 768 48 L 784 10 L 800 42 L 812 28 L 828 32 L 1200 32" 
+              stroke="#0d9488" 
+              strokeWidth="1.5" 
+              strokeDasharray="4 4"
+            />
+          </svg>
+          {/* Gentle Light Sweep passing across the Telemetry Line */}
+          <div 
+            className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-teal-400/20 to-transparent"
+            style={{ animation: 'ekgSweep 6s linear infinite' }}
+          />
+        </div>
+
+        {/* Serene Floating Micro-Medical Crosses & Pharmaceutical Dots */}
+        {/* Cross 1 (Top Right) */}
+        <div 
+          className="absolute top-20 right-[15%] text-teal-600/35 font-mono text-xl select-none"
+          style={{ animation: 'floatCrossA 10s ease-in-out infinite' }}
+        >
+          +
+        </div>
+
+        {/* Cross 2 (Bottom Left) */}
+        <div 
+          className="absolute bottom-24 left-[14%] text-teal-600/30 font-mono text-2xl select-none"
+          style={{ animation: 'floatCrossB 14s ease-in-out infinite' }}
+        >
+          +
+        </div>
+
+        {/* Cross 3 (Top Left) */}
+        <div 
+          className="absolute top-28 left-[18%] text-emerald-600/25 font-mono text-lg select-none"
+          style={{ animation: 'floatCrossA 12s ease-in-out infinite 2s' }}
+        >
+          +
+        </div>
+
+        {/* Floating Capsule Silhouette Dot (Bottom Right) */}
+        <div 
+          className="absolute bottom-36 right-[20%] w-3 h-5 rounded-full border border-teal-500/30 select-none rotate-45"
+          style={{ animation: 'floatCrossB 16s ease-in-out infinite 1s' }}
+        />
+
+        {/* Micro Pulse Dot (Center Left) */}
+        <div 
+          className="absolute top-1/2 left-[8%] w-2 h-2 rounded-full bg-teal-500/25 select-none animate-ping"
+          style={{ animationDuration: '4s' }}
+        />
+
+        {/* Micro Pulse Dot (Center Right) */}
+        <div 
+          className="absolute top-[45%] right-[9%] w-2 h-2 rounded-full bg-emerald-500/25 select-none animate-ping"
+          style={{ animationDuration: '5s' }}
+        />
+      </div>
+
       {/* Central White Login Card */}
-      <div className="bg-white rounded-[24px] sm:rounded-[28px] border border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] max-w-[370px] w-full p-7 sm:p-8 relative transition-all">
+      <div className="bg-white rounded-[24px] sm:rounded-[28px] border border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] max-w-[370px] w-full p-7 sm:p-8 relative z-10 transition-all">
         
         {/* Upper-Right Corner Info Icon with Hover Speech Bubble */}
         <div 
