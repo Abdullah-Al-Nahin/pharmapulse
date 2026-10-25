@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface LoginPageProps {
   onLoginSuccess?: () => void;
 }
+
+const THEME_STORAGE_KEY = 'pharmapulse_dark_mode';
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const { login } = useAuth();
@@ -14,6 +16,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+
+  // Dark Mode State persistent across Login and Software Dashboard
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(THEME_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Synchronize Dark Mode with DOM and localStorage
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'true' : 'false');
+    } catch {}
+  }, [isDark]);
 
   // Synchronous, single-click login handler
   const handleLogin = (e?: React.FormEvent) => {
@@ -46,13 +69,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center p-4 select-none relative font-sans overflow-hidden"
+      className={`min-h-screen w-full flex items-center justify-center p-4 select-none relative font-sans overflow-hidden transition-colors duration-500 ${
+        isDark ? 'bg-[#090e17] text-slate-100' : 'bg-[#f8fafc] text-slate-900'
+      }`}
       style={{
-        backgroundColor: '#f8fafc',
-        backgroundImage: `
-          linear-gradient(to right, rgba(226, 232, 240, 0.75) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(226, 232, 240, 0.75) 1px, transparent 1px)
-        `,
+        backgroundImage: isDark
+          ? `linear-gradient(to right, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
+             linear-gradient(to bottom, rgba(30, 41, 59, 0.5) 1px, transparent 1px)`
+          : `linear-gradient(to right, rgba(226, 232, 240, 0.75) 1px, transparent 1px),
+             linear-gradient(to bottom, rgba(226, 232, 240, 0.75) 1px, transparent 1px)`,
         backgroundSize: '24px 24px'
       }}
     >
@@ -85,6 +110,105 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         }
       `}</style>
 
+      {/* ======================================================== */}
+      {/* AESTHETIC HIGH-SHARPNESS SUN & MOON THEME TOGGLE SWITCH */}
+      {/* ======================================================== */}
+      <div className="fixed top-5 right-5 z-50">
+        <button
+          type="button"
+          onClick={() => setIsDark(!isDark)}
+          aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          className={`flex items-center p-1 rounded-full w-[68px] h-[32px] transition-all duration-300 cursor-pointer shadow-lg select-none relative focus:outline-none focus:ring-2 focus:ring-teal-500/40 ${
+            isDark
+              ? 'bg-[#151c28] border border-slate-700 shadow-black/50'
+              : 'bg-slate-200/95 border border-slate-300 shadow-slate-300/40'
+          }`}
+        >
+          {/* Track Icons with Razor-Sharp Geometry */}
+          <div className="w-full h-full flex items-center justify-between px-1.5 pointer-events-none">
+            {/* Left Track: Sun Icon (Sharp geometric outline) */}
+            <span className={`transition-opacity duration-200 flex items-center justify-center ${
+              !isDark ? 'opacity-0' : 'text-slate-400'
+            }`}>
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M6.7 17.3l-1.77 1.77M19.07 4.93l-1.77 1.77" />
+              </svg>
+            </span>
+
+            {/* Right Track: Moon Icon (Sharp crescent outline) */}
+            <span className={`transition-opacity duration-200 flex items-center justify-center ${
+              isDark ? 'opacity-0' : 'text-slate-500'
+            }`}>
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </span>
+          </div>
+
+          {/* Sliding Indicator Knob */}
+          <div
+            className={`absolute top-[3px] left-[3px] w-[26px] h-[26px] rounded-full flex items-center justify-center transition-transform duration-300 ease-out shadow-md pointer-events-none ${
+              isDark
+                ? 'translate-x-[36px] bg-gradient-to-br from-slate-650 to-slate-800 text-teal-300 border border-slate-600'
+                : 'translate-x-0 bg-white text-amber-500 border border-slate-200'
+            }`}
+          >
+            {isDark ? (
+              <svg 
+                width="13" 
+                height="13" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.4" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            ) : (
+              <svg 
+                width="13" 
+                height="13" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.4" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M6.7 17.3l-1.77 1.77M19.07 4.93l-1.77 1.77" />
+              </svg>
+            )}
+          </div>
+        </button>
+      </div>
+
       {/* Aesthetic Animated Background System */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
         {/* Calming Radial Breath Glow behind Central Card */}
@@ -95,13 +219,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
         {/* Ambient Floating Soft Teal Orb (Top Left) */}
         <div 
-          className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full bg-teal-300/15 blur-[100px]"
+          className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full bg-teal-400/12 blur-[100px]"
           style={{ animation: 'orbDrift1 18s ease-in-out infinite alternate' }}
         />
 
         {/* Ambient Floating Soft Mint/Emerald Orb (Bottom Right) */}
         <div 
-          className="absolute -bottom-28 -right-28 w-[540px] h-[540px] rounded-full bg-emerald-300/15 blur-[110px]"
+          className="absolute -bottom-28 -right-28 w-[540px] h-[540px] rounded-full bg-emerald-400/12 blur-[110px]"
           style={{ animation: 'orbDrift2 22s ease-in-out infinite alternate' }}
         />
 
@@ -123,7 +247,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         </div>
 
         {/* Serene Floating Micro-Medical Crosses & Pharmaceutical Dots */}
-        {/* Cross 1 (Top Right) */}
         <div 
           className="absolute top-20 right-[15%] text-teal-600/35 font-mono text-xl select-none"
           style={{ animation: 'floatCrossA 10s ease-in-out infinite' }}
@@ -131,7 +254,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           +
         </div>
 
-        {/* Cross 2 (Bottom Left) */}
         <div 
           className="absolute bottom-24 left-[14%] text-teal-600/30 font-mono text-2xl select-none"
           style={{ animation: 'floatCrossB 14s ease-in-out infinite' }}
@@ -139,7 +261,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           +
         </div>
 
-        {/* Cross 3 (Top Left) */}
         <div 
           className="absolute top-28 left-[18%] text-emerald-600/25 font-mono text-lg select-none"
           style={{ animation: 'floatCrossA 12s ease-in-out infinite 2s' }}
@@ -147,27 +268,28 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           +
         </div>
 
-        {/* Floating Capsule Silhouette Dot (Bottom Right) */}
         <div 
           className="absolute bottom-36 right-[20%] w-3 h-5 rounded-full border border-teal-500/30 select-none rotate-45"
           style={{ animation: 'floatCrossB 16s ease-in-out infinite 1s' }}
         />
 
-        {/* Micro Pulse Dot (Center Left) */}
         <div 
           className="absolute top-1/2 left-[8%] w-2 h-2 rounded-full bg-teal-500/25 select-none animate-ping"
           style={{ animationDuration: '4s' }}
         />
 
-        {/* Micro Pulse Dot (Center Right) */}
         <div 
           className="absolute top-[45%] right-[9%] w-2 h-2 rounded-full bg-emerald-500/25 select-none animate-ping"
           style={{ animationDuration: '5s' }}
         />
       </div>
 
-      {/* Central White Login Card */}
-      <div className="bg-white rounded-[24px] sm:rounded-[28px] border border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] max-w-[370px] w-full p-7 sm:p-8 relative z-10 transition-all">
+      {/* Central Login Card (Adaptive Light/Dark Mode) */}
+      <div className={`rounded-[24px] sm:rounded-[28px] border max-w-[370px] w-full p-7 sm:p-8 relative z-10 transition-all duration-300 ${
+        isDark
+          ? 'bg-[#111827]/95 border-slate-850 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65)]'
+          : 'bg-white border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]'
+      }`}>
         
         {/* Upper-Right Corner Info Icon with Hover Speech Bubble */}
         <div 
@@ -178,7 +300,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           <button
             type="button"
             onClick={() => setShowInfo(!showInfo)}
-            className="w-6 h-6 rounded-full border-[1.5px] border-[#0d9488] text-[#0d9488] hover:bg-[#0d9488]/10 flex items-center justify-center font-bold text-xs transition-colors cursor-pointer select-none"
+            className={`w-6 h-6 rounded-full border-[1.5px] flex items-center justify-center font-bold text-xs transition-colors cursor-pointer select-none ${
+              isDark
+                ? 'border-teal-400 text-teal-400 hover:bg-teal-400/10'
+                : 'border-[#0d9488] text-[#0d9488] hover:bg-[#0d9488]/10'
+            }`}
             aria-label="About Us Information"
           >
             i
@@ -186,18 +312,28 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
           {/* Tooltip / Speech Bubble */}
           <div 
-            className={`absolute top-8 right-0 w-60 bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xl transition-all duration-200 pointer-events-auto ${
+            className={`absolute top-8 right-0 w-60 border rounded-2xl p-4 shadow-xl transition-all duration-200 pointer-events-auto ${
+              isDark
+                ? 'bg-slate-900 border-slate-750 text-slate-150'
+                : 'bg-white border-slate-200/90 text-slate-800'
+            } ${
               showInfo ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-1 invisible pointer-events-none'
             }`}
           >
             {/* Speech bubble pointer notch pointing directly to the (i) circle */}
-            <div className="absolute -top-1.5 right-2 w-3 h-3 bg-white border-t border-l border-slate-200/90 rotate-45" />
+            <div className={`absolute -top-1.5 right-2 w-3 h-3 border-t border-l rotate-45 ${
+              isDark ? 'bg-slate-900 border-slate-750' : 'bg-white border-slate-200/90'
+            }`} />
 
             <div className="relative z-10 space-y-1">
-              <h4 className="text-[11px] font-black tracking-wide text-[#0d9488] uppercase">
+              <h4 className={`text-[11px] font-black tracking-wide uppercase ${
+                isDark ? 'text-teal-400' : 'text-[#0d9488]'
+              }`}>
                 ABOUT US
               </h4>
-              <p className="text-xs font-bold text-slate-800 leading-snug">
+              <p className={`text-xs font-bold leading-snug ${
+                isDark ? 'text-slate-200' : 'text-slate-800'
+              }`}>
                 QUANTUM is a specialized industrial software lab.
               </p>
             </div>
@@ -231,7 +367,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </defs>
 
               {/* Ambient Background Circle Badge */}
-              <circle cx="34" cy="34" r="32" fill="#f0fdfa" stroke="#ccfbf1" strokeWidth="1.5" />
+              <circle 
+                cx="34" 
+                cy="34" 
+                r="32" 
+                fill={isDark ? '#0f172a' : '#f0fdfa'} 
+                stroke={isDark ? '#1e293b' : '#ccfbf1'} 
+                strokeWidth="1.5" 
+              />
 
               {/* Pharmaceutical Medical Plus & Capsule Form */}
               <g filter="url(#logoDepthShadow)">
@@ -259,11 +402,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </svg>
           </div>
 
-          {/* Titles: PHARMA (black) PLUS (teal & tilted) */}
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-950 font-sans">
+          {/* Titles: PHARMA (black in light, white in dark) PLUS (teal & tilted) */}
+          <h1 className={`text-xl sm:text-2xl font-black tracking-tight font-sans ${
+            isDark ? 'text-white' : 'text-slate-950'
+          }`}>
             PHARMA <span className="text-[#0d9488] italic">PLUS</span>
           </h1>
-          <p className="text-[10px] tracking-[0.25em] font-bold text-slate-500 uppercase mt-1">
+          <p className={`text-[10px] tracking-[0.25em] font-bold uppercase mt-1 ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`}>
             SECURE ACCESS PORTAL
           </p>
         </div>
@@ -280,7 +427,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <form onSubmit={handleLogin} className="space-y-4">
           {/* Username / Employee ID Field */}
           <div>
-            <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
+            <label className={`text-[11px] font-bold block mb-1.5 ${
+              isDark ? 'text-slate-300' : 'text-slate-700'
+            }`}>
               ইউজারনেম (USERNAME)
             </label>
             <input
@@ -290,13 +439,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               placeholder="e.g. admin"
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-medium"
+              className={`w-full px-3.5 py-2.5 border rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-medium ${
+                isDark
+                  ? 'bg-slate-800/90 border-slate-700 text-white focus:bg-slate-800'
+                  : 'bg-[#f1f5f9] border-slate-200 text-slate-800 focus:bg-white'
+              }`}
             />
           </div>
 
           {/* Password Field */}
           <div>
-            <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
+            <label className={`text-[11px] font-bold block mb-1.5 ${
+              isDark ? 'text-slate-300' : 'text-slate-700'
+            }`}>
               পাসওয়ার্ড (PASSWORD)
             </label>
             <div className="relative flex items-center">
@@ -306,12 +461,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-3.5 pr-10 py-2.5 bg-[#f1f5f9] border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:bg-white focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-mono"
+                className={`w-full pl-3.5 pr-10 py-2.5 border rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-mono ${
+                  isDark
+                    ? 'bg-slate-800/90 border-slate-700 text-white focus:bg-slate-800'
+                    : 'bg-[#f1f5f9] border-slate-200 text-slate-800 focus:bg-white'
+                }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2.5 p-1 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="absolute right-2.5 p-1 text-slate-400 hover:text-slate-300 transition-colors cursor-pointer"
                 title={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -331,7 +490,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         </form>
 
         {/* Divider */}
-        <div className="border-t border-slate-200/80 my-5" />
+        <div className={`border-t my-5 ${isDark ? 'border-slate-800' : 'border-slate-200/80'}`} />
 
         {/* Footer Brand with Teal Accent */}
         <div className="text-center">

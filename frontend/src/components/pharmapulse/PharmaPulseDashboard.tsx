@@ -65,7 +65,13 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   const branches = BranchService.getBranches();
 
   // Theme & Language
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('pharmapulse_dark_mode') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [language, setLanguage] = useState<'EN' | 'BN'>('EN');
 
   // Active Cart State featuring cold chain, 28-day open expiry, and Rx metadata
@@ -114,13 +120,16 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     }, 3500);
   };
 
-  // Synchronize Dark Mode with DOM
+  // Synchronize Dark Mode with DOM and localStorage
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+    try {
+      localStorage.setItem('pharmapulse_dark_mode', isDarkMode ? 'true' : 'false');
+    } catch {}
   }, [isDarkMode]);
 
   // Real-time calculation engine
