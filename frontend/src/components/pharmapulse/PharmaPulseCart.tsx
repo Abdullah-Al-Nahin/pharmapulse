@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { PharmaCartItem, AlternativeDrug } from '../../types/pharmapulse';
 import { PharmacyService } from '../../services/pharmacyService';
+import { useAuth } from '../../context/AuthContext';
 
 interface PharmaPulseCartProps {
   cart: PharmaCartItem[];
@@ -75,6 +76,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
   onOpenSmartBarcodeModal,
   refreshTrigger = 0
 }) => {
+  const { canViewProfits, canViewCosts } = useAuth();
   const [showProfitBreakdown, setShowProfitBreakdown] = useState<boolean>(true);
   const totalUnits = cart.reduce((sum, item) => sum + item.qty, 0);
 
@@ -361,20 +363,24 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
             <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold">
               {cart.length} Items
             </span>
-            {/* Profit by Medicine Indicator */}
-            <button
-              onClick={() => setShowProfitBreakdown(!showProfitBreakdown)}
-              title="Toggle Profit by Medicine breakdown"
-              className="px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-200 transition"
-            >
-              <TrendingUp className="w-3 h-3 text-emerald-600" />
-              <span>Profit by Medicine ({showProfitBreakdown ? 'ON' : 'OFF'})</span>
-            </button>
+            {/* Profit by Medicine Indicator (Admin/Manager only) */}
+            {canViewProfits && (
+              <button
+                onClick={() => setShowProfitBreakdown(!showProfitBreakdown)}
+                title="Toggle Profit by Medicine breakdown"
+                className="px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-200 transition"
+              >
+                <TrendingUp className="w-3 h-3 text-emerald-600" />
+                <span>Profit by Medicine ({showProfitBreakdown ? 'ON' : 'OFF'})</span>
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-3 text-xs">
-            <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-              Profit: ৳{totalCartProfit.toFixed(2)} ({overallCartMargin.toFixed(0)}%)
-            </span>
+            {canViewProfits && (
+              <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                Profit: ৳{totalCartProfit.toFixed(2)} ({overallCartMargin.toFixed(0)}%)
+              </span>
+            )}
             <span className="font-mono text-[11px] text-slate-400 font-semibold">
               Order #RX-2026-9041
             </span>
@@ -393,7 +399,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                <th className="py-2.5 px-4">Medicine, Specialty & Profit Breakdown</th>
+                <th className="py-2.5 px-4">{canViewProfits ? 'Medicine, Specialty & Profit Breakdown' : 'Medicine & Specialty Details'}</th>
                 <th className="py-2.5 px-2.5">Batch & FEFO</th>
                 <th className="py-2.5 px-2.5">Exp. Date</th>
                 <th className="py-2.5 px-2.5 text-right">Unit (৳)</th>
@@ -476,8 +482,8 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                           {item.sub} • {item.company}
                         </span>
 
-                        {/* Feature ④ Profit by Medicine display */}
-                        {showProfitBreakdown && (
+                        {/* Feature ④ Profit by Medicine display (Masked for Cashiers) */}
+                        {showProfitBreakdown && canViewProfits && (
                           <div className="mt-1 p-1.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/40 flex items-center justify-between text-[10px] text-emerald-900 dark:text-emerald-300 font-mono">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-slate-500 dark:text-slate-400">
@@ -642,15 +648,23 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                 {totalUnits} units
               </strong>
             </span>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-mono">
-              <TrendingUp className="w-3.5 h-3.5" />
-              Bill Profit: <strong className="font-bold">৳{totalCartProfit.toFixed(2)}</strong> ({overallCartMargin.toFixed(1)}% Margin)
-            </span>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="text-slate-500">
-              Purchase Cost: <strong className="font-mono text-slate-700 dark:text-slate-300">৳{totalCartCost.toFixed(2)}</strong>
-            </span>
+            {canViewProfits && (
+              <>
+                <span className="text-slate-300 dark:text-slate-700">|</span>
+                <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-mono">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  Bill Profit: <strong className="font-bold">৳{totalCartProfit.toFixed(2)}</strong> ({overallCartMargin.toFixed(1)}% Margin)
+                </span>
+              </>
+            )}
+            {canViewCosts && (
+              <>
+                <span className="text-slate-300 dark:text-slate-700">|</span>
+                <span className="text-slate-500">
+                  Purchase Cost: <strong className="font-mono text-slate-700 dark:text-slate-300">৳{totalCartCost.toFixed(2)}</strong>
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-sky-600 dark:text-sky-400 font-semibold">

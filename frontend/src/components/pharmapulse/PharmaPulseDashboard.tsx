@@ -88,7 +88,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
   // Checkout calculations
   const [loyaltyApplied, setLoyaltyApplied] = useState(false);
-  const [specialDiscPercent, setSpecialDiscPercent] = useState(5);
+  const [specialDiscPercent, setSpecialDiscPercent] = useState<number>(5);
+  const [isVatEnabled, setIsVatEnabled] = useState<boolean>(true);
+  const [vatPercent, setVatPercent] = useState<number>(5);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'mfs' | 'due_credit'>('cash');
   const [tenderedAmount, setTenderedAmount] = useState<number>(1000);
   const [heldCount, setHeldCount] = useState<number>(2);
@@ -128,11 +130,11 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   }, 0);
 
   const loyaltyDiscount = loyaltyApplied ? 42.00 : 0.00;
-  const specialDiscount = (subtotal * specialDiscPercent) / 100;
+  const specialDiscount = (subtotal * Math.max(0, specialDiscPercent)) / 100;
   const discount = specialDiscount + loyaltyDiscount;
 
   const taxableAmount = Math.max(0, subtotal - discount);
-  const tax = taxableAmount * 0.05; // 5% Govt VAT
+  const tax = isVatEnabled ? (taxableAmount * (vatPercent / 100)) : 0;
 
   const calculatedTotal = taxableAmount + tax;
   const grandTotal = Math.floor(calculatedTotal);
@@ -623,11 +625,22 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                       );
                     }}
                     specialDiscPercent={specialDiscPercent}
+                    onChangeSpecialDiscPercent={setSpecialDiscPercent}
                     onToggleSpecialDisc={() => {
                       const newDisc = specialDiscPercent === 5 ? 10 : 5;
                       setSpecialDiscPercent(newDisc);
                       addToast(`Special discount adjusted to ${newDisc}%`, 'info');
                     }}
+                    isVatEnabled={isVatEnabled}
+                    onToggleVat={() => {
+                      setIsVatEnabled(!isVatEnabled);
+                      addToast(
+                        !isVatEnabled ? `Govt VAT (${vatPercent}%) applied` : 'Govt VAT removed (0%)',
+                        'info'
+                      );
+                    }}
+                    vatPercent={vatPercent}
+                    onChangeVatPercent={setVatPercent}
                     paymentMethod={paymentMethod}
                     onSelectPaymentMethod={(m) => {
                       setPaymentMethod(m);

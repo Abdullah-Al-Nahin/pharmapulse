@@ -37,7 +37,12 @@ interface PharmaPulseCheckoutProps {
   loyaltyApplied: boolean;
   onToggleLoyalty: () => void;
   specialDiscPercent: number;
-  onToggleSpecialDisc: () => void;
+  onChangeSpecialDiscPercent?: (percent: number) => void;
+  onToggleSpecialDisc?: () => void;
+  isVatEnabled?: boolean;
+  onToggleVat?: () => void;
+  vatPercent?: number;
+  onChangeVatPercent?: (percent: number) => void;
   paymentMethod: 'cash' | 'card' | 'mfs' | 'due_credit';
   onSelectPaymentMethod: (method: 'cash' | 'card' | 'mfs' | 'due_credit') => void;
   tenderedAmount: number;
@@ -63,7 +68,12 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
   loyaltyApplied,
   onToggleLoyalty,
   specialDiscPercent,
+  onChangeSpecialDiscPercent,
   onToggleSpecialDisc,
+  isVatEnabled = true,
+  onToggleVat,
+  vatPercent = 5,
+  onChangeVatPercent,
   paymentMethod,
   onSelectPaymentMethod,
   tenderedAmount,
@@ -298,26 +308,60 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               ৳ {subtotal.toFixed(2)}
             </span>
           </div>
+          {/* Special Discount Row */}
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-1.5">
-              <span>Special Discount ({specialDiscPercent}%)</span>
-              <button
-                onClick={onToggleSpecialDisc}
-                className="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold underline"
-              >
-                Change
-              </button>
+              <span>Special Discount</span>
+              <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md overflow-hidden shadow-2xs">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={specialDiscPercent}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    const cleanVal = isNaN(val) ? 0 : Math.max(0, Math.min(100, val));
+                    if (onChangeSpecialDiscPercent) {
+                      onChangeSpecialDiscPercent(cleanVal);
+                    } else if (onToggleSpecialDisc) {
+                      onToggleSpecialDisc();
+                    }
+                  }}
+                  className="w-10 px-1 py-0.5 text-center font-mono font-bold text-xs bg-transparent text-slate-900 dark:text-white focus:outline-none"
+                />
+                <span className="px-1.5 py-0.5 text-[10px] font-extrabold bg-emerald-500 text-white select-none">
+                  %
+                </span>
+              </div>
             </div>
             <span className="font-mono text-orange-600 font-semibold">
               - ৳ {discount.toFixed(2)}
             </span>
           </div>
+
+          {/* VAT / Govt Tax Row */}
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span>VAT / Govt Tax (5%)</span>
-            <span className="font-mono text-slate-800 dark:text-slate-200 font-semibold">
-              + ৳ {tax.toFixed(2)}
+            <div className="flex items-center gap-1.5">
+              <span>VAT / Govt Tax ({vatPercent}%)</span>
+              <button
+                type="button"
+                onClick={onToggleVat}
+                className={`text-[10px] font-bold underline cursor-pointer transition-colors ${
+                  isVatEnabled
+                    ? 'text-rose-600 dark:text-rose-400 hover:text-rose-700'
+                    : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'
+                }`}
+              >
+                {isVatEnabled ? 'Remove' : 'Add'}
+              </button>
+            </div>
+            <span className={`font-mono font-semibold ${isVatEnabled ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}`}>
+              {isVatEnabled ? `+ ৳ ${tax.toFixed(2)}` : '+ ৳ 0.00'}
             </span>
           </div>
+
+          {/* Round Off Adjustment */}
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <span>Round Off Adjustment</span>
             <span className="font-mono text-slate-400">
@@ -333,7 +377,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               NET PAYABLE (নিট প্রদেয়)
             </span>
             <span className="text-[10px] text-emerald-700 dark:text-emerald-400">
-              Includes 5% Govt Tax
+              {isVatEnabled ? `Includes ${vatPercent}% Govt Tax` : '0% Tax / Tax Exempt'}
             </span>
           </div>
           <div className="flex items-baseline gap-0.5">
