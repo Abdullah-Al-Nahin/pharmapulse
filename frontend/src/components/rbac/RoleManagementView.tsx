@@ -821,7 +821,14 @@ export const RoleManagementView: React.FC = () => {
             </div>
 
             <button
-              onClick={() => setShowAddEmployeeModal(true)}
+              onClick={() => {
+                setNewEmpName('');
+                setNewEmpEmployeeId('');
+                setNewEmpPassword('');
+                setNewEmpPhone('');
+                setNewEmpLicense('');
+                setShowAddEmployeeModal(true);
+              }}
               className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
             >
               <Plus className="w-4 h-4" />
@@ -835,7 +842,7 @@ export const RoleManagementView: React.FC = () => {
               <Search className="w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search staff by name, email, or phone..."
+                placeholder="Search staff by name, Employee ID, or phone..."
                 value={employeeSearch}
                 onChange={(e) => setEmployeeSearch(e.target.value)}
                 className="bg-transparent border-none outline-none w-full text-xs text-slate-800 placeholder-slate-400"
