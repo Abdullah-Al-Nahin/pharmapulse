@@ -6,7 +6,8 @@ import { userApi } from '../lib/api';
 
 export interface EmployeeCreateInput {
   name: string;
-  email: string;
+  employeeId: string;
+  email?: string;
   phone?: string;
   password?: string;
   roleCode: PredefinedRoleCode | string;
@@ -22,7 +23,7 @@ interface AuthContextType {
   allUsers: AuthUser[];
   token: string;
   isAuthenticated: boolean;
-  login: (email: string, password?: string) => { success: boolean; message?: string; user?: AuthUser };
+  login: (employeeIdOrEmail: string, password?: string) => { success: boolean; message?: string; user?: AuthUser };
   logout: () => void;
   switchUser: (userId: string) => void;
   switchRole: (roleCode: PredefinedRoleCode | string) => void;
@@ -230,23 +231,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Login handler
-  const login = (email: string, password?: string): { success: boolean; message?: string; user?: AuthUser } => {
-    const cleanEmail = email.trim().toLowerCase();
+  // Login handler with Employee ID support
+  const login = (employeeIdOrEmail: string, password?: string): { success: boolean; message?: string; user?: AuthUser } => {
+    const cleanId = employeeIdOrEmail.trim().toLowerCase();
     let user = allUsers.find(
       (u) =>
-        u.email.toLowerCase() === cleanEmail ||
-        u.name.toLowerCase() === cleanEmail ||
-        u.id.toLowerCase() === cleanEmail
+        (u.employeeId && u.employeeId.toLowerCase() === cleanId) ||
+        u.email.toLowerCase() === cleanId ||
+        u.name.toLowerCase() === cleanId ||
+        u.id.toLowerCase() === cleanId
     );
 
-    // Fallback if not yet in allUsers
-    if (!user && (cleanEmail === 'admin@1' || cleanEmail === 'admin')) {
+    // Fallback if not yet in allUsers (e.g. root Super Admin)
+    if (!user && (cleanId === 'admin' || cleanId === 'admin@1' || cleanId === 'super_admin' || cleanId === 'super admin')) {
       user = PRECONFIGURED_USERS[0];
     }
 
     if (!user) {
-      return { success: false, message: 'Invalid credentials. User not found in system directory.' };
+      return { success: false, message: 'Invalid Employee ID. No registered staff found with this ID.' };
     }
 
     // Validate password if user has one configured
@@ -401,12 +403,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const createEmployee = (data: EmployeeCreateInput): { success: boolean; message?: string; user?: AuthUser } => {
     const role = allRoles.find((r) => r.code === data.roleCode || r.id === data.roleCode) || allRoles[3]; // default cashier
     const newId = `user-emp-${Date.now()}`;
+    const cleanEmpId = (data.employeeId || data.email || data.name || 'EMP').trim();
+    const generatedEmail = data.email?.trim() || (cleanEmpId.includes('@') ? cleanEmpId : `${cleanEmpId.toLowerCase()}@pharma.local`);
     const newUser: AuthUser = {
       id: newId,
+      employeeId: cleanEmpId,
       name: data.name.trim(),
-      email: data.email.trim(),
+      email: generatedEmail,
       phone: data.phone?.trim() || undefined,
-      password: data.password?.trim() || 'pharma123',
+      password: data.password?.trim() || '1800',
       roleCode: role.code,
       roleName: role.name,
       branchId: data.branchId || 'br-snakra',
@@ -427,7 +432,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return {
       success: true,
-      message: `Employee '${newUser.name}' created and saved to database.`,
+      message: `Employee '${newUser.name}' (ID: ${cleanEmpId}) created and saved to database.`,
       user: newUser,
     };
   };

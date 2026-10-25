@@ -129,6 +129,7 @@ export interface RoleDefinition {
 // 3. User Representation
 export interface AuthUser {
   id: string;
+  employeeId?: string;
   name: string;
   email: string;
   phone?: string;

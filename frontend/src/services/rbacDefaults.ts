@@ -291,6 +291,7 @@ export const PRECONFIGURED_ROLES: RoleDefinition[] = [
 export const PRECONFIGURED_USERS: AuthUser[] = [
   {
     id: 'user-super-admin-01',
+    employeeId: 'admin',
     name: 'Super Admin',
     email: 'admin@1',
     phone: '+880 1700-000000',

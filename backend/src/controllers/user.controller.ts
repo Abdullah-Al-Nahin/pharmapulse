@@ -27,6 +27,7 @@ export class UserController {
       // Map to frontend AuthUser format
       const mapped = users.map((u: any) => ({
         id: u.id,
+        employeeId: u.username || u.email,
         name: u.name || u.username,
         email: u.email,
         phone: u.phone,
@@ -52,23 +53,27 @@ export class UserController {
 
   static async createUser(req: Request, res: Response) {
     try {
-      const { name, email, phone, roleCode, branchId, branchName, licenseNumber, password } = req.body;
+      const { name, employeeId, email, phone, roleCode, branchId, branchName, licenseNumber, password } = req.body;
       const role = await prisma.role.findFirst({ where: { slug: roleCode } });
       const roleId = role ? role.id : (await prisma.role.findFirst())?.id || 'role-default';
+      const cleanEmpId = (employeeId || email || name || 'emp').trim();
       const newId = `user-emp-${Date.now()}`;
-      const username = (email || name || 'user').split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      const username = cleanEmpId.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+      const emailToSave = cleanEmpId.includes('@') ? cleanEmpId : `${cleanEmpId.toLowerCase()}@pharma.local`;
       const passToSave = password || '1800';
 
       await prisma.$executeRawUnsafe(`
         INSERT INTO "users" ("id", "username", "fullName", "email", "phone", "passwordHash", "roleId", "branchId", "branchName", "licenseNumber", "updatedAt")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-      `, newId, username, name, email, phone || null, passToSave, roleId, branchId || 'br-snakra', branchName || 'snakra', licenseNumber || null);
+      `, newId, username, name, emailToSave, phone || null, passToSave, roleId, branchId || 'br-snakra', branchName || 'snakra', licenseNumber || null);
 
       res.status(201).json({
         id: newId,
+        employeeId: username,
         name,
-        email,
+        email: emailToSave,
         phone,
+        password: passToSave,
         roleCode: role?.slug || 'cashier',
         roleName: role?.name || 'Cashier',
         branchId: branchId || 'br-snakra',
@@ -84,9 +89,9 @@ export class UserController {
   static async updateUser(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { name, email, phone, roleCode, branchId, branchName, licenseNumber } = req.body;
+      const { name, employeeId, email, phone, roleCode, branchId, branchName, licenseNumber, password } = req.body;
 
-      let roleId = undefined;
+      let roleId = null;
       if (roleCode) {
         const role = await prisma.role.findFirst({ where: { slug: roleCode } });
         if (role) roleId = role.id;
@@ -98,16 +103,19 @@ export class UserController {
           "fullName" = COALESCE($2, "fullName"),
           "email" = COALESCE($3, "email"),
           "phone" = COALESCE($4, "phone"),
-          "roleId" = COALESCE($5, "roleId"),
-          "branchId" = COALESCE($6, "branchId"),
-          "branchName" = COALESCE($7, "branchName"),
-          "licenseNumber" = COALESCE($8, "licenseNumber"),
+          "passwordHash" = COALESCE($5, "passwordHash"),
+          "roleId" = COALESCE($6, "roleId"),
+          "branchId" = COALESCE($7, "branchId"),
+          "branchName" = COALESCE($8, "branchName"),
+          "licenseNumber" = COALESCE($9, "licenseNumber"),
+          "username" = COALESCE($10, "username"),
           "updatedAt" = NOW()
         WHERE "id" = $1
-      `, id, name, email, phone, roleId, branchId, branchName, licenseNumber);
+      `, id, name || null, email || null, phone || null, password || null, roleId, branchId || null, branchName || null, licenseNumber || null, employeeId || null);
 
       res.json({ success: true, message: 'User updated in database' });
     } catch (error: any) {
+      console.error('Error updating user:', error);
       res.status(500).json({ error: error.message });
     }
   }
