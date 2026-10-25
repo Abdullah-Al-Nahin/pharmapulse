@@ -11,6 +11,7 @@ export class UserController {
           u."fullName" as name,
           u.email,
           u.phone,
+          u."passwordHash" as password,
           u."branchId",
           u."branchName",
           u."licenseNumber",
@@ -29,6 +30,7 @@ export class UserController {
         name: u.name || u.username,
         email: u.email,
         phone: u.phone,
+        password: u.password || '1800',
         roleCode: u.roleCode || 'cashier',
         roleName: u.roleName || 'Cashier',
         branchId: u.branchId || 'br-snakra',
@@ -55,11 +57,12 @@ export class UserController {
       const roleId = role ? role.id : (await prisma.role.findFirst())?.id || 'role-default';
       const newId = `user-emp-${Date.now()}`;
       const username = (email || name || 'user').split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      const passToSave = password || '1800';
 
       await prisma.$executeRawUnsafe(`
         INSERT INTO "users" ("id", "username", "fullName", "email", "phone", "passwordHash", "roleId", "branchId", "branchName", "licenseNumber", "updatedAt")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-      `, newId, username, name, email, phone || null, 'hashed_pw_pharma123', roleId, branchId || 'br-snakra', branchName || 'snakra', licenseNumber || null);
+      `, newId, username, name, email, phone || null, passToSave, roleId, branchId || 'br-snakra', branchName || 'snakra', licenseNumber || null);
 
       res.status(201).json({
         id: newId,

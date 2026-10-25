@@ -62,7 +62,7 @@ export const PharmacyCommandCenter: React.FC<PharmacyCommandCenterProps> = ({
   onOpenExpiryView,
   onNavigateTab,
 }) => {
-  const { currentUser, allUsers } = useAuth();
+  const { currentUser, allUsers, isSuperAdmin } = useAuth();
   const [version, setVersion] = useState(0);
   const [lastRefreshed, setLastRefreshed] = useState<string>('Just now');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -1195,13 +1195,15 @@ export const PharmacyCommandCenter: React.FC<PharmacyCommandCenterProps> = ({
 
           <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
             <span className="text-[11px]">Roster Active</span>
-            <button
-              onClick={() => onNavigateTab && onNavigateTab('settings')}
-              className="text-purple-600 dark:text-purple-400 font-bold hover:underline flex items-center gap-0.5 text-[11px]"
-            >
-              <span>Manage Roles</span>
-              <ChevronRight className="w-3 h-3" />
-            </button>
+            {(isSuperAdmin || currentUser?.roleCode === 'super_admin') && (
+              <button
+                onClick={() => onNavigateTab && onNavigateTab('settings')}
+                className="text-purple-600 dark:text-purple-400 font-bold hover:underline flex items-center gap-0.5 text-[11px]"
+              >
+                <span>Manage Roles</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
         </div>
 

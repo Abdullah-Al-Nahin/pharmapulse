@@ -60,7 +60,22 @@ const LEGACY_MOCK_IDS = new Set([
   'user-purchase',
   'user-accountant',
   'user-auditor',
+  'user-nahin3-superadmin',
+  'user-nahin1-admin',
+  'user-nahin1-acc',
+  'user-nahin-cashier',
+  'user-pharmacist-01',
+  'user-storekeeper-01',
+  'user-purchase-01',
+  'user-auditor-01',
+  'be08c99a-5b9c-4265-88e5-cd3605fa4fcd',
 ]);
+
+const isLegacyUser = (u: any) =>
+  !u ||
+  LEGACY_MOCK_IDS.has(u.id) ||
+  (typeof u.email === 'string' && (u.email.endsWith('@phamerp.io') || u.email.includes('hospital.com'))) ||
+  (typeof u.name === 'string' && u.name.toLowerCase().startsWith('nahin'));
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Clear legacy v2 storage if present
@@ -98,12 +113,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Filter out any mock personas
-          const cleanUsers = parsed.filter((u: any) => !LEGACY_MOCK_IDS.has(u.id));
+          // Filter out any mock personas and legacy test employees
+          const cleanUsers = parsed.filter((u: any) => !isLegacyUser(u));
           const existingIds = new Set(cleanUsers.map((u: any) => u.id));
           const missing = PRECONFIGURED_USERS.filter((pu) => !existingIds.has(pu.id));
           const merged = [...cleanUsers, ...missing];
-          return merged.length > 0 ? merged : PRECONFIGURED_USERS;
+          if (merged.length > 0) {
+            localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(merged));
+            return merged;
+          }
         }
       }
     } catch {
@@ -112,7 +130,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return PRECONFIGURED_USERS;
   });
 
-  // Load current active user ID (defaults to nahin3 if available)
+  // Load current active user ID (defaults to single super admin admin@1)
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_USER_ID);
@@ -122,7 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch {
       // Fallback
     }
-    return PRECONFIGURED_USERS.find((u) => u.id === 'user-nahin3-superadmin')?.id || PRECONFIGURED_USERS[0].id;
+    return PRECONFIGURED_USERS[0].id;
   });
 
   // Load authentication status (defaults to true if session flag is set)
@@ -165,14 +183,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       userApi.getUsers().then((dbUsers: any) => {
         if (!isMounted) return;
         if (Array.isArray(dbUsers) && dbUsers.length > 0) {
+          const cleanDbUsers = dbUsers.filter((u: any) => !isLegacyUser(u));
+          const finalUsers = cleanDbUsers.length > 0 ? cleanDbUsers : PRECONFIGURED_USERS;
           setAllUsers((prev) => {
-            if (JSON.stringify(prev) === JSON.stringify(dbUsers)) {
+            if (JSON.stringify(prev) === JSON.stringify(finalUsers)) {
               return prev;
             }
             try {
-              localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(dbUsers));
+              localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(finalUsers));
             } catch {}
-            return dbUsers;
+            return finalUsers;
           });
         }
       }).catch((e) => console.error('Database user sync failed:', e));
@@ -213,12 +233,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Login handler
   const login = (email: string, password?: string): { success: boolean; message?: string; user?: AuthUser } => {
     const cleanEmail = email.trim().toLowerCase();
-    const user = allUsers.find(
+    let user = allUsers.find(
       (u) =>
         u.email.toLowerCase() === cleanEmail ||
         u.name.toLowerCase() === cleanEmail ||
         u.id.toLowerCase() === cleanEmail
     );
+
+    // Fallback if not yet in allUsers
+    if (!user && (cleanEmail === 'admin@1' || cleanEmail === 'admin')) {
+      user = PRECONFIGURED_USERS[0];
+    }
 
     if (!user) {
       return { success: false, message: 'Invalid credentials. User not found in system directory.' };

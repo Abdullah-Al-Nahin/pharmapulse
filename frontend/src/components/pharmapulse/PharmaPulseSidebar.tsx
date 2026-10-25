@@ -73,8 +73,11 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
   const { hasAnyPermission, isSuperAdmin, currentUser, logout } = useAuth();
 
   const isTabAllowed = (tabId: PharmaNavTab) => {
-    if (isSuperAdmin) return true;
-    if (tabId === 'settings') return true; // Keep settings accessible to inspect/configure roles
+    // ONLY Super Admin can view or access Settings & Roles
+    if (tabId === 'settings') {
+      return isSuperAdmin || currentUser?.roleCode === 'super_admin';
+    }
+    if (isSuperAdmin || currentUser?.roleCode === 'super_admin') return true;
     const perms = TAB_PERMISSIONS[tabId];
     if (!perms || perms.length === 0) return true;
     return hasAnyPermission(perms);

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { PriceHistoryRecord } from '../../types/pharmapulse';
 import { PharmacyService } from '../../services/pharmacyService';
+import { useAuth } from '../../context/AuthContext';
 
 interface PriceHistoryModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const PriceHistoryModal: React.FC<PriceHistoryModalProps> = ({
   onClose,
   initialMedicineName = 'Napa 500',
 }) => {
+  const { canViewCosts, isSuperAdmin } = useAuth();
   const medicines = PharmacyService.getMedicines();
   const allBatches = PharmacyService.getBatches();
 
@@ -40,6 +42,7 @@ export const PriceHistoryModal: React.FC<PriceHistoryModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
+  if (!canViewCosts && !isSuperAdmin) return null;
 
   const currentMed = medicines.find((m) => m.id === selectedMedId) || medicines[0];
   const medName = currentMed?.name || initialMedicineName;

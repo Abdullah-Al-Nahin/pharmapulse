@@ -167,13 +167,15 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
             <Scan className="w-3 h-3 text-emerald-600" />
             <span>Smart Barcode</span>
           </button>
-          <button
-            onClick={() => onOpenPriceHistoryModal && onOpenPriceHistoryModal('Napa 500')}
-            className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1.5 shadow-2xs hover:bg-white dark:hover:bg-slate-700 transition"
-          >
-            <History className="w-3 h-3 text-indigo-600" />
-            <span>Price History</span>
-          </button>
+          {canViewCosts && (
+            <button
+              onClick={() => onOpenPriceHistoryModal && onOpenPriceHistoryModal('Napa 500')}
+              className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1.5 shadow-2xs hover:bg-white dark:hover:bg-slate-700 transition"
+            >
+              <History className="w-3 h-3 text-indigo-600" />
+              <span>Price History</span>
+            </button>
+          )}
           <div className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1.5 shadow-2xs">
             <kbd className="text-emerald-600 dark:text-emerald-400 font-mono font-bold bg-white dark:bg-slate-900 px-1 rounded border border-slate-200 dark:border-slate-700 text-[10px]">
               F4

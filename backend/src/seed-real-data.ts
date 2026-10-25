@@ -29,20 +29,24 @@ async function main() {
   console.log("Cleared existing data.");
 
   // 2. Roles & Users
-  const adminRole = await prisma.role.create({
-    data: { name: 'Admin', slug: 'admin', isSystem: true }
-  });
-  const pharmacistRole = await prisma.role.create({
-    data: { name: 'Pharmacist', slug: 'pharmacist', isSystem: true }
+  const superAdminRole = await prisma.role.create({
+    data: {
+      id: '82ef9503-65bd-42c6-a4ab-a304b69e69fa',
+      name: 'Super Admin',
+      slug: 'super_admin',
+      description: 'Root system administrator with unrestricted system access',
+      isSystem: true
+    }
   });
 
   const adminUser = await prisma.user.create({
     data: {
+      id: 'user-super-admin-01',
       username: 'admin',
-      email: 'admin@hospital.com',
-      passwordHash: 'hashed_password_placeholder',
-      fullName: 'System Admin',
-      roleId: adminRole.id
+      email: 'admin@1',
+      passwordHash: '1800',
+      fullName: 'Super Admin',
+      roleId: superAdminRole.id
     }
   });
 

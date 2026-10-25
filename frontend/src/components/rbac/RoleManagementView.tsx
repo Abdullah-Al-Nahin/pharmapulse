@@ -243,6 +243,20 @@ export const RoleManagementView: React.FC = () => {
     return matchSearch && matchRole;
   });
 
+  if (!isSuperAdmin && currentUser?.roleCode !== 'super_admin') {
+    return (
+      <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-red-900/50 m-6 max-w-lg mx-auto shadow-lg text-slate-800 dark:text-slate-200">
+        <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center mx-auto mb-3">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Restricted</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Settings & Roles management is strictly restricted to Super Admin only.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-slate-800">
       {/* Top Banner / Breadcrumb */}
