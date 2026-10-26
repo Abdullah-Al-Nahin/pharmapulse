@@ -27,7 +27,7 @@ import {
   INITIAL_RETURNS, 
   INITIAL_ACCOUNTING_TRANSACTIONS 
 } from '../lib/initialData';
-import { batchApi, supplierApi, inventoryApi } from '../lib/api';
+import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi } from '../lib/api';
 import { AuditService } from './auditService';
 
 const STORAGE_KEYS = {
@@ -77,14 +77,14 @@ export class PharmacyService {
     medicines: INITIAL_MEDICINES,
     batches: INITIAL_BATCHES,
     suppliers: INITIAL_SUPPLIERS,
-    prescriptions: INITIAL_PRESCRIPTIONS,
-    purchases: INITIAL_PURCHASES,
+    prescriptions: getLocalItem(STORAGE_KEYS.PRESCRIPTIONS, INITIAL_PRESCRIPTIONS),
+    purchases: getLocalItem(STORAGE_KEYS.PURCHASES, INITIAL_PURCHASES),
     sales: getLocalItem(STORAGE_KEYS.SALES, INITIAL_SALES),
     returns: getLocalItem(STORAGE_KEYS.RETURNS, INITIAL_RETURNS),
-    accounting: INITIAL_ACCOUNTING_TRANSACTIONS,
+    accounting: getLocalItem(STORAGE_KEYS.ACCOUNTING, INITIAL_ACCOUNTING_TRANSACTIONS),
     heldSales: getLocalItem(STORAGE_KEYS.HELD_SALES, [] as HeldSale[]),
-    reorderList: [] as ReorderItem[],
-    supplierLedgers: [] as SupplierLedgerEntry[]
+    reorderList: getLocalItem(STORAGE_KEYS.REORDER_LIST, [] as ReorderItem[]),
+    supplierLedgers: getLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, [] as SupplierLedgerEntry[])
   };
 
   private static listeners: SyncListener[] = [];
@@ -121,10 +121,12 @@ export class PharmacyService {
         apiMedicines, 
         apiBatches, 
         apiSuppliers,
+        apiSales
       ] = await Promise.all([
         inventoryApi.getMedicines().catch(() => INITIAL_MEDICINES),
         batchApi.getBatches().catch(() => INITIAL_BATCHES),
         supplierApi.getSuppliers().catch(() => []),
+        saleApi.getSales().catch(() => []),
       ]);
 
       const newMedicines = (apiMedicines.length > 0 ? apiMedicines : INITIAL_MEDICINES).map((m: any) => ({
@@ -142,22 +144,53 @@ export class PharmacyService {
 
       const newSuppliers = apiSuppliers.length > 0 ? apiSuppliers : INITIAL_SUPPLIERS;
 
-      const hasChanged = 
-        JSON.stringify(newMedicines) !== JSON.stringify(this.cache.medicines) ||
-        JSON.stringify(newBatches) !== JSON.stringify(this.cache.batches) ||
-        JSON.stringify(newSuppliers) !== JSON.stringify(this.cache.suppliers);
-
-      if (!hasChanged) {
-        return;
+      let syncedSales = this.cache.sales;
+      if (Array.isArray(apiSales) && apiSales.length > 0) {
+        const formattedSales: Sale[] = apiSales.map((s: any) => ({
+          id: s.id,
+          invoiceNumber: s.invoiceNumber,
+          date: s.createdAt ? new Date(s.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          timestamp: s.createdAt ? new Date(s.createdAt).toISOString() : new Date().toISOString(),
+          customerName: s.customer?.name || 'Walk-In Customer',
+          customerPhone: s.customer?.phone || '',
+          items: (s.items || []).map((it: any) => ({
+            medicineId: it.productId,
+            medicineName: it.product?.name || 'Item',
+            genericName: '',
+            batchId: it.batchId,
+            batchNumber: it.batch?.batchNumber || '',
+            expiryDate: it.batch?.expiryDate || '',
+            quantity: it.quantity,
+            unitPrice: Number(it.unitSellingPrice || 0),
+            unitCost: Number(it.unitCostPrice || 0),
+            mrp: Number(it.unitMrp || 0),
+            discountPercent: 0,
+            taxRate: Number(it.taxRate || 0),
+            subtotal: Number(it.lineTotal || 0),
+            taxAmount: Number(it.taxAmount || 0),
+            total: Number(it.lineTotal || 0),
+          })),
+          subtotal: Number(s.subTotal || 0),
+          discountTotal: Number(s.discountAmount || 0),
+          taxTotal: Number(s.taxAmount || 0),
+          grandTotal: Number(s.grandTotal || 0),
+          totalCost: Number(s.costOfGoodsSold || 0),
+          grossProfit: Number(s.grandTotal || 0) - Number(s.taxAmount || 0) - Number(s.costOfGoodsSold || 0),
+          paymentMethod: 'cash',
+          paymentStatus: 'completed',
+          cashierName: s.cashier?.fullName || 'Cashier',
+        }));
+        syncedSales = formattedSales;
+        setLocalItem(STORAGE_KEYS.SALES, syncedSales);
       }
 
       this.cache = {
         medicines: newMedicines,
         batches: newBatches,
         suppliers: newSuppliers,
-        prescriptions: INITIAL_PRESCRIPTIONS,
+        prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : INITIAL_PRESCRIPTIONS,
         purchases: this.cache.purchases.length > 0 ? this.cache.purchases : INITIAL_PURCHASES,
-        sales: this.cache.sales.length > 0 ? this.cache.sales : INITIAL_SALES,
+        sales: syncedSales.length > 0 ? syncedSales : INITIAL_SALES,
         returns: this.cache.returns.length > 0 ? this.cache.returns : INITIAL_RETURNS,
         accounting: this.cache.accounting.length > 0 ? this.cache.accounting : INITIAL_ACCOUNTING_TRANSACTIONS,
         heldSales: this.cache.heldSales,
@@ -170,6 +203,7 @@ export class PharmacyService {
       console.error("Global Database Sync failed", err);
     }
   }
+
 
   // --- Medicines ---
   public static getMedicines(): Medicine[] {
@@ -476,11 +510,25 @@ export class PharmacyService {
     return this.cache.suppliers;
   }
 
-  public static addSupplier(supplier: Supplier): void {
+  public static async addSupplier(supplier: Supplier): Promise<void> {
     const list = this.getSuppliers();
     list.unshift(supplier);
     this.cache.suppliers = list;
     this.emitChange();
+
+    try {
+      await supplierApi.createSupplier({
+        name: supplier.name,
+        contactPerson: supplier.contactPerson,
+        phone: supplier.phone,
+        email: supplier.email,
+        address: supplier.address,
+        balancePayable: supplier.balancePayable || 0,
+      });
+      await this.syncDatabase();
+    } catch (e) {
+      console.error("Failed to sync new supplier to backend", e);
+    }
   }
 
   public static updateSupplier(supplier: Supplier): void {
@@ -592,6 +640,7 @@ export class PharmacyService {
     }
 
     this.cache.purchases = purchases;
+    setLocalItem(STORAGE_KEYS.PURCHASES, purchases);
     this.emitChange();
 
     // 3. Add Supplier Ledger Entry
@@ -610,6 +659,7 @@ export class PharmacyService {
     };
     allLedgers.unshift(entry);
     this.cache.supplierLedgers = allLedgers;
+    setLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, allLedgers);
     this.emitChange();
 
     // 4. Add General Accounting Entry
@@ -725,7 +775,34 @@ export class PharmacyService {
     };
 
     this.cache.purchases = [newPO, ...this.getPurchases()];
+    setLocalItem(STORAGE_KEYS.PURCHASES, this.cache.purchases);
     this.emitChange();
+
+    purchaseOrderApi.createPurchaseOrder({
+      poNumber: newPO.poNumber,
+      invoiceNumber: newPO.invoiceNumber,
+      supplierId: newPO.supplierId,
+      orderDate: newPO.orderDate,
+      subTotal: newPO.subtotal,
+      taxAmount: newPO.taxAmount || 0,
+      discountAmount: newPO.discountAmount || 0,
+      grandTotal: newPO.totalAmount,
+      items: newPO.items.map(it => ({
+        productId: it.medicineId,
+        batchNumber: it.batchNumber || 'TBD',
+        manufacturingDate: it.manufacturingDate || new Date().toISOString().split('T')[0],
+        expiryDate: it.expiryDate || new Date(Date.now() + 365*24*3600*1000).toISOString().split('T')[0],
+        orderedQuantity: it.orderedQuantity || it.quantity,
+        receivedQuantity: 0,
+        freeQuantity: it.freeQuantity || 0,
+        unitPurchasePrice: it.purchasePrice,
+        mrp: it.mrp,
+        sellingPrice: it.sellingPrice,
+        taxRate: it.taxRate || 0,
+        taxAmount: it.taxAmount || 0,
+        lineTotal: it.totalAmount
+      }))
+    }).catch(e => console.error("Failed to sync purchase order to backend", e));
 
     return newPO;
   }
@@ -966,6 +1043,8 @@ export class PharmacyService {
     this.cache.suppliers = suppliers;
     this.emitChange();
     this.cache.supplierLedgers = allLedgers;
+    setLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, allLedgers);
+    setLocalItem(STORAGE_KEYS.PURCHASES, this.cache.purchases);
     this.emitChange();
 
     // 6. Record General Accounting Transactions
@@ -982,57 +1061,63 @@ export class PharmacyService {
       branchName: po.branchName || input.receivingWarehouse,
     };
     this.addAccountingTransaction(tx);
+    setLocalItem(STORAGE_KEYS.ACCOUNTING, this.cache.accounting);
+
+    purchaseOrderApi.receiveGRN(input.poId, input).catch(e => console.error("Failed to sync GRN to backend", e));
 
     return { po, batchesCreatedCount: batchesCount };
   }
 
-  public static recordPurchase(po: PurchaseOrder): void {
+  public static recordPurchase(po: PurchaseOrder, skipLocalBatchIncrement: boolean = false): void {
     const purchases = this.getPurchases();
     purchases.unshift(po);
     this.cache.purchases = purchases;
+    setLocalItem(STORAGE_KEYS.PURCHASES, purchases);
     this.emitChange();
 
-    // Inward batch stock creation/increment
-    const batches = this.getBatches();
-    const medicines = this.getMedicines();
+    if (!skipLocalBatchIncrement) {
+      // Inward batch stock creation/increment
+      const batches = this.getBatches();
+      const medicines = this.getMedicines();
 
-    po.items.forEach(item => {
-      const existingBatch = batches.find(
-        b => b.medicineId === item.medicineId && b.batchNumber.toLowerCase() === item.batchNumber.toLowerCase()
-      );
+      po.items.forEach(item => {
+        const existingBatch = batches.find(
+          b => b.medicineId === item.medicineId && b.batchNumber.toLowerCase() === item.batchNumber.toLowerCase()
+        );
 
-      if (existingBatch) {
-        existingBatch.currentStock += item.quantity;
-        existingBatch.purchasePrice = item.purchasePrice;
-        existingBatch.sellingPrice = item.sellingPrice;
-        existingBatch.mrp = item.mrp;
-      } else {
-        const med = medicines.find(m => m.id === item.medicineId);
-        const newBatch: Batch = {
-          id: `bat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          medicineId: item.medicineId,
-          medicineName: item.medicineName,
-          batchNumber: item.batchNumber,
-          manufacturingDate: item.manufacturingDate,
-          expiryDate: item.expiryDate,
-          purchasePrice: item.purchasePrice,
-          mrp: item.mrp,
-          sellingPrice: item.sellingPrice,
-          initialQuantity: item.quantity,
-          currentStock: item.quantity,
-          status: 'active',
-          supplierId: po.supplierId,
-          supplierName: po.supplierName,
-          rackLocation: med?.rackLocation || 'General Storage',
-          branchId: po.branchId,
-          branchName: po.branchName,
-        };
-        batches.unshift(newBatch);
-      }
-    });
+        if (existingBatch) {
+          existingBatch.currentStock += item.quantity;
+          existingBatch.purchasePrice = item.purchasePrice;
+          existingBatch.sellingPrice = item.sellingPrice;
+          existingBatch.mrp = item.mrp;
+        } else {
+          const med = medicines.find(m => m.id === item.medicineId);
+          const newBatch: Batch = {
+            id: `bat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            medicineId: item.medicineId,
+            medicineName: item.medicineName,
+            batchNumber: item.batchNumber,
+            manufacturingDate: item.manufacturingDate,
+            expiryDate: item.expiryDate,
+            purchasePrice: item.purchasePrice,
+            mrp: item.mrp,
+            sellingPrice: item.sellingPrice,
+            initialQuantity: item.quantity,
+            currentStock: item.quantity,
+            status: 'active',
+            supplierId: po.supplierId,
+            supplierName: po.supplierName,
+            rackLocation: med?.rackLocation || 'General Storage',
+            branchId: po.branchId,
+            branchName: po.branchName,
+          };
+          batches.unshift(newBatch);
+        }
+      });
 
-    this.cache.batches = batches;
-    this.emitChange();
+      this.cache.batches = batches;
+      this.emitChange();
+    }
 
     // Record Accounting Entry
     const tx: AccountingTransaction = {
@@ -1048,6 +1133,35 @@ export class PharmacyService {
       branchName: po.branchName,
     };
     this.addAccountingTransaction(tx);
+    setLocalItem(STORAGE_KEYS.ACCOUNTING, this.cache.accounting);
+
+    purchaseOrderApi.createPurchaseOrder({
+      poNumber: po.poNumber,
+      invoiceNumber: po.invoiceNumber,
+      supplierId: po.supplierId,
+      orderDate: po.purchaseDate || po.orderDate,
+      subTotal: po.subtotal,
+      taxAmount: po.taxAmount || 0,
+      discountAmount: po.discountAmount || 0,
+      grandTotal: po.totalAmount,
+      paidAmount: po.paidAmount || 0,
+      dueAmount: po.dueAmount || 0,
+      items: po.items.map(it => ({
+        productId: it.medicineId,
+        batchNumber: it.batchNumber,
+        manufacturingDate: it.manufacturingDate,
+        expiryDate: it.expiryDate,
+        orderedQuantity: it.quantity,
+        receivedQuantity: it.receivedQuantity || it.quantity,
+        freeQuantity: it.freeQuantity || 0,
+        unitPurchasePrice: it.purchasePrice,
+        mrp: it.mrp,
+        sellingPrice: it.sellingPrice,
+        taxRate: it.taxRate || 0,
+        taxAmount: it.taxAmount || 0,
+        lineTotal: it.totalAmount
+      }))
+    }).catch(e => console.error("Failed to sync recorded purchase to backend", e));
   }
 
   // --- POS Sales ---
@@ -1148,6 +1262,35 @@ export class PharmacyService {
     this.cache.sales = sales;
     setLocalItem(STORAGE_KEYS.SALES, sales);
     this.emitChange();
+
+    try {
+      await saleApi.createSale({
+        invoiceNumber: sale.invoiceNumber,
+        cashierId: sale.cashierName,
+        customerId: sale.customerId || null,
+        subTotal: sale.subtotal,
+        discountAmount: sale.discountTotal || 0,
+        taxAmount: sale.taxTotal || 0,
+        grandTotal: sale.grandTotal,
+        paidAmount: sale.grandTotal - (sale.dueAmount || 0),
+        dueAmount: sale.dueAmount || 0,
+        changeGiven: sale.changeGiven || 0,
+        items: sale.items.map(it => ({
+          productId: it.medicineId,
+          batchId: it.batchId,
+          quantity: it.quantity,
+          unitMrp: it.mrp,
+          unitSellingPrice: it.unitPrice,
+          unitCostPrice: it.unitCost,
+          lineTotal: it.total,
+          lineGrossProfit: it.total - (it.quantity * it.unitCost),
+          discountAmount: (it.subtotal * (it.discountPercent || 0)) / 100,
+          taxAmount: it.taxAmount || 0
+        }))
+      });
+    } catch (e) {
+      console.error("Failed to post sale to Neon backend:", e);
+    }
 
     // Audit Log: Record the completed sale
     AuditService.recordAuditLog({
@@ -1332,6 +1475,7 @@ export class PharmacyService {
     const list = this.getAccountingTransactions();
     list.unshift(tx);
     this.cache.accounting = list;
+    setLocalItem(STORAGE_KEYS.ACCOUNTING, list);
     this.emitChange();
   }
 

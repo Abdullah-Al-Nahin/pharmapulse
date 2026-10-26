@@ -13,27 +13,37 @@ export class CustomerController {
             { phone: { contains: search as string } }
           ]
         } : undefined,
+        include: {
+          sales: {
+            select: { grandTotal: true }
+          }
+        },
         orderBy: { createdAt: 'desc' }
       });
 
       // Map to frontend Customer model
-      const mapped = customers.map((c: any) => ({
-        id: c.id,
-        name: c.name,
-        phone: c.phone,
-        email: c.email || '',
-        address: c.address || '',
-        customerType: c.customerType ? c.customerType.toLowerCase() : 'retail',
-        pricingTier: 'retail',
-        creditLimit: Number(c.creditLimit || 0),
-        outstandingBalance: Number(c.outstandingBalance || 0),
-        loyaltyPoints: c.loyaltyPointsBalance || 0,
-        totalSpent: Number(c.outstandingBalance || 0) * 2.5,
-        totalOrders: 5,
-        status: 'active',
-        notes: c.allergyNotes || '',
-        createdAt: c.createdAt.toISOString().split('T')[0]
-      }));
+      const mapped = customers.map((c: any) => {
+        const totalOrders = c.sales ? c.sales.length : 0;
+        const totalSpent = c.sales ? c.sales.reduce((sum: number, s: any) => sum + Number(s.grandTotal || 0), 0) : 0;
+
+        return {
+          id: c.id,
+          name: c.name,
+          phone: c.phone,
+          email: c.email || '',
+          address: c.address || '',
+          customerType: c.customerType ? c.customerType.toLowerCase() : 'retail',
+          pricingTier: 'retail',
+          creditLimit: Number(c.creditLimit || 0),
+          outstandingBalance: Number(c.outstandingBalance || 0),
+          loyaltyPoints: c.loyaltyPointsBalance || 0,
+          totalSpent,
+          totalOrders,
+          status: 'active',
+          notes: c.allergyNotes || '',
+          createdAt: c.createdAt.toISOString().split('T')[0]
+        };
+      });
 
       res.json(mapped);
     } catch (error: any) {

@@ -190,5 +190,20 @@ export const transferApi = {
   },
 };
 
+// Sales & POS Invoicing
+export const saleApi = {
+  getSales: async () => (await api.get('/sales')).data,
+  getSaleById: async (id: string) => (await api.get(`/sales/${id}`)).data,
+  createSale: async (data: any) => (await api.post('/sales', data)).data,
+};
+
+// Purchase Orders & GRN
+export const purchaseOrderApi = {
+  getPurchaseOrders: async () => (await api.get('/purchase-orders')).data,
+  getPurchaseOrderById: async (id: string) => (await api.get(`/purchase-orders/${id}`)).data,
+  createPurchaseOrder: async (data: any) => (await api.post('/purchase-orders', data)).data,
+  receiveGRN: async (id: string, data: any) => (await api.post(`/purchase-orders/${id}/grn`, data)).data,
+};
+
 export default api;
 

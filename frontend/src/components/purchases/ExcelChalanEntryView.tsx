@@ -360,46 +360,15 @@ export const ExcelChalanEntryView: React.FC<ExcelChalanEntryViewProps> = ({
         }
       }
 
-      // Local Sync Second
+      // Authoritative sync from Neon DB
+      await PharmacyService.syncDatabase();
+
+      // Build purchase items for PO History
       rows.forEach((row, idx) => {
         const totalInwardStock = Number(row.chalanQuantity) + Number(row.freeBonusQuantity || 0);
         const lineNet = Number(row.chalanQuantity) * Number(row.unitPurchasePrice);
         const lineTax = lineNet * (Number(row.taxRate || 0) / 100);
         const lineTotal = lineNet + lineTax;
-
-        // Check if batch exists
-        const existingBatch = allBatches.find(
-          b => b.medicineId === row.medicineId && b.batchNumber.toUpperCase() === row.batchNumber.trim().toUpperCase()
-        );
-
-        if (existingBatch) {
-          existingBatch.currentStock += totalInwardStock;
-          existingBatch.purchasePrice = Number(row.unitPurchasePrice);
-          existingBatch.mrp = Number(row.mrp);
-          existingBatch.sellingPrice = Number(row.mrp);
-          existingBatch.expiryDate = row.expiryDate;
-          existingBatch.rackLocation = `${receivingWarehouse} - ${row.rackLocation}`;
-        } else {
-          const newBatch: Batch = {
-            id: `bat-chl-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
-            medicineId: row.medicineId,
-            medicineName: row.medicineName,
-            batchNumber: row.batchNumber.trim().toUpperCase(),
-            manufacturingDate: row.manufacturingDate || todayStr,
-            expiryDate: row.expiryDate,
-            purchasePrice: Number(row.unitPurchasePrice),
-            mrp: Number(row.mrp),
-            sellingPrice: Number(row.mrp),
-            initialQuantity: totalInwardStock,
-            currentStock: totalInwardStock,
-            status: 'active',
-            supplierId: supplier.id,
-            supplierName: supplier.name,
-            rackLocation: `${receivingWarehouse} - ${row.rackLocation}`
-          };
-          allBatches.unshift(newBatch);
-          createdBatchesCount++;
-        }
 
         // Format for PO History
         purchaseItems.push({
@@ -423,10 +392,7 @@ export const ExcelChalanEntryView: React.FC<ExcelChalanEntryViewProps> = ({
         });
       });
 
-      // Save batches into LocalStorage & Sync
-      localStorage.setItem('rx_batches_v1', JSON.stringify(allBatches));
-
-      // 3. Record Purchase & Supplier Ledger
+      // 3. Record Purchase & Supplier Ledger (skip local batch increment to prevent double addition)
       const actualPaid = paymentType === 'credit' ? paidAmount : totals.grandTotal;
       const dueAmount = Math.max(0, totals.grandTotal - actualPaid);
 
@@ -451,7 +417,8 @@ export const ExcelChalanEntryView: React.FC<ExcelChalanEntryViewProps> = ({
         items: purchaseItems
       };
 
-      PharmacyService.recordPurchase(newPo);
+      PharmacyService.recordPurchase(newPo, true);
+
 
       // 4. Update Supplier balancePayable & Ledger using PharmacyService
       // Always update supplier balance for any due amount
