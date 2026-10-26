@@ -685,12 +685,14 @@ export class PharmacyService {
     const list = this.getPrescriptions();
     list.unshift(rx);
     this.cache.prescriptions = list;
+    setLocalItem(STORAGE_KEYS.PRESCRIPTIONS, list);
     this.emitChange();
   }
 
   public static updatePrescriptionStatus(rxId: string, status: Prescription['status']): void {
     const list = this.getPrescriptions().map(rx => rx.id === rxId ? { ...rx, status } : rx);
     this.cache.prescriptions = list;
+    setLocalItem(STORAGE_KEYS.PRESCRIPTIONS, list);
     this.emitChange();
   }
 
@@ -1652,6 +1654,7 @@ export class PharmacyService {
     }
 
     this.cache.reorderList = list;
+    setLocalItem(STORAGE_KEYS.REORDER_LIST, list);
     this.emitChange();
     return reorderItem;
   }
@@ -1659,11 +1662,13 @@ export class PharmacyService {
   public static removeFromReorderList(medicineId: string): void {
     const list = this.getReorderList().filter(r => r.medicineId !== medicineId);
     this.cache.reorderList = list;
+    setLocalItem(STORAGE_KEYS.REORDER_LIST, list);
     this.emitChange();
   }
 
   public static saveReorderList(list: ReorderItem[]): void {
     this.cache.reorderList = list;
+    setLocalItem(STORAGE_KEYS.REORDER_LIST, list);
     this.emitChange();
   }
 

@@ -36,7 +36,7 @@ app.use(cors({
     } catch {
       // If URL parsing fails, fall back safely
     }
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
