@@ -159,7 +159,7 @@ export class PharmacyService {
             genericName: '',
             batchId: it.batchId,
             batchNumber: it.batch?.batchNumber || '',
-            expiryDate: it.batch?.expiryDate || '',
+            expiryDate: it.batch?.expiryDate ? new Date(it.batch.expiryDate).toISOString().split('T')[0] : '',
             quantity: it.quantity,
             unitPrice: Number(it.unitSellingPrice || 0),
             unitCost: Number(it.unitCostPrice || 0),
@@ -176,9 +176,12 @@ export class PharmacyService {
           grandTotal: Number(s.grandTotal || 0),
           totalCost: Number(s.costOfGoodsSold || 0),
           grossProfit: Number(s.grandTotal || 0) - Number(s.taxAmount || 0) - Number(s.costOfGoodsSold || 0),
-          paymentMethod: 'cash',
-          paymentStatus: 'completed',
-          cashierName: s.cashier?.fullName || 'Cashier',
+          dueAmount: Number(s.dueAmount || 0),
+          paymentMethod: (s.notes && s.notes.startsWith('METHOD:'))
+            ? (s.notes.replace('METHOD:', '').trim() as any)
+            : (Number(s.dueAmount || 0) > 0 ? 'credit' : 'cash'),
+          paymentStatus: Number(s.dueAmount || 0) > 0 ? 'due' : 'paid',
+          cashierName: s.cashier?.fullName || s.cashier?.username || 'Cashier',
         }));
         syncedSales = formattedSales;
         setLocalItem(STORAGE_KEYS.SALES, syncedSales);
@@ -1182,9 +1185,6 @@ export class PharmacyService {
     const batches = this.getBatches();
     const todayStr = new Date().toISOString().split('T')[0];
 
-    // Collect all backend sync promises
-    const backendSyncPromises: Promise<any>[] = [];
-
     sale.items.forEach(saleItem => {
       let remainingToDeduct = saleItem.quantity;
       
@@ -1204,15 +1204,6 @@ export class PharmacyService {
         }
         if (primaryBatch.currentStock === 0) primaryBatch.status = 'depleted';
         console.log("Deducted from primary. remainingToDeduct:", remainingToDeduct);
-
-        
-        // Queue backend sync
-        backendSyncPromises.push(
-          batchApi.updateBatch(primaryBatch.id, { 
-            currentStock: primaryBatch.currentStock, 
-            status: primaryBatch.status.toUpperCase() 
-          }).catch(e => console.error("Failed to sync sale deduction for batch", primaryBatch.id, e))
-        );
       }
 
       // If we still need to deduct, find other active batches for the same medicine, sorted by FEFO
@@ -1239,24 +1230,11 @@ export class PharmacyService {
           }
           if (ob.currentStock === 0) ob.status = 'depleted';
           console.log("Remaining to deduct now:", remainingToDeduct);
-          
-          // Queue backend sync
-          backendSyncPromises.push(
-            batchApi.updateBatch(ob.id, { 
-              currentStock: ob.currentStock, 
-              status: ob.status.toUpperCase() 
-            }).catch(e => console.error("Failed to sync sale deduction for batch", ob.id, e))
-          );
         }
       }
     });
     this.cache.batches = batches;
     this.emitChange();
-
-    // Wait for ALL backend updates to land before returning
-    if (backendSyncPromises.length > 0) {
-      await Promise.all(backendSyncPromises);
-    }
 
     // 2. Save Sale
     const sales = this.getSales();
@@ -1290,6 +1268,7 @@ export class PharmacyService {
           taxAmount: it.taxAmount || 0
         }))
       });
+      await this.syncDatabase();
     } catch (e) {
       console.error("Failed to post sale to Neon backend:", e);
     }

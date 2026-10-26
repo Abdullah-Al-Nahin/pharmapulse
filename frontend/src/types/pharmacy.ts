@@ -276,7 +276,7 @@ export interface Sale {
     cardType?: 'Visa' | 'Mastercard' | 'Amex' | 'POS';
     cardAuthCode?: string;
   };
-  paymentStatus: 'completed' | 'refunded' | 'partially_refunded' | 'due' | 'partially_paid';
+  paymentStatus: 'completed' | 'paid' | 'refunded' | 'partially_refunded' | 'due' | 'partially_paid';
   cashierName: string;
   notes?: string;
   branchId?: string;

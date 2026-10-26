@@ -1,94 +1,182 @@
 import { prisma } from '../server';
-import { Prisma } from '@prisma/client';
 
 export class SaleService {
   static async getAllSales() {
     return prisma.sale.findMany({
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+            batch: true,
+          },
+        },
         customer: true,
-      }
+        cashier: {
+          select: { id: true, fullName: true, username: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   static async getSaleById(id: string) {
     return prisma.sale.findUnique({
       where: { id },
-      include: { items: true, customer: true }
+      include: {
+        items: {
+          include: {
+            product: true,
+            batch: true,
+          },
+        },
+        customer: true,
+        cashier: {
+          select: { id: true, fullName: true, username: true },
+        },
+      },
     });
   }
 
   static async completeSale(data: any) {
     return prisma.$transaction(async (tx) => {
-      // 1. Resolve cashierId
+      // 1. Resolve valid cashierId (by ID, fullName, or username, with safe fallback)
       let cashierId = data.cashierId;
-      if (cashierId) {
-        const userExists = await tx.user.findUnique({ where: { id: cashierId } });
-        if (!userExists) {
-          const fallbackUser = await tx.user.findFirst();
-          cashierId = fallbackUser ? fallbackUser.id : cashierId;
-        }
+      const matchedUser = cashierId
+        ? await tx.user.findFirst({
+            where: {
+              OR: [
+                { id: String(cashierId) },
+                { fullName: { equals: String(cashierId), mode: 'insensitive' } },
+                { username: { equals: String(cashierId), mode: 'insensitive' } },
+              ],
+            },
+          })
+        : null;
+
+      if (matchedUser) {
+        cashierId = matchedUser.id;
       } else {
         const fallbackUser = await tx.user.findFirst();
         if (fallbackUser) cashierId = fallbackUser.id;
       }
 
-      // 2. Decrement currentStock on tx.batch
+      // 2. Resolve valid customerId if provided
+      let validCustomerId: string | null = null;
+      if (data.customerId) {
+        const cust = await tx.customer.findUnique({ where: { id: String(data.customerId) } });
+        if (cust) validCustomerId = cust.id;
+      }
+
+      // 3. Resolve batches, decrement stock once atomically, and accumulate COGS
+      const validSaleItems: any[] = [];
+      let totalCogs = 0;
+
       if (Array.isArray(data.items)) {
         for (const item of data.items) {
-          if (item.batchId) {
-            const batch = await tx.batch.findUnique({ where: { id: item.batchId } });
-            if (batch) {
-              const newStock = Math.max(0, batch.currentStock - Number(item.quantity || 0));
-              await tx.batch.update({
-                where: { id: item.batchId },
-                data: {
-                  currentStock: newStock,
-                  status: newStock === 0 ? 'DEPLETED' : batch.status
-                }
-              });
-            }
+          const qty = Number(item.quantity || 0);
+          if (qty <= 0) continue;
+
+          let batch =
+            item.batchId && item.batchId !== 'unknown-batch'
+              ? await tx.batch.findUnique({ where: { id: String(item.batchId) } })
+              : null;
+
+          if (!batch && item.productId && item.productId !== 'unknown-med') {
+            batch = await tx.batch.findFirst({
+              where: {
+                productId: String(item.productId),
+                currentStock: { gt: 0 },
+                status: { not: 'QUARANTINED' },
+              },
+              orderBy: { expiryDate: 'asc' },
+            });
           }
+
+          if (!batch) {
+            batch = await tx.batch.findFirst({ orderBy: { expiryDate: 'asc' } });
+          }
+
+          if (!batch) continue;
+
+          const newStock = Math.max(0, batch.currentStock - qty);
+          await tx.batch.update({
+            where: { id: batch.id },
+            data: {
+              currentStock: newStock,
+              status: newStock === 0 ? 'DEPLETED' : batch.status,
+            },
+          });
+
+          const unitCost = Number(
+            item.unitCostPrice || item.unitPurchasePrice || batch.purchasePrice || 0
+          );
+          const unitSelling = Number(
+            item.unitSellingPrice || item.sellingPrice || batch.unitSellingPrice || 0
+          );
+          const unitMrp = Number(item.unitMrp || item.mrp || batch.mrp || unitSelling);
+          const lineTotal = Number(item.lineTotal ?? unitSelling * qty);
+          const itemCogs = unitCost * qty;
+          totalCogs += itemCogs;
+
+          validSaleItems.push({
+            productId: batch.productId,
+            batchId: batch.id,
+            quantity: qty,
+            unitMrp,
+            unitSellingPrice: unitSelling,
+            unitCostPrice: unitCost,
+            discountAmount: Number(item.discountAmount || 0),
+            taxRate: Number(item.taxRate || 0),
+            taxAmount: Number(item.taxAmount || 0),
+            lineTotal,
+            lineGrossProfit: lineTotal - itemCogs,
+          });
         }
       }
 
-      // 3. Create sale record with items
-      const sale = await tx.sale.create({
+      // 4. Increment Customer outstandingBalance if sale has dueAmount > 0
+      const dueAmount = Number(data.dueAmount ?? 0);
+      if (validCustomerId && dueAmount > 0) {
+        await tx.customer.update({
+          where: { id: validCustomerId },
+          data: { outstandingBalance: { increment: dueAmount } },
+        });
+      }
+
+      // 5. Create Sale record with computed costOfGoodsSold
+      return tx.sale.create({
         data: {
           invoiceNumber: data.invoiceNumber || `INV-${Date.now()}`,
           cashierId,
-          customerId: data.customerId || null,
+          customerId: validCustomerId,
           subTotal: data.subTotal ?? 0,
           discountAmount: data.discountAmount ?? 0,
           taxAmount: data.taxAmount ?? 0,
           roundOff: data.roundOff ?? 0,
           grandTotal: data.grandTotal ?? 0,
-          paidAmount: data.paidAmount ?? data.grandTotal ?? 0,
+          costOfGoodsSold: totalCogs,
+          paidAmount: data.paidAmount ?? Math.max(0, Number(data.grandTotal || 0) - dueAmount),
           changeGiven: data.changeGiven ?? 0,
-          dueAmount: data.dueAmount ?? 0,
+          dueAmount,
           status: 'COMPLETED',
           notes: data.notes || null,
           items: {
-            create: (data.items || []).map((item: any) => ({
-              productId: item.productId,
-              batchId: item.batchId,
-              quantity: Number(item.quantity || 0),
-              unitMrp: Number(item.unitMrp || item.mrp || 0),
-              unitSellingPrice: Number(item.unitSellingPrice || item.sellingPrice || item.unitMrp || 0),
-              unitCostPrice: Number(item.unitCostPrice || item.unitPurchasePrice || 0),
-              discountAmount: Number(item.discountAmount || 0),
-              taxRate: Number(item.taxRate || 0),
-              taxAmount: Number(item.taxAmount || 0),
-              lineTotal: Number(item.lineTotal || 0),
-              lineGrossProfit: Number(item.lineGrossProfit || 0),
-            }))
-          }
+            create: validSaleItems,
+          },
         },
-        include: { items: true, customer: true }
+        include: {
+          items: {
+            include: {
+              product: true,
+              batch: true,
+            },
+          },
+          customer: true,
+          cashier: {
+            select: { id: true, fullName: true, username: true },
+          },
+        },
       });
-
-      return sale;
     });
   }
 }
-
