@@ -33,7 +33,8 @@ export class PurchaseOrderService {
     invoiceNumber: string;
     notes?: string;
     items: Array<{
-      productId: string;
+      productId?: string;
+      medicineId?: string;
       batchNumber: string;
       manufacturingDate: string;
       expiryDate: string;
@@ -51,13 +52,19 @@ export class PurchaseOrderService {
     taxAmount: number;
     discountAmount: number;
     grandTotal: number;
+    poNumber?: string;
+    paidAmount?: number;
+    dueAmount?: number;
   }) {
     const supplier = await prisma.supplier.findUnique({ where: { id: data.supplierId } });
     if (!supplier) throw new Error('Supplier not found.');
 
     const dateNum = new Date().toISOString().slice(2, 10).replace(/-/g, '');
     const suffix = Math.floor(100 + Math.random() * 900);
-    const poNumber = `PO-${dateNum}-${suffix}`;
+    const poNumber = (data as any).poNumber || `PO-${dateNum}-${suffix}`;
+    const paidAmount = Number((data as any).paidAmount || 0);
+    const dueAmount = Number((data as any).dueAmount ?? Math.max(0, Number(data.grandTotal || 0) - paidAmount));
+    const paymentStatus = paidAmount >= Number(data.grandTotal || 0) ? 'PAID' : paidAmount > 0 ? 'PARTIALLY_PAID' : 'UNPAID';
 
     return prisma.purchaseOrder.create({
       data: {
@@ -68,10 +75,13 @@ export class PurchaseOrderService {
         taxAmount: data.taxAmount,
         discountAmount: data.discountAmount,
         grandTotal: data.grandTotal,
+        paidAmount,
+        dueAmount,
+        paymentStatus: paymentStatus as any,
         notes: data.notes,
         items: {
-          create: data.items.map(item => ({
-            productId: item.productId,
+          create: data.items.map((item: any) => ({
+            productId: item.productId || item.medicineId,
             batchNumber: item.batchNumber,
             manufacturingDate: new Date(item.manufacturingDate),
             expiryDate: new Date(item.expiryDate),
@@ -103,8 +113,9 @@ export class PurchaseOrderService {
     paidAmount?: number;
     notes?: string;
     items: Array<{
-      purchaseOrderItemId: string;
-      productId: string;
+      purchaseOrderItemId?: string;
+      productId?: string;
+      medicineId?: string;
       batchNumber: string;
       manufacturingDate: string;
       expiryDate: string;
@@ -131,7 +142,16 @@ export class PurchaseOrderService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const po = await tx.purchaseOrder.findUnique({ where: { id: poId }, include: { supplier: true } });
+      const po = await tx.purchaseOrder.findFirst({
+        where: {
+          OR: [
+            { id: poId },
+            { poNumber: poId },
+            ...(data.vendorInvoiceNumber ? [{ invoiceNumber: data.vendorInvoiceNumber }] : []),
+          ],
+        },
+        include: { supplier: true },
+      });
       if (!po) throw new Error('Purchase Order not found.');
 
       let calculatedSubtotal = 0;
@@ -147,10 +167,12 @@ export class PurchaseOrderService {
         calculatedSubtotal += lineSub;
         calculatedTax += tax;
 
+        const productId = item.productId || (item as any).medicineId;
+
         // Check existing batch (same product + batchNumber)
         const existingBatch = await tx.batch.findFirst({
           where: {
-            productId: item.productId,
+            productId,
             batchNumber: { equals: item.batchNumber.toUpperCase(), mode: 'insensitive' },
           }
         });
@@ -170,9 +192,8 @@ export class PurchaseOrderService {
           await tx.batch.create({
             data: {
               batchNumber: item.batchNumber.toUpperCase(),
-              productId: item.productId,
+              productId,
               supplierId: po.supplierId,
-              purchaseOrderItemId: item.purchaseOrderItemId,
               manufacturingDate: new Date(item.manufacturingDate),
               expiryDate: new Date(item.expiryDate),
               purchasePrice: item.unitPurchasePrice,
@@ -202,7 +223,7 @@ export class PurchaseOrderService {
 
       // Update PO status
       const updatedPO = await tx.purchaseOrder.update({
-        where: { id: poId },
+        where: { id: po.id },
         data: {
           invoiceNumber: data.vendorInvoiceNumber,
           receivedDate: new Date(data.receivedDate),

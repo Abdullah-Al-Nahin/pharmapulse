@@ -807,6 +807,11 @@ export class PharmacyService {
         taxAmount: it.taxAmount || 0,
         lineTotal: it.totalAmount
       }))
+    }).then((savedPo) => {
+      if (savedPo && savedPo.id) {
+        newPO.id = savedPo.id;
+        setLocalItem(STORAGE_KEYS.PURCHASES, this.cache.purchases);
+      }
     }).catch(e => console.error("Failed to sync purchase order to backend", e));
 
     return newPO;
@@ -1068,7 +1073,14 @@ export class PharmacyService {
     this.addAccountingTransaction(tx);
     setLocalItem(STORAGE_KEYS.ACCOUNTING, this.cache.accounting);
 
-    purchaseOrderApi.receiveGRN(input.poId, input).catch(e => console.error("Failed to sync GRN to backend", e));
+    purchaseOrderApi.receiveGRN(po.id, {
+      ...input,
+      items: input.items.map(it => ({
+        ...it,
+        productId: it.medicineId,
+      })),
+    }).then(() => this.syncDatabase())
+    .catch(e => console.error("Failed to sync GRN to backend", e));
 
     return { po, batchesCreatedCount: batchesCount };
   }
