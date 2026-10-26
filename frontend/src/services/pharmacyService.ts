@@ -27,14 +27,6 @@ import {
   INITIAL_RETURNS, 
   INITIAL_ACCOUNTING_TRANSACTIONS 
 } from '../lib/initialData';
-import { db } from '../lib/firebase';
-import { 
-  collection, 
-  getDocs, 
-  setDoc, 
-  doc, 
-  writeBatch 
-} from 'firebase/firestore';
 import { batchApi, supplierApi, inventoryApi } from '../lib/api';
 import { AuditService } from './auditService';
 
@@ -644,11 +636,6 @@ export class PharmacyService {
     list.unshift(rx);
     this.cache.prescriptions = list;
     this.emitChange();
-    try {
-      setDoc(doc(db, 'prescriptions', rx.id), rx);
-    } catch {
-      // Offline fallback
-    }
   }
 
   public static updatePrescriptionStatus(rxId: string, status: Prescription['status']): void {
@@ -1161,11 +1148,6 @@ export class PharmacyService {
     this.cache.sales = sales;
     setLocalItem(STORAGE_KEYS.SALES, sales);
     this.emitChange();
-    try {
-      setDoc(doc(db, 'sales', sale.id), sale);
-    } catch {
-      // Offline fallback
-    }
 
     // Audit Log: Record the completed sale
     AuditService.recordAuditLog({
