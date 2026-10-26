@@ -79,6 +79,8 @@ export class AdjustmentController {
         validUserId = u?.id;
       }
 
+      const isPending = Boolean(req.body.requiresApproval);
+
       const adj = await prisma.stockAdjustment.create({
         data: {
           adjustmentNumber,
@@ -92,18 +94,20 @@ export class AdjustmentController {
           newStock,
           unitCost,
           totalMonetaryValue,
-          status: 'APPROVED',
-          requiresApproval: false,
+          status: isPending ? 'PENDING_APPROVAL' : 'APPROVED',
+          requiresApproval: isPending,
           reason: reason || 'Routine inventory audit',
           notes: notes || null
         }
       });
 
-      // Update active batch stock
-      await prisma.batch.update({
-        where: { id: batchId },
-        data: { currentStock: newStock }
-      });
+      // Update active batch stock only if not pending approval
+      if (!isPending) {
+        await prisma.batch.update({
+          where: { id: batchId },
+          data: { currentStock: newStock }
+        });
+      }
 
       res.status(201).json(adj);
     } catch (error: any) {

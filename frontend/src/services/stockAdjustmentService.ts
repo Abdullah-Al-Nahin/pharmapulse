@@ -230,7 +230,8 @@ export class StockAdjustmentService {
       quantityAdjusted: params.quantityAdjusted,
       reason: params.reason,
       notes: params.notes,
-      userId: params.requester.userId
+      userId: params.requester.userId,
+      requiresApproval
     }).catch(e => console.error('Failed to create adjustment in database:', e));
 
     return {

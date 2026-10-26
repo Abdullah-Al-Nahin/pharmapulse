@@ -311,6 +311,10 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
   };
 
   const handleReceiveTransfer = (transferId: string) => {
+    transferApi.receiveTransfer(transferId)
+      .then(() => PharmacyService.syncDatabase())
+      .catch((e) => console.error('Failed to receive transfer in DB:', e));
+
     const targetTransfer = transfers.find((t) => t.id === transferId);
     if (targetTransfer && targetTransfer.items) {
       targetTransfer.items.forEach((item) => {
@@ -410,6 +414,7 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
       fromBranchName: newTransfer.fromBranchName,
       toBranchId: newTransfer.toBranchId,
       toBranchName: newTransfer.toBranchName,
+      status: 'requested',
       totalUnits: Number(qty),
       totalValue: Number(qty) * 120.0,
       isColdChain: false,
@@ -417,6 +422,16 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
       requestedBy: newTransfer.requestedBy,
       items: newTransfer.items,
       notes: newTransfer.notes
+    }).then((res: any) => {
+      if (res && res.id) {
+        setTransfers((prev) => {
+          const list = prev.map((t) => (t.id === newTransfer.id ? { ...t, id: res.id } : t));
+          try {
+            localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(list));
+          } catch {}
+          return list;
+        });
+      }
     }).catch(e => console.error('Failed to sync transfer to DB:', e));
 
     setShowNewTransferModal(false);

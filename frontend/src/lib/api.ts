@@ -188,6 +188,7 @@ export const transferApi = {
     const res = await api.post('/transfers', data);
     return res.data;
   },
+  receiveTransfer: async (id: string) => (await api.put(`/transfers/${id}/receive`)).data,
 };
 
 // Sales & POS Invoicing

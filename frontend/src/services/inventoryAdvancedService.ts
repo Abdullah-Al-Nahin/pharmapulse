@@ -15,7 +15,7 @@ import {
 } from '../types/inventoryAdvanced';
 import { PharmacyService } from './pharmacyService';
 import { Batch, Medicine } from '../types/pharmacy';
-import { transferApi } from '../lib/api';
+import { transferApi, batchApi } from '../lib/api';
 
 const STORAGE_KEYS = {
   RACK_LOCATIONS: 'rx_rack_locations_db_v3',
@@ -283,6 +283,10 @@ export class InventoryAdvancedService {
     try {
       localStorage.setItem('rx_batches_v1', JSON.stringify(updatedBatches));
     } catch {}
+
+    batchApi.quarantineBatch(batch.id, `${reason}: ${details}`)
+      .then(() => PharmacyService.syncDatabase())
+      .catch((e) => console.error('Failed to quarantine batch in DB:', e));
   }
 
   public static releaseFromQuarantine(recordId: string, releasedBy: string, notes: string): void {
@@ -316,6 +320,12 @@ export class InventoryAdvancedService {
       try {
         localStorage.setItem('rx_batches_v1', JSON.stringify(updatedBatches));
       } catch {}
+
+      if (target.batchId) {
+        batchApi.updateBatch(target.batchId, { status: 'ACTIVE', quarantineReason: null })
+          .then(() => PharmacyService.syncDatabase())
+          .catch((e) => console.error('Failed to release quarantine in DB:', e));
+      }
     }
   }
 
