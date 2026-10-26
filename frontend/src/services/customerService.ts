@@ -194,7 +194,12 @@ export class CustomerService {
 
     list.unshift(newCustomer);
     this.setLocal(STORAGE_KEYS.CUSTOMERS, list);
-    customerApi.createCustomer(newCustomer).catch((e) => console.error('Failed to save customer to DB:', e));
+    customerApi.createCustomer(newCustomer).then((saved) => {
+      if (saved && saved.id) {
+        const updated = this.getCustomers().map((c) => (c.id === newCustomer.id ? { ...c, id: saved.id } : c));
+        this.setLocal(STORAGE_KEYS.CUSTOMERS, updated);
+      }
+    }).catch((e) => console.error('Failed to save customer to DB:', e));
     return newCustomer;
   }
 

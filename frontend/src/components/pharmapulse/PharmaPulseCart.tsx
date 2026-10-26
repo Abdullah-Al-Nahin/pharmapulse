@@ -41,6 +41,7 @@ interface PharmaPulseCartProps {
   onSwitchAlternative: (drug: AlternativeDrug) => void;
   heldCount: number;
   onHoldCart: () => void;
+  onOpenHeldOrdersModal?: () => void;
   onProcessCheckout: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -65,6 +66,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
   onSwitchAlternative,
   heldCount,
   onHoldCart,
+  onOpenHeldOrdersModal,
   onProcessCheckout,
   searchQuery,
   onSearchChange,
@@ -191,6 +193,15 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
             </kbd>
             <span>Hold Cart ({heldCount})</span>
           </button>
+          {heldCount > 0 && onOpenHeldOrdersModal && (
+            <button
+              onClick={onOpenHeldOrdersModal}
+              className="px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/40 border border-orange-300 dark:border-orange-800 text-orange-700 dark:text-orange-300 font-bold flex items-center gap-1.5 shadow-2xs hover:bg-orange-100 transition"
+            >
+              <Clock className="w-3 h-3 text-orange-600" />
+              <span>Recall Held ({heldCount})</span>
+            </button>
+          )}
           <button
             onClick={onProcessCheckout}
             className="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium flex items-center gap-1.5 shadow-2xs hover:bg-white dark:hover:bg-slate-700 transition"

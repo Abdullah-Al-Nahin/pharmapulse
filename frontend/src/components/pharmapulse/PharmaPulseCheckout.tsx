@@ -55,6 +55,8 @@ interface PharmaPulseCheckoutProps {
   // Doctor & Bengali Receipt customizers
   selectedDoctor?: DoctorInfo | null;
   onSelectDoctor?: (doc: DoctorInfo | null) => void;
+  selectedCustomer?: Customer | null;
+  onSelectCustomer?: (c: Customer | null) => void;
   isBengaliReceipt?: boolean;
   onToggleBengaliReceipt?: () => void;
 }
@@ -83,11 +85,13 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
   onPrintThermal,
   onHoldOrder,
   onAddFefoItem,
+  selectedCustomer,
+  onSelectCustomer,
   isBengaliReceipt = true,
   onToggleBengaliReceipt,
 }) => {
   const [customerPhone, setCustomerPhone] = useState('');
-  const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
+  const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(selectedCustomer || null);
   const [velocityFilter, setVelocityFilter] = useState<'1D' | '7D' | '1M' | '1Y'>('7D');
 
   // RBAC Admin Lock for Due / Credit Billing
@@ -107,8 +111,10 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
         c.phone.replace(/[^0-9]/g, '').includes(clean)
       );
       setMatchedCustomer(found || null);
+      onSelectCustomer?.(found || null);
     } else {
       setMatchedCustomer(null);
+      onSelectCustomer?.(null);
     }
   }, [customerPhone]);
 

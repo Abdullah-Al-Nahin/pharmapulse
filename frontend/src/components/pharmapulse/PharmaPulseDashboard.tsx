@@ -22,7 +22,7 @@ import {
   DoctorInfo,
   GenericSubstituteOption,
 } from '../../types/pharmapulse';
-import { CheckCircle2, AlertTriangle, Info, X, Building2 } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Info, X, Building2, Clock } from 'lucide-react';
 import { InventoryView } from '../inventory/InventoryView';
 import { PrescriptionView } from '../prescriptions/PrescriptionView';
 import { PurchaseOrdersView } from '../purchases/PurchaseOrdersView';
@@ -40,6 +40,8 @@ import { useAuth } from '../../context/AuthContext';
 import { AuditService } from '../../services/auditService';
 import { PharmacyService } from '../../services/pharmacyService';
 import { BranchService } from '../../services/branchService';
+import { CustomerService } from '../../services/customerService';
+import { Customer } from '../../types/customer';
 import { setLocale } from '../../utils/i18nFormatter';
 
 interface Toast {
@@ -80,11 +82,13 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
   // Prescribing Doctor & Bengali Thermal Receipt State
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorInfo | null>(REGISTERED_DOCTORS[0]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isBengaliReceipt, setIsBengaliReceipt] = useState<boolean>(true);
 
   // Modals
   const [isAnomalyModalOpen, setIsAnomalyModalOpen] = useState(false);
   const [isF10ModalOpen, setIsF10ModalOpen] = useState(false);
+  const [isHeldOrdersModalOpen, setIsHeldOrdersModalOpen] = useState(false);
   const [isThermalModalOpen, setIsThermalModalOpen] = useState(false);
   const [autoPrintThermal, setAutoPrintThermal] = useState(false);
   const [isRxWarningModalOpen, setIsRxWarningModalOpen] = useState(false);
@@ -140,7 +144,12 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     return sum + itemTotal;
   }, 0);
 
-  const loyaltyDiscount = loyaltyApplied ? 42.00 : 0.00;
+  const loyaltyDiscount = loyaltyApplied && selectedCustomer
+    ? Math.min(
+        subtotal,
+        Math.round((selectedCustomer.loyaltyPoints || 0) * CustomerService.getLoyaltyConfig().redemptionRatePerPoint * 100) / 100
+      )
+    : 0.00;
   const specialDiscount = (subtotal * Math.max(0, specialDiscPercent)) / 100;
   const discount = specialDiscount + loyaltyDiscount;
 
@@ -435,7 +444,11 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         invoiceNumber,
         date: new Date().toISOString().split('T')[0],
         timestamp: new Date().toISOString(),
-        customerName: 'Walk-In Customer',
+        customerId: selectedCustomer?.id,
+        customerName: selectedCustomer?.name || 'Walk-In Customer',
+        customerPhone: selectedCustomer?.phone || '',
+        dueAmount: paymentMethod === 'due_credit' ? grandTotal : 0,
+        notes: `METHOD:${paymentMethod === 'mfs' ? 'bkash_nagad' : paymentMethod === 'due_credit' ? 'credit' : paymentMethod}`,
         items: cart.map(item => ({
           medicineId: item.medicineId || 'unknown-med',
           medicineName: item.name,
@@ -473,8 +486,35 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         branchName: currentUser?.branchName || 'Main Branch',
       };
 
-
       await PharmacyService.completeSale(newSale);
+      if (selectedCustomer) {
+        if (loyaltyApplied && (selectedCustomer.loyaltyPoints || 0) > 0) {
+          CustomerService.redeemLoyaltyPoints(
+            selectedCustomer.id,
+            selectedCustomer.loyaltyPoints,
+            invoiceNumber,
+            currentUser?.name
+          );
+          setLoyaltyApplied(false);
+        }
+        if (paymentMethod === 'due_credit') {
+          CustomerService.recordCreditSale({
+            customerId: selectedCustomer.id,
+            invoiceNumber,
+            totalAmount: grandTotal,
+            amountPaidNow: 0,
+            dueAmount: grandTotal,
+            collectedBy: currentUser?.name,
+          });
+        } else {
+          CustomerService.awardLoyaltyPoints(
+            selectedCustomer.id,
+            invoiceNumber,
+            grandTotal,
+            currentUser?.name
+          );
+        }
+      }
       setRefreshTrigger(prev => prev + 1); // Trigger catalog refresh
 
       AuditService.recordAuditLog({
@@ -642,6 +682,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                     onSwitchAlternative={handleSwitchAlternative}
                     heldCount={heldCount}
                     onHoldCart={handleHoldOrder}
+                    onOpenHeldOrdersModal={() => setIsHeldOrdersModalOpen(true)}
                     onProcessCheckout={handleProcessDispense}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
@@ -669,7 +710,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                       addToast(
                         loyaltyApplied
                           ? 'Removed loyalty points discount'
-                          : 'Applied 420 Member Points (-৳42.00)',
+                          : selectedCustomer && selectedCustomer.loyaltyPoints
+                          ? `Applied ${selectedCustomer.loyaltyPoints} Member Points (-৳${loyaltyDiscount.toFixed(2)})`
+                          : 'Applied loyalty discount',
                         'success'
                       );
                     }}
@@ -705,6 +748,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                     onAddFefoItem={handleAddFefoItem}
                     selectedDoctor={selectedDoctor}
                     onSelectDoctor={setSelectedDoctor}
+                    selectedCustomer={selectedCustomer}
+                    onSelectCustomer={setSelectedCustomer}
                     isBengaliReceipt={isBengaliReceipt}
                     onToggleBengaliReceipt={() => setIsBengaliReceipt(!isBengaliReceipt)}
                   />
@@ -994,6 +1039,89 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         onClose={() => setIsAnomalyModalOpen(false)}
         onToast={addToast}
       />
+
+      {/* Recall Held Orders Modal (F8) */}
+      {isHeldOrdersModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-orange-500" />
+                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                  Recall Held Orders ({PharmacyService.getHeldSales().length})
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsHeldOrdersModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1 space-y-3">
+              {PharmacyService.getHeldSales().length === 0 ? (
+                <div className="text-center py-12 text-slate-400">No held orders currently queued.</div>
+              ) : (
+                PharmacyService.getHeldSales().map((held) => (
+                  <div
+                    key={held.id}
+                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:border-orange-300 dark:hover:border-orange-700/50 flex items-center justify-between gap-4 transition shadow-2xs"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                          {held.holdNumber}
+                        </span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 font-semibold">
+                          {held.items.length} items
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Customer: <span className="font-medium text-slate-700 dark:text-slate-300">{held.customerName}</span>
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        {held.items.map((i: any) => `${i.name} (x${i.qty})`).join(', ')}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => {
+                          setCart(held.items);
+                          PharmacyService.removeHeldSale(held.id);
+                          setHeldCount(PharmacyService.getHeldSales().length);
+                          setIsHeldOrdersModalOpen(false);
+                          addToast(`Restored held cart ${held.holdNumber} into POS`, 'success');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-xs transition"
+                      >
+                        Restore Cart
+                      </button>
+                      <button
+                        onClick={() => {
+                          PharmacyService.removeHeldSale(held.id);
+                          setHeldCount(PharmacyService.getHeldSales().length);
+                          addToast(`Discarded held cart ${held.holdNumber}`, 'info');
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex justify-end">
+              <button
+                onClick={() => setIsHeldOrdersModalOpen(false)}
+                className="px-4 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
