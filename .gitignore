@@ -7,6 +7,9 @@ node_modules/
 .env
 .env.*
 !.env.example
+backend/.env
+frontend/.env
+backend/bakend/
 .neon
 
 # Production & Build Artifacts

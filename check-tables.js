@@ -1,11 +1,6 @@
+require('./backend/node_modules/dotenv').config({ path: './backend/.env' });
 const { PrismaClient } = require('./backend/node_modules/@prisma/client');
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'postgresql://neondb_owner:npg_VxZlL5sgNkr9@ep-silent-haze-b33tmzc2-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require'
-    }
-  }
-});
+const prisma = new PrismaClient();
 
 async function main() {
   const [userCount, roleCount, customerCount, adjCount, productCount, batchCount, supplierCount] = await Promise.all([

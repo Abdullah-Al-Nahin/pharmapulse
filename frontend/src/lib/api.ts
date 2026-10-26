@@ -8,6 +8,16 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
 });
 
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('pharmerp_jwt_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
 // Medicines
 export const inventoryApi = {
   getMedicines: async (params?: any) => {
@@ -112,6 +122,10 @@ export const userApi = {
   },
   getRoles: async () => {
     const res = await api.get('/users/roles');
+    return res.data;
+  },
+  login: async (credentials: { identifier: string; password?: string }) => {
+    const res = await api.post('/users/login', credentials);
     return res.data;
   },
 };

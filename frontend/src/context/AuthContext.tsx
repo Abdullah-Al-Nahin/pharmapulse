@@ -23,7 +23,7 @@ interface AuthContextType {
   allUsers: AuthUser[];
   token: string;
   isAuthenticated: boolean;
-  login: (employeeIdOrEmail: string, password?: string) => { success: boolean; message?: string; user?: AuthUser };
+  login: (employeeIdOrEmail: string, password?: string) => Promise<{ success: boolean; message?: string; user?: AuthUser }> | { success: boolean; message?: string; user?: AuthUser };
   logout: () => void;
   switchUser: (userId: string) => void;
   switchRole: (roleCode: PredefinedRoleCode | string) => void;
@@ -144,16 +144,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return PRECONFIGURED_USERS[0].id;
   });
 
-  // Load authentication status (defaults to true if session flag is set)
+  // Load authentication status (defaults to false so unauthenticated users must sign in via LoginPage.tsx)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
       const session = localStorage.getItem(STORAGE_KEY_AUTH_SESSION);
-      if (session === 'false') return false;
       if (session === 'true') return true;
-      // Default initial state: authenticated for seamless access unless user signs out
-      return true;
+      return false;
     } catch {
-      return true;
+      return false;
     }
   });
 
@@ -231,19 +229,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Login handler with Employee ID support
-  const login = (employeeIdOrEmail: string, password?: string): { success: boolean; message?: string; user?: AuthUser } => {
-    const cleanId = employeeIdOrEmail.trim().toLowerCase();
+  // Login handler with Server Authentication & Fallback support
+  const login = async (employeeIdOrEmail: string, password?: string): Promise<{ success: boolean; message?: string; user?: AuthUser }> => {
+    const cleanId = employeeIdOrEmail.trim();
+
+    // 1. Try server-side validation against database
+    try {
+      const serverRes = await userApi.login({ identifier: cleanId, password });
+      if (serverRes && serverRes.success && serverRes.user) {
+        if (serverRes.token) {
+          localStorage.setItem('pharmerp_jwt_token', serverRes.token);
+        }
+        setCurrentUserId(serverRes.user.id);
+        setIsAuthenticated(true);
+        localStorage.setItem(STORAGE_KEY_USER_ID, serverRes.user.id);
+        localStorage.setItem(STORAGE_KEY_AUTH_SESSION, 'true');
+        return {
+          success: true,
+          message: `Welcome back, ${serverRes.user.name}! Authenticated as ${serverRes.user.roleName}.`,
+          user: serverRes.user,
+        };
+      }
+    } catch (err: any) {
+      console.warn('Server authentication failed or server offline, trying local directory:', err?.response?.data?.message || err.message);
+    }
+
+    // 2. Offline / local fallback (e.g. root Super Admin admin/1800)
+    const cleanLower = cleanId.toLowerCase();
     let user = allUsers.find(
       (u) =>
-        (u.employeeId && u.employeeId.toLowerCase() === cleanId) ||
-        u.email.toLowerCase() === cleanId ||
-        u.name.toLowerCase() === cleanId ||
-        u.id.toLowerCase() === cleanId
+        (u.employeeId && u.employeeId.toLowerCase() === cleanLower) ||
+        u.email.toLowerCase() === cleanLower ||
+        u.name.toLowerCase() === cleanLower ||
+        u.id.toLowerCase() === cleanLower
     );
 
-    // Fallback if not yet in allUsers (e.g. root Super Admin)
-    if (!user && (cleanId === 'admin' || cleanId === 'admin@1' || cleanId === 'super_admin' || cleanId === 'super admin')) {
+    if (!user && (cleanLower === 'admin' || cleanLower === 'admin@1' || cleanLower === 'super_admin' || cleanLower === 'super admin')) {
       user = PRECONFIGURED_USERS[0];
     }
 
@@ -251,16 +272,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: false, message: 'Invalid Employee ID. No registered staff found with this ID.' };
     }
 
-    // Validate password if user has one configured
-    if (user.password) {
-      if (!password || user.password !== password) {
-        return { success: false, message: 'Invalid password. Please verify and try again.' };
-      }
+    // Validate password if known locally (or admin default 1800)
+    const validPass = user.password || (user.roleCode === 'super_admin' ? '1800' : undefined);
+    if (validPass && validPass !== password) {
+      return { success: false, message: 'Invalid password. Please verify and try again.' };
     }
 
     setCurrentUserId(user.id);
     setIsAuthenticated(true);
     try {
+      localStorage.setItem('pharmerp_jwt_token', `pharmerp_token_${user.id}`);
       localStorage.setItem(STORAGE_KEY_USER_ID, user.id);
       localStorage.setItem(STORAGE_KEY_AUTH_SESSION, 'true');
     } catch {}
@@ -277,6 +298,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsAuthenticated(false);
     try {
       localStorage.setItem(STORAGE_KEY_AUTH_SESSION, 'false');
+      localStorage.removeItem('pharmerp_jwt_token');
     } catch {}
   };
 

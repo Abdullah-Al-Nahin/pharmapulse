@@ -38,8 +38,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     } catch {}
   }, [isDark]);
 
-  // Synchronous, single-click login handler
-  const handleLogin = (e?: React.FormEvent) => {
+  // Single-click login handler
+  const handleLogin = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
@@ -56,8 +56,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       return;
     }
 
-    // Direct single-click execution — no artificial delay or setTimeout
-    const res = login(cleanId, password);
+    // Direct execution with server auth & fallback
+    const res = await login(cleanId, password);
     if (res.success) {
       if (onLoginSuccess) {
         onLoginSuccess();
