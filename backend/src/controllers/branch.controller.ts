@@ -4,9 +4,9 @@ import { prisma } from '../server';
 export class BranchController {
   static async getAllBranches(_req: Request, res: Response) {
     try {
-      const branches: any = await prisma.$queryRaw`
-        SELECT * FROM "branches" ORDER BY "createdAt" ASC
-      `;
+      const branches = await prisma.branch.findMany({
+        orderBy: { createdAt: 'asc' }
+      });
 
       // Map to frontend BranchInfo
       const mapped = branches.map((b: any) => ({
@@ -48,7 +48,7 @@ export class BranchController {
       const { name, bnName, code, type, address, phone, managerName, licenseNo, color } = req.body;
       const newId = `br-${Date.now()}`;
 
-      const defaultMetrics = JSON.stringify({
+      const defaultMetrics = {
         stockCount: 0,
         stockValue: 0,
         todaySales: 0,
@@ -61,25 +61,25 @@ export class BranchController {
         staffCount: 1,
         activeSuppliers: 0,
         registeredCustomers: 0,
+      };
+
+      const branch = await prisma.branch.create({
+        data: {
+          id: newId,
+          name,
+          bnName: bnName || name,
+          code,
+          type: type || 'retail_branch',
+          address: address || '',
+          phone: phone || '',
+          managerName: managerName || '',
+          licenseNo: licenseNo || '',
+          color: color || '#10b981',
+          metrics: defaultMetrics,
+        }
       });
 
-      await prisma.$executeRawUnsafe(`
-        INSERT INTO "branches" ("id", "name", "bnName", "code", "type", "address", "phone", "managerName", "licenseNo", "color", "metrics", "updatedAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, NOW())
-      `, newId, name, bnName || name, code, type || 'retail_branch', address || '', phone || '', managerName || '', licenseNo || '', color || '#10b981', defaultMetrics);
-
-      res.status(201).json({
-        id: newId,
-        name,
-        bnName,
-        code,
-        type,
-        address,
-        phone,
-        managerName,
-        licenseNo,
-        color
-      });
+      res.status(201).json(branch);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -90,20 +90,19 @@ export class BranchController {
       const { id } = req.params;
       const { name, bnName, code, address, phone, managerName, licenseNo, metrics } = req.body;
 
-      await prisma.$executeRawUnsafe(`
-        UPDATE "branches"
-        SET
-          "name" = COALESCE($2, "name"),
-          "bnName" = COALESCE($3, "bnName"),
-          "code" = COALESCE($4, "code"),
-          "address" = COALESCE($5, "address"),
-          "phone" = COALESCE($6, "phone"),
-          "managerName" = COALESCE($7, "managerName"),
-          "licenseNo" = COALESCE($8, "licenseNo"),
-          "metrics" = COALESCE($9::jsonb, "metrics"),
-          "updatedAt" = NOW()
-        WHERE "id" = $1
-      `, id, name, bnName, code, address, phone, managerName, licenseNo, metrics ? JSON.stringify(metrics) : null);
+      await prisma.branch.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(bnName !== undefined && { bnName }),
+          ...(code !== undefined && { code }),
+          ...(address !== undefined && { address }),
+          ...(phone !== undefined && { phone }),
+          ...(managerName !== undefined && { managerName }),
+          ...(licenseNo !== undefined && { licenseNo }),
+          ...(metrics !== undefined && { metrics }),
+        }
+      });
 
       res.json({ success: true, message: 'Branch updated in database' });
     } catch (error: any) {
@@ -114,7 +113,7 @@ export class BranchController {
   static async deleteBranch(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      await prisma.$executeRawUnsafe(`DELETE FROM "branches" WHERE "id" = $1`, id);
+      await prisma.branch.delete({ where: { id } });
       res.json({ success: true, message: 'Branch deleted from database' });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

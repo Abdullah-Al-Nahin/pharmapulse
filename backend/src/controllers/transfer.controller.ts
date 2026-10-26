@@ -4,11 +4,11 @@ import { prisma } from '../server';
 export class TransferController {
   static async getAllTransfers(_req: Request, res: Response) {
     try {
-      const transfers: any = await prisma.$queryRaw`
-        SELECT * FROM "stock_transfers" ORDER BY "createdAt" DESC
-      `;
+      const transfers = await prisma.stockTransfer.findMany({
+        orderBy: { createdAt: 'desc' }
+      });
 
-      const mapped = transfers.map((t: any) => ({
+      const mapped = transfers.map((t) => ({
         id: t.id,
         transferNumber: t.transferNumber,
         transferType: t.transferType || 'branch_to_branch',
@@ -59,15 +59,25 @@ export class TransferController {
       const newId = `trf-${Date.now()}`;
       const transferNumber = `TRF-${new Date().toISOString().slice(0, 4)}-${String(Math.floor(1000 + Math.random() * 9000))}`;
 
-      await prisma.$executeRawUnsafe(`
-        INSERT INTO "stock_transfers" (
-          "id", "transferNumber", "transferType", "fromBranchId", "fromBranchName",
-          "toBranchId", "toBranchName", "status", "totalUnits", "totalValue",
-          "isColdChain", "challanNumber", "requestedBy", "items", "notes", "createdAt"
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, 'received', $8, $9, $10, $11, $12, $13::jsonb, $14, NOW()
-        )
-      `, newId, transferNumber, transferType || 'branch_to_branch', fromBranchId, fromBranchName, toBranchId, toBranchName, Number(totalUnits || 0), Number(totalValue || 0), Boolean(isColdChain), challanNumber || `CH-${Date.now().toString().slice(-4)}`, requestedBy || 'Pharmacist', JSON.stringify(items || []), notes || '');
+      await prisma.stockTransfer.create({
+        data: {
+          id: newId,
+          transferNumber,
+          transferType: transferType || 'branch_to_branch',
+          fromBranchId: fromBranchId || null,
+          fromBranchName: fromBranchName || null,
+          toBranchId: toBranchId || null,
+          toBranchName: toBranchName || null,
+          status: 'received',
+          totalUnits: Number(totalUnits || 0),
+          totalValue: Number(totalValue || 0),
+          isColdChain: Boolean(isColdChain),
+          challanNumber: challanNumber || `CH-${Date.now().toString().slice(-4)}`,
+          requestedBy: requestedBy || 'Pharmacist',
+          items: items || [],
+          notes: notes || ''
+        }
+      });
 
       res.status(201).json({
         id: newId,
@@ -75,6 +85,7 @@ export class TransferController {
         status: 'received'
       });
     } catch (error: any) {
+      console.error('Error creating transfer:', error);
       res.status(500).json({ error: error.message });
     }
   }

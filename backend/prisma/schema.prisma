@@ -267,6 +267,8 @@ model User {
   fullName        String            @db.VarChar(100)
   phone           String?           @db.VarChar(20)
   licenseNumber   String?           @db.VarChar(50) // Pharmacist registration council number
+  branchId        String?           @db.VarChar(100)
+  branchName      String?           @db.VarChar(150)
   roleId          String
   status          UserStatus        @default(ACTIVE)
   lastLoginAt     DateTime?
@@ -452,6 +454,8 @@ model Batch {
   currentStock        Int                 @default(0)        // Physical available units
   reservedStock       Int                 @default(0)        // Units in active held carts
   rackLocation        String?             @db.VarChar(50)    // Exact shelf, tray, or fridge slot
+  branchId            String?             @db.VarChar(100)
+  branchName          String?             @db.VarChar(150)
   status              BatchStatus         @default(ACTIVE)
   quarantineReason    String?             @db.Text
   createdAt           DateTime            @default(now())
@@ -959,4 +963,53 @@ model JournalLine {
   @@index([journalEntryId])
   @@index([accountId])
   @@map("journal_lines")
+}
+
+// ==============================================================================
+// 10. MULTI-BRANCH NETWORK & INTER-BRANCH STOCK TRANSFERS
+// ==============================================================================
+
+model Branch {
+  id           String    @id @db.VarChar(100)
+  name         String    @db.VarChar(150)
+  bnName       String?   @db.VarChar(150)
+  code         String    @unique @db.VarChar(50)
+  type         String?   @default("retail_branch") @db.VarChar(50)
+  address      String?   @db.Text
+  phone        String?   @db.VarChar(50)
+  managerName  String?   @db.VarChar(100)
+  licenseNo    String?   @db.VarChar(100)
+  color        String?   @db.VarChar(50)
+  metrics      Json?     @default("{}")
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("branches")
+}
+
+model StockTransfer {
+  id                 String    @id @db.VarChar(100)
+  transferNumber     String    @unique @db.VarChar(100)
+  transferType       String?   @default("branch_to_branch") @db.VarChar(50)
+  fromBranchId       String?   @db.VarChar(100)
+  fromBranchName     String?   @db.VarChar(150)
+  toBranchId         String?   @db.VarChar(100)
+  toBranchName       String?   @db.VarChar(150)
+  status             String?   @default("received") @db.VarChar(50)
+  totalUnits         Int?      @default(0)
+  totalValue         Decimal?  @default(0) @db.Decimal(14, 2)
+  isColdChain        Boolean?  @default(false)
+  transitTemperature String?   @default("Ambient") @db.VarChar(50)
+  challanNumber      String?   @db.VarChar(100)
+  requestedBy        String?   @db.VarChar(100)
+  dispatchedBy       String?   @db.VarChar(100)
+  receivedBy         String?   @db.VarChar(100)
+  requestedAt        DateTime? @default(now()) @db.Timestamptz(6)
+  dispatchedAt       DateTime? @db.Timestamptz(6)
+  receivedAt         DateTime? @db.Timestamptz(6)
+  items              Json?     @default("[]")
+  notes              String?   @db.Text
+  createdAt          DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("stock_transfers")
 }
