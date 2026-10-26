@@ -236,25 +236,28 @@ export class ExecutiveDashboardService {
     ).length;
 
     // 5. OUTSTANDING (Properly coerced numbers, NO STRING CONCATENATION)
+    const supplierBalanceSum = suppliers.reduce((sum, s) => sum + (Number(s.balancePayable) || 0), 0);
     const unpaidPurchasesDue = purchases
       .filter((p) => p.paymentStatus !== 'paid')
       .reduce((acc, p) => {
         if (p.dueAmount !== undefined) return acc + Number(p.dueAmount);
         return acc + Math.max(0, (Number(p.totalAmount) || 0) - (Number(p.paidAmount) || 0));
       }, 0);
+    const supplierPayablesTotal = Math.round(Math.max(supplierBalanceSum, unpaidPurchasesDue));
+    const supplierCountWithDue = new Set([
+      ...suppliers.filter((s) => (Number(s.balancePayable) || 0) > 0).map((s) => s.id),
+      ...purchases.filter((p) => p.paymentStatus !== 'paid').map((p) => p.supplierId),
+    ]).size;
 
-    const supplierPayablesTotal = Math.round(
-      unpaidPurchasesDue + suppliers.reduce((sum, s) => sum + (Number(s.balancePayable) || 0), 0)
+    const customerBalanceSum = customers.reduce((sum, c) => sum + (Number(c.outstandingBalance) || 0), 0);
+    const dueSalesSum = sales
+      .filter((s) => s.paymentStatus === 'due')
+      .reduce((sum, s) => sum + (Number(s.dueAmount || s.grandTotal) || 0), 0);
+    const customerReceivablesTotal = Math.round(Math.max(customerBalanceSum, dueSalesSum));
+    const customerCountWithDue = Math.max(
+      customers.filter((c) => (Number(c.outstandingBalance) || 0) > 0).length,
+      sales.filter((s) => s.paymentStatus === 'due').length
     );
-    const supplierCountWithDue = suppliers.filter((s) => (Number(s.balancePayable) || 0) > 0).length +
-      purchases.filter((p) => p.paymentStatus !== 'paid').length;
-
-    const customerReceivablesTotal = Math.round(
-      customers.reduce((sum, c) => sum + (Number(c.outstandingBalance) || 0), 0) +
-      sales.filter((s) => s.paymentStatus === 'due').reduce((sum, s) => sum + (Number(s.dueAmount || s.grandTotal) || 0), 0)
-    );
-    const customerCountWithDue = customers.filter((c) => (Number(c.outstandingBalance) || 0) > 0).length +
-      sales.filter((s) => s.paymentStatus === 'due').length;
 
     const netBalance = customerReceivablesTotal - supplierPayablesTotal;
 

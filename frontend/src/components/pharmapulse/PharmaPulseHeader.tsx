@@ -51,6 +51,8 @@ export const PharmaPulseHeader: React.FC<PharmaPulseHeaderProps> = ({
   const [branches, setBranches] = useState(() => BranchService.getBranches());
   const [currentTime, setCurrentTime] = useState<string>('');
 
+  const liveCashBalance = BranchService.computeMetricsForBranch(currentUser?.branchId || 'all').cashBalance;
+
   useEffect(() => {
     return BranchService.subscribe(() => {
       setBranches(BranchService.getBranches());
@@ -146,7 +148,7 @@ export const PharmaPulseHeader: React.FC<PharmaPulseHeaderProps> = ({
             {language === 'BN' ? 'ক্যাশ ড্রয়ার:' : 'Drawer Cash:'}
           </span>
           <span className="font-mono font-black text-emerald-800 dark:text-emerald-300 text-xs">
-            ৳3,420.50
+            ৳{liveCashBalance.toLocaleString()}
           </span>
         </div>
 

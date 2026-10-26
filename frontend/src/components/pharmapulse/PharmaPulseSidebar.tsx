@@ -24,6 +24,8 @@ import {
 import { PharmaNavTab } from '../../types/pharmapulse';
 import { useAuth } from '../../context/AuthContext';
 import { Permission } from '../../types/rbac';
+import { BranchService } from '../../services/branchService';
+import { PharmacyService } from '../../services/pharmacyService';
 
 const TAB_PERMISSIONS: Partial<Record<PharmaNavTab, Permission[]>> = {
   pos: ['pos:sale:create', 'pos:sale:view'],
@@ -71,6 +73,14 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
   onExpiringClick,
 }) => {
   const { hasAnyPermission, isSuperAdmin, currentUser, logout } = useAuth();
+
+  const now = Date.now();
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+  const expiringLotsCount = PharmacyService.getBatches().filter((b) => {
+    if ((b.currentStock || 0) <= 0) return false;
+    const expTime = new Date(b.expiryDate).getTime();
+    return expTime > now && expTime <= now + thirtyDaysMs;
+  }).length;
 
   const isTabAllowed = (tabId: PharmaNavTab) => {
     // ONLY Super Admin can view or access Settings & Roles
@@ -136,7 +146,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           label: 'Multi-Branch (IBT)',
           labelBn: 'মাল্টি-ব্রাঞ্চ',
           icon: Building2,
-          badge: '6 Br',
+          badge: `${BranchService.getBranches().length} Br`,
           badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
         },
         {
@@ -274,7 +284,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
                 </div>
                 <div className="flex flex-col leading-tight truncate">
                   <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Expiring Soon</span>
-                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">14 Lots &lt; 30d</span>
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">{expiringLotsCount} Lots &lt; 30d</span>
                 </div>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -310,7 +320,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={onExpiringClick}
-              title="Expiring Soon: 14 Lots < 30d"
+              title={`Expiring Soon: ${expiringLotsCount} Lots < 30d`}
               className="w-full flex items-center justify-center p-2 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950 cursor-pointer"
             >
               <Clock className="w-4 h-4" />

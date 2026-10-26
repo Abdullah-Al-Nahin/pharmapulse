@@ -57,7 +57,7 @@ interface PharmaPulseDashboardProps {
 export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   onNavigateToTab,
 }) => {
-  const { currentUser, isSuperAdmin } = useAuth();
+  const { currentUser, isSuperAdmin, maxDiscountPercent } = useAuth();
 
   // Navigation
   const [activeTab, setActiveTab] = useState<PharmaNavTab>('pos');
@@ -196,9 +196,15 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     );
   };
 
+  const maxAllowedDisc = isSuperAdmin ? 100 : (maxDiscountPercent ?? 5);
+
   const handleSetDisc = (id: number, disc: number) => {
+    if (disc > maxAllowedDisc) {
+      addToast(`Discount capped at ${maxAllowedDisc}% for role ${currentUser?.roleName || 'Staff'}`, 'error');
+    }
+    const clamped = Math.max(0, Math.min(maxAllowedDisc, disc));
     setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, disc: Math.max(0, Math.min(100, disc)) } : item))
+      prev.map((item) => (item.id === id ? { ...item, disc: clamped } : item))
     );
   };
 
@@ -629,6 +635,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         onSelectTab={handleNavSelect}
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onExpiringClick={() => setActiveTab('batches_expiry')}
       />
 
       {/* Main App Workspace */}
@@ -717,9 +724,18 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                       );
                     }}
                     specialDiscPercent={specialDiscPercent}
-                    onChangeSpecialDiscPercent={setSpecialDiscPercent}
+                    onChangeSpecialDiscPercent={(pct) => {
+                      if (pct > maxAllowedDisc) {
+                        addToast(`Special discount capped at ${maxAllowedDisc}% for your role`, 'error');
+                      }
+                      setSpecialDiscPercent(Math.max(0, Math.min(maxAllowedDisc, pct)));
+                    }}
                     onToggleSpecialDisc={() => {
-                      const newDisc = specialDiscPercent === 5 ? 10 : 5;
+                      const targetDisc = specialDiscPercent === 5 ? 10 : 5;
+                      const newDisc = Math.min(maxAllowedDisc, targetDisc);
+                      if (targetDisc > maxAllowedDisc) {
+                        addToast(`Special discount capped at ${maxAllowedDisc}% for your role`, 'error');
+                      }
                       setSpecialDiscPercent(newDisc);
                       addToast(`Special discount adjusted to ${newDisc}%`, 'info');
                     }}
