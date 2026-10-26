@@ -40,6 +40,7 @@ import { useAuth } from '../../context/AuthContext';
 import { AuditService } from '../../services/auditService';
 import { PharmacyService } from '../../services/pharmacyService';
 import { BranchService } from '../../services/branchService';
+import { setLocale } from '../../utils/i18nFormatter';
 
 interface Toast {
   id: string;
@@ -99,7 +100,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   const [vatPercent, setVatPercent] = useState<number>(5);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'mfs' | 'due_credit'>('cash');
   const [tenderedAmount, setTenderedAmount] = useState<number>(1000);
-  const [heldCount, setHeldCount] = useState<number>(2);
+  const [heldCount, setHeldCount] = useState<number>(() => PharmacyService.getHeldSales().length);
+
 
   // Search & Dialogs
   const [searchQuery, setSearchQuery] = useState('');
@@ -365,10 +367,36 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       addToast('Cannot hold an empty cart', 'error');
       return;
     }
-    const holdId = `HLD-${Date.now().toString().slice(-4)}`;
-    setHeldCount((prev) => prev + 1);
+
+    const mappedItems: any = cart.map(item => ({
+      medicineId: item.medicineId || 'unknown-med',
+      medicineName: item.name,
+      genericName: item.sub,
+      strength: item.strength || '',
+      dosageForm: 'TABLET',
+      rackLocation: item.storageTemp || 'General Storage',
+      requiresPrescription: Boolean(item.isRxRequired),
+      batchId: item.batchId || 'unknown-batch',
+      batchNumber: item.batch,
+      expiryDate: item.exp,
+      currentBatchStock: item.stock || 0,
+      isExpired: false,
+      daysToExpiry: 365,
+      quantity: item.qty,
+      unitPrice: item.price,
+      unitCost: item.purchasePrice || 0,
+      mrp: item.price,
+      discountPercent: item.disc || 0,
+      taxRate: 0,
+      subtotal: item.price * item.qty,
+      taxAmount: 0,
+      total: (item.price * item.qty) * (1 - ((item.disc || 0) / 100))
+    }));
+
+    const held = PharmacyService.holdSale(mappedItems, 'Walk-In Customer');
+    setHeldCount(PharmacyService.getHeldSales().length);
     setCart([]);
-    addToast(`Order #${holdId} placed on hold. Total held: ${heldCount + 1}`, 'info');
+    addToast(`Order #${held.holdNumber} placed on hold. Total held: ${PharmacyService.getHeldSales().length}`, 'info');
   };
 
   // F10 Checkout with DGDA Prescription Check Guardrail
@@ -431,12 +459,20 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         grandTotal,
         totalCost,
         grossProfit: grandTotal - tax - totalCost,
-        paymentMethod: paymentMethod === 'mobile' ? 'bkash_nagad' : (paymentMethod === 'card' ? 'card' : 'cash'),
-        paymentStatus: 'paid',
+        paymentMethod:
+          paymentMethod === 'mfs'
+            ? 'bkash_nagad'
+            : paymentMethod === 'card'
+            ? 'card'
+            : paymentMethod === 'due_credit'
+            ? 'credit'
+            : 'cash',
+        paymentStatus: paymentMethod === 'due_credit' ? 'due' : 'paid',
         cashierName: currentUser?.name || 'Duty Pharmacist',
         branchId: currentUser?.branchId || 'main',
         branchName: currentUser?.branchName || 'Main Branch',
       };
+
 
       await PharmacyService.completeSale(newSale);
       setRefreshTrigger(prev => prev + 1); // Trigger catalog refresh
@@ -509,7 +545,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  });
+  }, [cart, selectedDoctor, heldCount]);
 
   const handleNavSelect = (tab: PharmaNavTab) => {
     setActiveTab(tab);
@@ -562,7 +598,11 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
           language={language}
-          onToggleLanguage={() => setLanguage(language === 'EN' ? 'BN' : 'EN')}
+          onToggleLanguage={() => {
+            const nextLang = language === 'EN' ? 'BN' : 'EN';
+            setLanguage(nextLang);
+            setLocale(nextLang === 'BN' ? 'bn' : 'en');
+          }}
           onOpenSettings={() => setActiveTab('settings')}
           onOpenShortcuts={() =>
             addToast('Hotkeys: F2 (Search), F3 (Smart Barcode), F8 (Hold), F10 (Dispense), Ctrl+P (Thermal Receipt)', 'info')
@@ -684,8 +724,35 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
             <div className="w-full">
               <PrescriptionView
                 onDispenseRxInPOS={(rx) => {
+                  const medicines = PharmacyService.getMedicines();
+                  const rxCartItems: PharmaCartItem[] = rx.items.map((item, idx) => {
+                    const med = medicines.find(m => (item.medicineId && m.id === item.medicineId) || m.name.toLowerCase() === item.medicineName.toLowerCase());
+                    const medId = med ? med.id : (item.medicineId || '');
+                    const fefo = medId ? PharmacyService.getFefoBatchForMedicine(medId) : { batch: null, totalStock: 0 };
+                    const batch = fefo.batch;
+
+                    return {
+                      id: Date.now() + idx,
+                      medicineId: medId,
+                      batchId: batch ? batch.id : undefined,
+                      name: med ? med.name : item.medicineName,
+                      sub: med?.genericName || '',
+                      company: med?.manufacturer || '',
+                      batch: batch ? batch.batchNumber : 'BATCH-01',
+                      exp: batch ? batch.expiryDate : '2026-12-31',
+                      price: batch ? Number(batch.sellingPrice) : ((med as any)?.sellingPrice || 10),
+                      purchasePrice: batch ? Number(batch.purchasePrice) : 0,
+                      qty: item.quantity || 1,
+                      disc: 0,
+                      isRxRequired: true,
+                      stock: batch ? batch.currentStock : (fefo.totalStock || 50),
+                      dosageEn: item.dosage || '',
+                    };
+                  });
+
+                  setCart((prev) => [...prev, ...rxCartItems]);
                   setActiveTab('pos');
-                  addToast(`Loaded prescription #${rx.id} into active cart`, 'success');
+                  addToast(`Loaded ${rxCartItems.length} item(s) from prescription #${rx.id || rx.prescriptionNumber} into cart`, 'success');
                 }}
               />
             </div>

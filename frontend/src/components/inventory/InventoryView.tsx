@@ -26,8 +26,23 @@ import { Medicine, Batch, MedicineCategory, DosageForm, Supplier } from '../../t
 import { MaskedCost, PermissionGuard } from '../common/PermissionGuard';
 import { usePermission } from '../../hooks/usePermission';
 import { BatchStockFefoTable } from './BatchStockFefoTable';
+import { InventoryAnalyticsEoqView } from './InventoryAnalyticsEoqView';
+import { StockSegregationHub } from './StockSegregationHub';
+import { StockTransferHub } from './StockTransferHub';
+import { RackBinManager } from './RackBinManager';
 import { inventoryApi, batchApi, supplierApi } from '../../lib/api';
 import { PharmacyService } from '../../services/pharmacyService';
+import { InventoryAdvancedService } from '../../services/inventoryAdvancedService';
+import { 
+  QuarantineRecord, 
+  DamagedStockRecord, 
+  BonusStockRecord, 
+  ReservedStockRecord, 
+  NegativeStockConfig, 
+  NegativeStockOverrideAudit,
+  RackBinLocation,
+  StockTransfer
+} from '../../types/inventoryAdvanced';
 
 interface InventoryViewProps {
   onDataChanged?: () => void;
@@ -41,7 +56,102 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
   const [loading, setLoading] = useState(true);
 
   // Active Module Tab
-  const [activeModule, setActiveModule] = useState<'batch_fefo' | 'master_catalog'>('batch_fefo');
+  const [activeModule, setActiveModule] = useState<
+    'batch_fefo' | 'master_catalog' | 'eoq_analytics' | 'segregation' | 'transfers' | 'rack_bins'
+  >('batch_fefo');
+
+  // Sub-component state
+  const [quarantineRecords, setQuarantineRecords] = useState<QuarantineRecord[]>(() => InventoryAdvancedService.getQuarantineRecords());
+  const [damagedRecords, setDamagedRecords] = useState<DamagedStockRecord[]>(() => InventoryAdvancedService.getDamagedRecords());
+  const [bonusRecords, setBonusRecords] = useState<BonusStockRecord[]>(() => InventoryAdvancedService.getBonusRecords());
+  const [reservedRecords, setReservedRecords] = useState<ReservedStockRecord[]>(() => InventoryAdvancedService.getReservedRecords());
+  const [negativeStockConfig, setNegativeStockConfig] = useState<NegativeStockConfig>(() => InventoryAdvancedService.getNegativeStockConfig());
+  const [negativeOverrides, setNegativeOverrides] = useState<NegativeStockOverrideAudit[]>(() => InventoryAdvancedService.getNegativeOverrides());
+  const [rackLocations, setRackLocations] = useState<RackBinLocation[]>(() => InventoryAdvancedService.getRackLocations());
+  const [transfers, setTransfers] = useState<StockTransfer[]>(() => InventoryAdvancedService.getTransfers());
+
+  useEffect(() => {
+    const unsub = InventoryAdvancedService.subscribe(() => {
+      setQuarantineRecords(InventoryAdvancedService.getQuarantineRecords());
+      setDamagedRecords(InventoryAdvancedService.getDamagedRecords());
+      setBonusRecords(InventoryAdvancedService.getBonusRecords());
+      setReservedRecords(InventoryAdvancedService.getReservedRecords());
+      setNegativeStockConfig(InventoryAdvancedService.getNegativeStockConfig());
+      setNegativeOverrides(InventoryAdvancedService.getNegativeOverrides());
+      setRackLocations(InventoryAdvancedService.getRackLocations());
+      setTransfers(InventoryAdvancedService.getTransfers());
+    });
+    return unsub;
+  }, []);
+
+  // Handlers for StockSegregationHub
+  const handleQuarantineBatch = (med: Medicine, batch: Batch, qty: number, reason: any, details: string, pharmacist: string) => {
+    InventoryAdvancedService.quarantineBatch(med, batch, qty, reason, details, pharmacist);
+    setQuarantineRecords(InventoryAdvancedService.getQuarantineRecords());
+    refreshData();
+  };
+
+  const handleReleaseQuarantine = (id: string, pharmacist: string, notes: string) => {
+    InventoryAdvancedService.releaseFromQuarantine(id, pharmacist, notes);
+    setQuarantineRecords(InventoryAdvancedService.getQuarantineRecords());
+    refreshData();
+  };
+
+  const handleLogDamagedStock = (record: any) => {
+    InventoryAdvancedService.logDamagedStock(record);
+    setDamagedRecords(InventoryAdvancedService.getDamagedRecords());
+    refreshData();
+  };
+
+  const handleAddReservedStock = (res: any) => {
+    InventoryAdvancedService.addReservedStock(res);
+    setReservedRecords(InventoryAdvancedService.getReservedRecords());
+  };
+
+  const handleReleaseReservedStock = (id: string) => {
+    InventoryAdvancedService.releaseReservedStock(id);
+    setReservedRecords(InventoryAdvancedService.getReservedRecords());
+  };
+
+  const handleToggleNegativeStockPrevention = (enabled: boolean) => {
+    const updated = { ...negativeStockConfig, preventNegativeSales: enabled };
+    InventoryAdvancedService.setNegativeStockConfig(updated);
+    setNegativeStockConfig(updated);
+  };
+
+  // Handlers for StockTransferHub
+  const handleCreateTransfer = (transfer: StockTransfer) => {
+    InventoryAdvancedService.createTransfer(transfer);
+    setTransfers(InventoryAdvancedService.getTransfers());
+    refreshData();
+  };
+
+  const handleDispatchTransfer = (id: string, dispatcherName: string) => {
+    InventoryAdvancedService.dispatchTransfer(id, dispatcherName);
+    setTransfers(InventoryAdvancedService.getTransfers());
+  };
+
+  const handleReceiveTransfer = (id: string, receiverName: string) => {
+    InventoryAdvancedService.receiveTransfer(id, receiverName);
+    setTransfers(InventoryAdvancedService.getTransfers());
+    refreshData();
+  };
+
+  // Handlers for RackBinManager
+  const handleAddLocation = (loc: RackBinLocation) => {
+    InventoryAdvancedService.addRackLocation(loc);
+    setRackLocations(InventoryAdvancedService.getRackLocations());
+  };
+
+  const handleRelocateMedicine = async (medicineId: string, newLocation: string) => {
+    const med = medicines.find(m => m.id === medicineId);
+    if (med) {
+      const updated = { ...med, defaultRackLocation: newLocation, rackLocation: newLocation };
+      await inventoryApi.updateMedicine(medicineId, updated).catch(e => console.error(e));
+      refreshData();
+    }
+  };
+
 
   // Search & Filter
   const [search, setSearch] = useState('');
@@ -363,6 +473,54 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
           >
             <Boxes className="w-4 h-4" />
             <span>Medicine Master</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModule('eoq_analytics')}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeModule === 'eoq_analytics'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Calculator className="w-4 h-4" />
+            <span>EOQ & Analytics</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModule('segregation')}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeModule === 'segregation'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <ShieldAlert className="w-4 h-4" />
+            <span>Stock Segregation</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModule('transfers')}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeModule === 'transfers'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <ArrowRightLeft className="w-4 h-4" />
+            <span>Stock Transfers</span>
+          </button>
+
+          <button
+            onClick={() => setActiveModule('rack_bins')}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeModule === 'rack_bins'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <MapPin className="w-4 h-4" />
+            <span>Rack & Bins</span>
           </button>
         </div>
 
@@ -686,6 +844,58 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
       </div>
     </div>
     )}
+
+      {/* MODULE 3: EOQ & ANALYTICS */}
+      {activeModule === 'eoq_analytics' && (
+        <InventoryAnalyticsEoqView
+          medicines={medicines}
+          batches={batches}
+        />
+      )}
+
+      {/* MODULE 4: STOCK SEGREGATION & QUARANTINE */}
+      {activeModule === 'segregation' && (
+        <StockSegregationHub
+          quarantineRecords={quarantineRecords}
+          damagedRecords={damagedRecords}
+          bonusRecords={bonusRecords}
+          reservedRecords={reservedRecords}
+          negativeStockConfig={negativeStockConfig}
+          negativeOverrides={negativeOverrides}
+          medicines={medicines}
+          batches={batches}
+          onQuarantineBatch={handleQuarantineBatch}
+          onReleaseQuarantine={handleReleaseQuarantine}
+          onLogDamagedStock={handleLogDamagedStock}
+          onAddReservedStock={handleAddReservedStock}
+          onReleaseReservedStock={handleReleaseReservedStock}
+          onToggleNegativeStockPrevention={handleToggleNegativeStockPrevention}
+        />
+      )}
+
+      {/* MODULE 5: MULTI-BRANCH STOCK TRANSFERS */}
+      {activeModule === 'transfers' && (
+        <StockTransferHub
+          transfers={transfers}
+          medicines={medicines}
+          batches={batches}
+          onCreateTransfer={handleCreateTransfer}
+          onDispatchTransfer={handleDispatchTransfer}
+          onReceiveTransfer={handleReceiveTransfer}
+        />
+      )}
+
+      {/* MODULE 6: RACK & BIN LOCATION MANAGER */}
+      {activeModule === 'rack_bins' && (
+        <RackBinManager
+          locations={rackLocations}
+          medicines={medicines}
+          batches={batches}
+          onAddLocation={handleAddLocation}
+          onRelocateMedicine={handleRelocateMedicine}
+        />
+      )}
+
 
       {/* --- ADD MEDICINE MODAL --- */}
       {showAddModal && (
