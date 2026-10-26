@@ -8,7 +8,7 @@ export class TransferController {
         orderBy: { createdAt: 'desc' }
       });
 
-      const mapped = transfers.map((t) => ({
+      const mapped = transfers.map((t: any) => ({
         id: t.id,
         transferNumber: t.transferNumber,
         transferType: t.transferType || 'branch_to_branch',
