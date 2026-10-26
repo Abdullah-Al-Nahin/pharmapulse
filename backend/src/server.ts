@@ -34,9 +34,9 @@ app.use(cors({
         return callback(null, true);
       }
     } catch {
-      // If URL parsing fails, fall back safely
+      return callback(new Error('Invalid Origin header'));
     }
-    return callback(new Error('Not allowed by CORS'));
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
