@@ -92,8 +92,8 @@ export const DatabaseControlView: React.FC = () => {
     const medicines = PharmacyService.getMedicines();
     const batches = PharmacyService.getBatches();
     const sales = PharmacyService.getSales();
-    const returns = PharmacyService.getSaleReturns();
-    const purchases = PharmacyService.getPurchaseOrders();
+    const returns = PharmacyService.getReturns();
+    const purchases = PharmacyService.getPurchases();
     const prescriptions = PharmacyService.getPrescriptions();
     const heldSales = PharmacyService.getHeldSales();
     const accounting = PharmacyService.getAccountingTransactions();
@@ -118,7 +118,7 @@ export const DatabaseControlView: React.FC = () => {
     const salesLast7d = sales.filter((s) => now - new Date(s.timestamp || s.date).getTime() <= 7 * dayMs).length;
     const salesLast30d = sales.filter((s) => now - new Date(s.timestamp || s.date).getTime() <= 30 * dayMs).length;
 
-    const customersWithDue = customers.filter((c) => (c.totalDue || 0) > 0 || (c.loyaltyPoints || 0) > 0).length;
+    const customersWithDue = customers.filter((c: any) => (c.dueBalance || c.totalDue || 0) > 0 || (c.loyaltyPoints || 0) > 0).length;
 
     return {
       medicines: Math.max(medicines.length, remoteStats?.products || 0),
@@ -444,8 +444,8 @@ export const DatabaseControlView: React.FC = () => {
       batches: PharmacyService.getBatches(),
       suppliers: PharmacyService.getSuppliers(),
       sales: PharmacyService.getSales(),
-      returns: PharmacyService.getSaleReturns(),
-      purchases: PharmacyService.getPurchaseOrders(),
+      returns: PharmacyService.getReturns(),
+      purchases: PharmacyService.getPurchases(),
       prescriptions: PharmacyService.getPrescriptions(),
       accounting: PharmacyService.getAccountingTransactions(),
       customers: CustomerService.getCustomers(),

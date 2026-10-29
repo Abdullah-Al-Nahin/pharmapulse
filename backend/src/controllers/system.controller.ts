@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../config/database';
+import { prisma } from '../server';
 
 export type PurgeScope =
   | 'full_database'
@@ -247,7 +247,7 @@ export const purgeDatabase = async (req: Request, res: Response) => {
           },
           select: { id: true },
         });
-        const batchIds = expiredOrQuarantined.map((b) => b.id);
+        const batchIds = expiredOrQuarantined.map((b: { id: string }) => b.id);
         if (batchIds.length > 0) {
           await prisma.$transaction([
             prisma.stockAdjustment.deleteMany({ where: { batchId: { in: batchIds } } }),
@@ -322,13 +322,13 @@ export const purgeDatabase = async (req: Request, res: Response) => {
           where: { createdAt: { gte: cutoff } },
           select: { id: true },
         });
-        const saleIds = targetSales.map((s) => s.id);
+        const saleIds = targetSales.map((s: { id: string }) => s.id);
 
         const targetReturns = await prisma.saleReturn.findMany({
           where: { createdAt: { gte: cutoff } },
           select: { id: true },
         });
-        const returnIds = targetReturns.map((r) => r.id);
+        const returnIds = targetReturns.map((r: { id: string }) => r.id);
 
         await prisma.$transaction([
           ...(saleIds.length > 0
