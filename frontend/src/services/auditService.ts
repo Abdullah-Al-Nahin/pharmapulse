@@ -39,6 +39,7 @@ export class AuditService {
   // Persistent append-only log store
   private static logs: ImmutableAuditLog[] = AuditService.loadLogs();
   private static listeners: AuditListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: AuditListener) {
     this.listeners.push(listener);
@@ -48,7 +49,19 @@ export class AuditService {
   }
 
   private static emitChange() {
-    this.listeners.forEach(listener => listener());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach(listener => {
+        try {
+          listener();
+        } catch (err) {
+          console.error('AuditService listener error:', err);
+        }
+      });
+    });
   }
 
   /**

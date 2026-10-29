@@ -107,6 +107,7 @@ type InventoryListener = () => void;
 
 export class InventoryAdvancedService {
   private static listeners: InventoryListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: InventoryListener): () => void {
     this.listeners.push(listener);
@@ -116,7 +117,19 @@ export class InventoryAdvancedService {
   }
 
   private static emitChange(): void {
-    this.listeners.forEach((l) => l());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach((l) => {
+        try {
+          l();
+        } catch (err) {
+          console.error('InventoryAdvancedService listener error:', err);
+        }
+      });
+    });
   }
 
   private static getLocal<T>(key: string, fallback: T): T {

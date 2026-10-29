@@ -28,6 +28,7 @@ type CustomerListener = () => void;
 
 export class CustomerService {
   private static listeners: CustomerListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: CustomerListener): () => void {
     this.listeners.push(listener);
@@ -37,7 +38,19 @@ export class CustomerService {
   }
 
   private static emitChange(): void {
-    this.listeners.forEach((l) => l());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach((l) => {
+        try {
+          l();
+        } catch (err) {
+          console.error('CustomerService listener error:', err);
+        }
+      });
+    });
   }
 
   private static getLocal<T>(key: string, fallback: T): T {

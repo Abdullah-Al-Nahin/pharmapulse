@@ -178,7 +178,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Sync users directly from Neon PostgreSQL Database on mount & poll every 30s
   useEffect(() => {
     let isMounted = true;
+    let endpointAvailable = true;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const syncUsersFromDB = () => {
+      if (!endpointAvailable) return;
       userApi.getUsers().then((dbUsers: any) => {
         if (!isMounted) return;
         if (Array.isArray(dbUsers) && dbUsers.length > 0) {
@@ -194,14 +198,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return finalUsers;
           });
         }
-      }).catch((e) => console.error('Database user sync failed:', e));
+      }).catch((e: any) => {
+        if (e?.response?.status === 404) {
+          // Stop spamming 404 polls if backend deployment hasn't mounted /api/users yet
+          endpointAvailable = false;
+          if (intervalId) clearInterval(intervalId);
+        }
+      });
     };
 
     syncUsersFromDB();
-    const interval = setInterval(syncUsersFromDB, 30000);
+    intervalId = setInterval(syncUsersFromDB, 30000);
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      if (intervalId) clearInterval(intervalId);
     };
   }, []);
 

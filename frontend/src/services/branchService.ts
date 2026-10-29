@@ -116,6 +116,7 @@ const DEFAULT_BRANCHES: BranchInfo[] = [
 
 export class BranchService {
   private static listeners: BranchListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: BranchListener): () => void {
     this.listeners.push(listener);
@@ -125,7 +126,19 @@ export class BranchService {
   }
 
   private static emitChange(): void {
-    this.listeners.forEach((l) => l());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach((l) => {
+        try {
+          l();
+        } catch (err) {
+          console.error('BranchService listener error:', err);
+        }
+      });
+    });
   }
 
   private static isSyncing = false;

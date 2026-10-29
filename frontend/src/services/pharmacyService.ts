@@ -88,6 +88,7 @@ export class PharmacyService {
   };
 
   private static listeners: SyncListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: SyncListener) {
     this.listeners.push(listener);
@@ -97,7 +98,19 @@ export class PharmacyService {
   }
 
   private static emitChange() {
-    this.listeners.forEach(listener => listener());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach(listener => {
+        try {
+          listener();
+        } catch (err) {
+          console.error('PharmacyService listener error:', err);
+        }
+      });
+    });
   }
 
   private static isInitialized = false;
@@ -149,8 +162,8 @@ export class PharmacyService {
         const formattedSales: Sale[] = apiSales.map((s: any) => ({
           id: s.id,
           invoiceNumber: s.invoiceNumber,
-          date: s.createdAt ? new Date(s.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          timestamp: s.createdAt ? new Date(s.createdAt).toISOString() : new Date().toISOString(),
+          date: s.createdAt ? new Date(s.createdAt).toISOString().split('T')[0] : '2026-01-01',
+          timestamp: s.createdAt ? new Date(s.createdAt).toISOString() : '2026-01-01T00:00:00.000Z',
           customerName: s.customer?.name || 'Walk-In Customer',
           customerPhone: s.customer?.phone || '',
           items: (s.items || []).map((it: any) => ({
@@ -184,24 +197,36 @@ export class PharmacyService {
           cashierName: s.cashier?.fullName || s.cashier?.username || 'Cashier',
         }));
         syncedSales = formattedSales;
-        setLocalItem(STORAGE_KEYS.SALES, syncedSales);
       }
 
-      this.cache = {
-        medicines: newMedicines,
-        batches: newBatches,
-        suppliers: newSuppliers,
-        prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : INITIAL_PRESCRIPTIONS,
-        purchases: this.cache.purchases.length > 0 ? this.cache.purchases : INITIAL_PURCHASES,
-        sales: syncedSales.length > 0 ? syncedSales : INITIAL_SALES,
-        returns: this.cache.returns.length > 0 ? this.cache.returns : INITIAL_RETURNS,
-        accounting: this.cache.accounting.length > 0 ? this.cache.accounting : INITIAL_ACCOUNTING_TRANSACTIONS,
-        heldSales: this.cache.heldSales,
-        reorderList: this.cache.reorderList,
-        supplierLedgers: this.cache.supplierLedgers
-      };
+      const nextSales = syncedSales.length > 0 ? syncedSales : INITIAL_SALES;
+      const hasChanged =
+        JSON.stringify(this.cache.medicines) !== JSON.stringify(newMedicines) ||
+        JSON.stringify(this.cache.batches) !== JSON.stringify(newBatches) ||
+        JSON.stringify(this.cache.suppliers) !== JSON.stringify(newSuppliers) ||
+        JSON.stringify(this.cache.sales) !== JSON.stringify(nextSales);
 
-      this.emitChange();
+      if (hasChanged) {
+        if (Array.isArray(apiSales) && apiSales.length > 0) {
+          setLocalItem(STORAGE_KEYS.SALES, syncedSales);
+        }
+
+        this.cache = {
+          medicines: newMedicines,
+          batches: newBatches,
+          suppliers: newSuppliers,
+          prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : INITIAL_PRESCRIPTIONS,
+          purchases: this.cache.purchases.length > 0 ? this.cache.purchases : INITIAL_PURCHASES,
+          sales: nextSales,
+          returns: this.cache.returns.length > 0 ? this.cache.returns : INITIAL_RETURNS,
+          accounting: this.cache.accounting.length > 0 ? this.cache.accounting : INITIAL_ACCOUNTING_TRANSACTIONS,
+          heldSales: this.cache.heldSales,
+          reorderList: this.cache.reorderList,
+          supplierLedgers: this.cache.supplierLedgers
+        };
+
+        this.emitChange();
+      }
     } catch (err) {
       console.error("Global Database Sync failed", err);
     }

@@ -384,6 +384,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     }
 
     const mappedItems: any = cart.map(item => ({
+      ...item,
       medicineId: item.medicineId || 'unknown-med',
       medicineName: item.name,
       genericName: item.sub,
@@ -786,8 +787,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
               <PrescriptionView
                 onDispenseRxInPOS={(rx) => {
                   const medicines = PharmacyService.getMedicines();
-                  const rxCartItems: PharmaCartItem[] = rx.items.map((item, idx) => {
-                    const med = medicines.find(m => (item.medicineId && m.id === item.medicineId) || m.name.toLowerCase() === item.medicineName.toLowerCase());
+                  const rawMedications = (rx as any).medications || (rx as any).items || [];
+                  const rxCartItems: PharmaCartItem[] = rawMedications.map((item: any, idx: number) => {
+                    const med = medicines.find(m => (item.medicineId && m.id === item.medicineId) || m.name.toLowerCase() === (item.medicineName || '').toLowerCase());
                     const medId = med ? med.id : (item.medicineId || '');
                     const fefo = medId ? PharmacyService.getFefoBatchForMedicine(medId) : { batch: null, totalStock: 0 };
                     const batch = fefo.batch;
@@ -796,7 +798,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                       id: Date.now() + idx,
                       medicineId: medId,
                       batchId: batch ? batch.id : undefined,
-                      name: med ? med.name : item.medicineName,
+                      name: med ? med.name : (item.medicineName || 'Medicine'),
                       sub: med?.genericName || '',
                       company: med?.manufacturer || '',
                       batch: batch ? batch.batchNumber : 'BATCH-01',
@@ -1096,13 +1098,33 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                         Customer: <span className="font-medium text-slate-700 dark:text-slate-300">{held.customerName}</span>
                       </div>
                       <div className="text-xs text-slate-400 mt-0.5">
-                        {held.items.map((i: any) => `${i.name} (x${i.qty})`).join(', ')}
+                        {held.items.map((i: any) => `${i.name || i.medicineName || 'Item'} (x${i.qty ?? i.quantity ?? 1})`).join(', ')}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => {
-                          setCart(held.items);
+                          const restoredCart: PharmaCartItem[] = held.items.map((i: any, idx: number) => ({
+                            id: i.id ?? (Date.now() + idx),
+                            medicineId: i.medicineId,
+                            batchId: i.batchId,
+                            name: i.name || i.medicineName || 'Medicine',
+                            sub: i.sub || i.genericName || '',
+                            company: i.company || '',
+                            batch: i.batch || i.batchNumber || 'BATCH-01',
+                            exp: i.exp || i.expiryDate || '2026-12-31',
+                            price: Number(i.price ?? i.unitPrice ?? 0),
+                            purchasePrice: Number(i.purchasePrice ?? i.unitCost ?? 0),
+                            qty: Number(i.qty ?? i.quantity ?? 1),
+                            disc: Number(i.disc ?? i.discountPercent ?? 0),
+                            isRxRequired: Boolean(i.isRxRequired ?? i.requiresPrescription),
+                            stock: Number(i.stock ?? i.currentBatchStock ?? 50),
+                            dosageEn: i.dosageEn || '',
+                            dosageBn: i.dosageBn || '',
+                            strength: i.strength || '',
+                            storageTemp: i.storageTemp || i.rackLocation || '',
+                          }));
+                          setCart(restoredCart);
                           PharmacyService.removeHeldSale(held.id);
                           setHeldCount(PharmacyService.getHeldSales().length);
                           setIsHeldOrdersModalOpen(false);

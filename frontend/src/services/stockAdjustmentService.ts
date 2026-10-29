@@ -30,6 +30,7 @@ function initializeStockAdjustments(): StockAdjustment[] {
 
 export class StockAdjustmentService {
   private static listeners: AdjustmentListener[] = [];
+  private static isEmitting = false;
 
   public static subscribe(listener: AdjustmentListener): () => void {
     this.listeners.push(listener);
@@ -39,7 +40,19 @@ export class StockAdjustmentService {
   }
 
   private static emitChange(): void {
-    this.listeners.forEach((l) => l());
+    if (this.isEmitting) return;
+    this.isEmitting = true;
+    queueMicrotask(() => {
+      this.isEmitting = false;
+      const snapshot = [...this.listeners];
+      snapshot.forEach((l) => {
+        try {
+          l();
+        } catch (err) {
+          console.error('StockAdjustmentService listener error:', err);
+        }
+      });
+    });
   }
 
   public static getApprovalThreshold(): number {
