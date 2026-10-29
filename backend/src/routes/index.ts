@@ -10,6 +10,7 @@ import branchRoutes from './branch.routes';
 import customerRoutes from './customer.routes';
 import adjustmentRoutes from './adjustment.routes';
 import transferRoutes from './transfer.routes';
+import systemRoutes from './system.routes';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/branches', branchRoutes);
 router.use('/customers', customerRoutes);
 router.use('/adjustments', adjustmentRoutes);
 router.use('/transfers', transferRoutes);
+router.use('/system', systemRoutes);
 
 export default router;

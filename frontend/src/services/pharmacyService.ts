@@ -27,7 +27,7 @@ import {
   INITIAL_RETURNS, 
   INITIAL_ACCOUNTING_TRANSACTIONS 
 } from '../lib/initialData';
-import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi } from '../lib/api';
+import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi, systemApi } from '../lib/api';
 import { AuditService } from './auditService';
 
 const STORAGE_KEYS = {
@@ -42,17 +42,49 @@ const STORAGE_KEYS = {
   HELD_SALES: 'rx_held_sales_v1',
   REORDER_LIST: 'rx_reorder_list_v1',
   SUPPLIER_LEDGERS: 'rx_supplier_ledgers_v1',
+  CLEARED_SCOPES: 'rx_cleared_scopes_v1',
 };
+
+export interface ClearedScopesFlags {
+  medicines?: boolean;
+  batches?: boolean;
+  suppliers?: boolean;
+  prescriptions?: boolean;
+  purchases?: boolean;
+  sales?: boolean;
+  returns?: boolean;
+  accounting?: boolean;
+}
+
+function getClearedScopes(): ClearedScopesFlags {
+  try {
+    if (typeof window !== 'undefined') {
+      const raw = localStorage.getItem(STORAGE_KEYS.CLEARED_SCOPES);
+      if (raw) return JSON.parse(raw);
+    }
+  } catch {}
+  return {};
+}
+
+function setClearedScopes(flags: ClearedScopesFlags): void {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.CLEARED_SCOPES, JSON.stringify(flags));
+    }
+  } catch {}
+}
 
 type SyncListener = () => void;
 
-function getLocalItem<T>(key: string, fallback: T): T {
+function getLocalItem<T>(key: string, fallback: T, allowEmpty = false): T {
   try {
     if (typeof window !== 'undefined') {
       const item = localStorage.getItem(key);
-      if (item) {
+      if (item !== null) {
         const parsed = JSON.parse(item);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed as unknown as T;
+        if (Array.isArray(parsed) && (parsed.length > 0 || allowEmpty)) {
+          return parsed as unknown as T;
+        }
       }
     }
   } catch {
@@ -71,20 +103,22 @@ function setLocalItem(key: string, data: any): void {
   }
 }
 
+const initialCleared = getClearedScopes();
+
 export class PharmacyService {
   // Lightning-fast RAM Cache
   private static cache = {
-    medicines: INITIAL_MEDICINES,
-    batches: INITIAL_BATCHES,
-    suppliers: INITIAL_SUPPLIERS,
-    prescriptions: getLocalItem(STORAGE_KEYS.PRESCRIPTIONS, INITIAL_PRESCRIPTIONS),
-    purchases: getLocalItem(STORAGE_KEYS.PURCHASES, INITIAL_PURCHASES),
-    sales: getLocalItem(STORAGE_KEYS.SALES, INITIAL_SALES),
-    returns: getLocalItem(STORAGE_KEYS.RETURNS, INITIAL_RETURNS),
-    accounting: getLocalItem(STORAGE_KEYS.ACCOUNTING, INITIAL_ACCOUNTING_TRANSACTIONS),
-    heldSales: getLocalItem(STORAGE_KEYS.HELD_SALES, [] as HeldSale[]),
-    reorderList: getLocalItem(STORAGE_KEYS.REORDER_LIST, [] as ReorderItem[]),
-    supplierLedgers: getLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, [] as SupplierLedgerEntry[])
+    medicines: initialCleared.medicines ? getLocalItem(STORAGE_KEYS.MEDICINES, [] as Medicine[], true) : INITIAL_MEDICINES,
+    batches: initialCleared.batches ? getLocalItem(STORAGE_KEYS.BATCHES, [] as Batch[], true) : INITIAL_BATCHES,
+    suppliers: initialCleared.suppliers ? getLocalItem(STORAGE_KEYS.SUPPLIERS, [] as Supplier[], true) : INITIAL_SUPPLIERS,
+    prescriptions: getLocalItem(STORAGE_KEYS.PRESCRIPTIONS, initialCleared.prescriptions ? [] : INITIAL_PRESCRIPTIONS, Boolean(initialCleared.prescriptions)),
+    purchases: getLocalItem(STORAGE_KEYS.PURCHASES, initialCleared.purchases ? [] : INITIAL_PURCHASES, Boolean(initialCleared.purchases)),
+    sales: getLocalItem(STORAGE_KEYS.SALES, initialCleared.sales ? [] : INITIAL_SALES, Boolean(initialCleared.sales)),
+    returns: getLocalItem(STORAGE_KEYS.RETURNS, initialCleared.returns ? [] : INITIAL_RETURNS, Boolean(initialCleared.returns)),
+    accounting: getLocalItem(STORAGE_KEYS.ACCOUNTING, initialCleared.accounting ? [] : INITIAL_ACCOUNTING_TRANSACTIONS, Boolean(initialCleared.accounting)),
+    heldSales: getLocalItem(STORAGE_KEYS.HELD_SALES, [] as HeldSale[], true),
+    reorderList: getLocalItem(STORAGE_KEYS.REORDER_LIST, [] as ReorderItem[], true),
+    supplierLedgers: getLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, [] as SupplierLedgerEntry[], true)
   };
 
   private static listeners: SyncListener[] = [];
@@ -129,6 +163,7 @@ export class PharmacyService {
 
   public static async syncDatabase(): Promise<void> {
     try {
+      const cleared = getClearedScopes();
       // Execute fast parallel fetch from our Postgres backend
       const [
         apiMedicines, 
@@ -136,26 +171,28 @@ export class PharmacyService {
         apiSuppliers,
         apiSales
       ] = await Promise.all([
-        inventoryApi.getMedicines().catch(() => INITIAL_MEDICINES),
-        batchApi.getBatches().catch(() => INITIAL_BATCHES),
+        inventoryApi.getMedicines().catch(() => (cleared.medicines ? [] : INITIAL_MEDICINES)),
+        batchApi.getBatches().catch(() => (cleared.batches ? [] : INITIAL_BATCHES)),
         supplierApi.getSuppliers().catch(() => []),
         saleApi.getSales().catch(() => []),
       ]);
 
-      const newMedicines = (apiMedicines.length > 0 ? apiMedicines : INITIAL_MEDICINES).map((m: any) => ({
+      const rawMedicines = apiMedicines.length > 0 ? apiMedicines : (cleared.medicines ? [] : INITIAL_MEDICINES);
+      const newMedicines = rawMedicines.map((m: any) => ({
         ...m,
         manufacturer: typeof m.manufacturer === 'object' && m.manufacturer ? m.manufacturer.name : (m.manufacturer || ''),
         genericName: typeof m.generic === 'object' && m.generic ? m.generic.name : (m.genericName || m.generic || ''),
         category: typeof m.category === 'object' && m.category ? m.category.name : (m.category || ''),
       }));
 
-      const newBatches = (apiBatches.length > 0 ? apiBatches : INITIAL_BATCHES).map((b: any) => ({
+      const rawBatches = apiBatches.length > 0 ? apiBatches : (cleared.batches ? [] : INITIAL_BATCHES);
+      const newBatches = rawBatches.map((b: any) => ({
         ...b,
         medicineId: b.medicineId || b.productId, // map Prisma's productId to frontend's medicineId
         sellingPrice: b.sellingPrice !== undefined ? b.sellingPrice : b.unitSellingPrice // map Prisma's unitSellingPrice to frontend's sellingPrice
       }));
 
-      const newSuppliers = apiSuppliers.length > 0 ? apiSuppliers : INITIAL_SUPPLIERS;
+      const newSuppliers = apiSuppliers.length > 0 ? apiSuppliers : (cleared.suppliers ? [] : INITIAL_SUPPLIERS);
 
       let syncedSales = this.cache.sales;
       if (Array.isArray(apiSales) && apiSales.length > 0) {
@@ -199,7 +236,7 @@ export class PharmacyService {
         syncedSales = formattedSales;
       }
 
-      const nextSales = syncedSales.length > 0 ? syncedSales : INITIAL_SALES;
+      const nextSales = syncedSales.length > 0 ? syncedSales : (cleared.sales ? [] : INITIAL_SALES);
       const hasChanged =
         JSON.stringify(this.cache.medicines) !== JSON.stringify(newMedicines) ||
         JSON.stringify(this.cache.batches) !== JSON.stringify(newBatches) ||
@@ -215,11 +252,11 @@ export class PharmacyService {
           medicines: newMedicines,
           batches: newBatches,
           suppliers: newSuppliers,
-          prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : INITIAL_PRESCRIPTIONS,
-          purchases: this.cache.purchases.length > 0 ? this.cache.purchases : INITIAL_PURCHASES,
+          prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : (cleared.prescriptions ? [] : INITIAL_PRESCRIPTIONS),
+          purchases: this.cache.purchases.length > 0 ? this.cache.purchases : (cleared.purchases ? [] : INITIAL_PURCHASES),
           sales: nextSales,
-          returns: this.cache.returns.length > 0 ? this.cache.returns : INITIAL_RETURNS,
-          accounting: this.cache.accounting.length > 0 ? this.cache.accounting : INITIAL_ACCOUNTING_TRANSACTIONS,
+          returns: this.cache.returns.length > 0 ? this.cache.returns : (cleared.returns ? [] : INITIAL_RETURNS),
+          accounting: this.cache.accounting.length > 0 ? this.cache.accounting : (cleared.accounting ? [] : INITIAL_ACCOUNTING_TRANSACTIONS),
           heldSales: this.cache.heldSales,
           reorderList: this.cache.reorderList,
           supplierLedgers: this.cache.supplierLedgers
@@ -230,6 +267,271 @@ export class PharmacyService {
     } catch (err) {
       console.error("Global Database Sync failed", err);
     }
+  }
+
+  // --- Super Admin Database Purge & Reset Operations ---
+  public static async executeSuperAdminPurge(scope: string): Promise<{ success: boolean; message: string }> {
+    const cleared = getClearedScopes();
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    // 1. Apply local cache & localStorage purge immediately
+    switch (scope) {
+      case 'full_database': {
+        const nextFlags: ClearedScopesFlags = {
+          medicines: true,
+          batches: true,
+          suppliers: true,
+          prescriptions: true,
+          purchases: true,
+          sales: true,
+          returns: true,
+          accounting: true,
+        };
+        setClearedScopes(nextFlags);
+        this.cache = {
+          medicines: [],
+          batches: [],
+          suppliers: [],
+          prescriptions: [],
+          purchases: [],
+          sales: [],
+          returns: [],
+          accounting: [],
+          heldSales: [],
+          reorderList: [],
+          supplierLedgers: [],
+        };
+        Object.values(STORAGE_KEYS).forEach((k) => {
+          if (k !== STORAGE_KEYS.CLEARED_SCOPES) setLocalItem(k, []);
+        });
+        try {
+          localStorage.setItem('rx_customers_v1', JSON.stringify([]));
+          localStorage.setItem('rx_customer_due_tx_v1', JSON.stringify([]));
+          localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
+          localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
+          localStorage.setItem('rx_quarantine_items_v1', JSON.stringify([]));
+          localStorage.setItem('rx_supplier_returns_v1', JSON.stringify([]));
+        } catch {}
+        AuditService.clearLogsByWindow('all');
+        break;
+      }
+
+      case 'only_transactions': {
+        setClearedScopes({
+          ...cleared,
+          purchases: true,
+          sales: true,
+          returns: true,
+          accounting: true,
+        });
+        this.cache.sales = [];
+        this.cache.returns = [];
+        this.cache.purchases = [];
+        this.cache.accounting = [];
+        this.cache.heldSales = [];
+        this.cache.supplierLedgers = [];
+        setLocalItem(STORAGE_KEYS.SALES, []);
+        setLocalItem(STORAGE_KEYS.RETURNS, []);
+        setLocalItem(STORAGE_KEYS.PURCHASES, []);
+        setLocalItem(STORAGE_KEYS.ACCOUNTING, []);
+        setLocalItem(STORAGE_KEYS.HELD_SALES, []);
+        setLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, []);
+        try {
+          localStorage.setItem('rx_customer_due_tx_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'only_sales_pos': {
+        setClearedScopes({ ...cleared, sales: true, returns: true });
+        this.cache.sales = [];
+        this.cache.returns = [];
+        this.cache.heldSales = [];
+        setLocalItem(STORAGE_KEYS.SALES, []);
+        setLocalItem(STORAGE_KEYS.RETURNS, []);
+        setLocalItem(STORAGE_KEYS.HELD_SALES, []);
+        break;
+      }
+
+      case 'only_purchases_ledgers': {
+        setClearedScopes({ ...cleared, purchases: true });
+        this.cache.purchases = [];
+        this.cache.reorderList = [];
+        this.cache.supplierLedgers = [];
+        setLocalItem(STORAGE_KEYS.PURCHASES, []);
+        setLocalItem(STORAGE_KEYS.REORDER_LIST, []);
+        setLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, []);
+        break;
+      }
+
+      case 'only_customer_dues': {
+        try {
+          const rawCust = localStorage.getItem('rx_customers_v1');
+          if (rawCust) {
+            const parsed = JSON.parse(rawCust);
+            if (Array.isArray(parsed)) {
+              const zeroed = parsed.map((c: any) => ({ ...c, totalDue: 0, loyaltyPoints: 0 }));
+              localStorage.setItem('rx_customers_v1', JSON.stringify(zeroed));
+            }
+          }
+          localStorage.setItem('rx_customer_due_tx_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'only_stock': {
+        setClearedScopes({ ...cleared, batches: true });
+        this.cache.batches = [];
+        setLocalItem(STORAGE_KEYS.BATCHES, []);
+        try {
+          localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
+          localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'stock_and_catalog': {
+        setClearedScopes({ ...cleared, medicines: true, batches: true });
+        this.cache.medicines = [];
+        this.cache.batches = [];
+        setLocalItem(STORAGE_KEYS.MEDICINES, []);
+        setLocalItem(STORAGE_KEYS.BATCHES, []);
+        try {
+          localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
+          localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'expired_and_quarantined_stock': {
+        const todayStr = new Date().toISOString().split('T')[0];
+        this.cache.batches = this.cache.batches.filter((b) => {
+          const st = (b.status || '').toLowerCase();
+          return st !== 'expired' && st !== 'quarantined' && b.expiryDate >= todayStr;
+        });
+        setLocalItem(STORAGE_KEYS.BATCHES, this.cache.batches);
+        try {
+          localStorage.setItem('rx_quarantine_items_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'stock_transfers_adjustments': {
+        try {
+          localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
+          localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
+        } catch {}
+        break;
+      }
+
+      case 'logs_last_day':
+        AuditService.clearLogsByWindow('last_day');
+        break;
+      case 'logs_last_week':
+        AuditService.clearLogsByWindow('last_week');
+        break;
+      case 'logs_last_month':
+        AuditService.clearLogsByWindow('last_month');
+        break;
+      case 'logs_older_than_30d':
+        AuditService.clearLogsByWindow('older_than_30d');
+        break;
+      case 'logs_all':
+        AuditService.clearLogsByWindow('all');
+        break;
+
+      case 'transactions_last_day':
+      case 'transactions_last_week':
+      case 'transactions_last_month': {
+        const windowMs =
+          scope === 'transactions_last_day'
+            ? dayMs
+            : scope === 'transactions_last_week'
+            ? 7 * dayMs
+            : 30 * dayMs;
+        const cutoff = now - windowMs;
+        this.cache.sales = this.cache.sales.filter(
+          (s) => new Date(s.timestamp || s.date).getTime() < cutoff
+        );
+        this.cache.returns = this.cache.returns.filter(
+          (r) => new Date(r.date).getTime() < cutoff
+        );
+        this.cache.accounting = this.cache.accounting.filter(
+          (a) => new Date(a.date).getTime() < cutoff
+        );
+        setLocalItem(STORAGE_KEYS.SALES, this.cache.sales);
+        setLocalItem(STORAGE_KEYS.RETURNS, this.cache.returns);
+        setLocalItem(STORAGE_KEYS.ACCOUNTING, this.cache.accounting);
+        break;
+      }
+
+      case 'only_prescriptions': {
+        setClearedScopes({ ...cleared, prescriptions: true });
+        this.cache.prescriptions = [];
+        setLocalItem(STORAGE_KEYS.PRESCRIPTIONS, []);
+        break;
+      }
+
+      case 'non_admin_users': {
+        try {
+          const rawUsers = localStorage.getItem('pharmerp_employees_v3');
+          if (rawUsers) {
+            const parsed = JSON.parse(rawUsers);
+            if (Array.isArray(parsed)) {
+              const adminOnly = parsed.filter(
+                (u: any) => u.roleCode === 'super_admin' || u.id === 'admin' || u.email === 'admin'
+              );
+              localStorage.setItem('pharmerp_employees_v3', JSON.stringify(adminOnly));
+            }
+          }
+        } catch {}
+        break;
+      }
+    }
+
+    this.emitChange();
+
+    // 2. Execute backend PostgreSQL purge
+    try {
+      const apiRes = await systemApi.purgeDatabase({
+        scope,
+        requesterRole: 'super_admin',
+      });
+      return {
+        success: true,
+        message: apiRes?.message || `Executed purge operation (${scope}) on database and local cache.`,
+      };
+    } catch {
+      return {
+        success: true,
+        message: `Cleared local database & cache for scope "${scope}".`,
+      };
+    }
+  }
+
+  public static async restoreFactoryDemoData(): Promise<void> {
+    setClearedScopes({});
+    Object.values(STORAGE_KEYS).forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {}
+    });
+    this.cache = {
+      medicines: INITIAL_MEDICINES,
+      batches: INITIAL_BATCHES,
+      suppliers: INITIAL_SUPPLIERS,
+      prescriptions: INITIAL_PRESCRIPTIONS,
+      purchases: INITIAL_PURCHASES,
+      sales: INITIAL_SALES,
+      returns: INITIAL_RETURNS,
+      accounting: INITIAL_ACCOUNTING_TRANSACTIONS,
+      heldSales: [],
+      reorderList: [],
+      supplierLedgers: [],
+    };
+    this.emitChange();
+    await this.syncDatabase();
   }
 
 

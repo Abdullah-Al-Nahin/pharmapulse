@@ -141,6 +141,7 @@ export type PharmaNavTab =
   | 'accounts'
   | 'analytics'
   | 'settings'
+  | 'database_control'
   | 'returns'
   | 'customers'
   | 'adjustments_audit'

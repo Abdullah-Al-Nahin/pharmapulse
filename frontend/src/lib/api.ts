@@ -206,5 +206,12 @@ export const purchaseOrderApi = {
   receiveGRN: async (id: string, data: any) => (await api.post(`/purchase-orders/${id}/grn`, data)).data,
 };
 
+// System & Super Admin Database Control
+export const systemApi = {
+  getStats: async () => (await api.get('/system/stats')).data,
+  purgeDatabase: async (data: { scope: string; requesterRole?: string }) =>
+    (await api.post('/system/purge', data)).data,
+};
+
 export default api;
 

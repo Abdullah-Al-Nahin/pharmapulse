@@ -20,6 +20,7 @@ import {
   Building2,
   Crown,
   LogOut,
+  Database,
 } from 'lucide-react';
 import { PharmaNavTab } from '../../types/pharmapulse';
 import { useAuth } from '../../context/AuthContext';
@@ -87,8 +88,8 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
   }).length;
 
   const isTabAllowed = (tabId: PharmaNavTab) => {
-    // ONLY Super Admin can view or access Settings & Roles
-    if (tabId === 'settings') {
+    // ONLY Super Admin can view or access Settings & Roles or Database Control
+    if (tabId === 'settings' || tabId === 'database_control') {
       return isSuperAdmin || currentUser?.roleCode === 'super_admin';
     }
     if (isSuperAdmin || currentUser?.roleCode === 'super_admin') return true;
@@ -167,6 +168,15 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
         },
         { id: 'settings', label: 'Settings & Roles', labelBn: 'সেটিংস ও রোল', icon: Settings },
+        {
+          id: 'database_control',
+          label: 'Database & Reset',
+          labelBn: 'ডাটাবেস ও রিসেট',
+          icon: Database,
+          badge: 'ROOT',
+          badgeBn: 'রুট',
+          badgeColor: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800',
+        },
       ]
     }
   ];

@@ -163,6 +163,41 @@ export class AuditService {
   }
 
   /**
+   * Clear audit logs by time window ('last_day' | 'last_week' | 'last_month' | 'older_than_30d' | 'all')
+   */
+  public static clearLogsByWindow(
+    window: 'last_day' | 'last_week' | 'last_month' | 'older_than_30d' | 'all'
+  ): number {
+    const current = this.getAllLogs();
+    const beforeCount = current.length;
+    if (window === 'all') {
+      this.logs = [];
+      AuditService.saveLogs([]);
+      this.emitChange();
+      return beforeCount;
+    }
+
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const cutoff =
+      window === 'last_day'
+        ? now - dayMs
+        : window === 'last_week'
+        ? now - 7 * dayMs
+        : now - 30 * dayMs;
+
+    if (window === 'older_than_30d') {
+      this.logs = current.filter((l) => new Date(l.timestamp).getTime() >= cutoff);
+    } else {
+      this.logs = current.filter((l) => new Date(l.timestamp).getTime() < cutoff);
+    }
+
+    AuditService.saveLogs(this.logs);
+    this.emitChange();
+    return beforeCount - this.logs.length;
+  }
+
+  /**
    * Filter audit logs by module, action, date, user, userRole, or search query
    */
   public static filterLogs(params: AuditLogFilterParams): ImmutableAuditLog[] {

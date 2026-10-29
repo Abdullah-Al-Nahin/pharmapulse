@@ -36,6 +36,7 @@ import { BatchExpiryView } from '../batches/BatchExpiryView';
 import { MultiBranchHub } from '../branches/MultiBranchHub';
 import { ExecutiveDashboardView } from '../executive/ExecutiveDashboardView';
 import { InventoryAnomalyModal } from '../inventory/InventoryAnomalyModal';
+import { DatabaseControlView } from '../admin/DatabaseControlView';
 import { useAuth } from '../../context/AuthContext';
 import { AuditService } from '../../services/auditService';
 import { PharmacyService } from '../../services/pharmacyService';
@@ -933,6 +934,30 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Restricted</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Settings & Roles is strictly restricted to Super Admin only.
+                </p>
+                <button
+                  onClick={() => setActiveTab('pos')}
+                  className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition"
+                >
+                  Return to POS Billing
+                </button>
+              </div>
+            )
+          )}
+
+          {activeTab === 'database_control' && (
+            (isSuperAdmin || currentUser?.roleCode === 'super_admin') ? (
+              <div className="w-full">
+                <DatabaseControlView />
+              </div>
+            ) : (
+              <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-red-900/50 m-6 max-w-lg mx-auto shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center mx-auto mb-3">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Restricted</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Database Control &amp; Purge Center is strictly restricted to Super Admin only.
                 </p>
                 <button
                   onClick={() => setActiveTab('pos')}
