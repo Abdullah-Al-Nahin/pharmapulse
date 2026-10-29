@@ -42,12 +42,24 @@ export function toEnglishDigits(input: string): string {
   return input.replace(/[০-৯]/g, (digit) => ENGLISH_DIGITS[digit] || digit);
 }
 
+type LocaleListener = (locale: 'en' | 'bn') => void;
+const localeListeners: LocaleListener[] = [];
+
+export function subscribeLocale(listener: LocaleListener): () => void {
+  localeListeners.push(listener);
+  return () => {
+    const idx = localeListeners.indexOf(listener);
+    if (idx !== -1) localeListeners.splice(idx, 1);
+  };
+}
+
 /**
  * Get current active locale ('en' | 'bn')
  */
 export function getCurrentLocale(): 'en' | 'bn' {
-  const lng = i18n.language || (typeof window !== 'undefined' ? localStorage.getItem('rx_locale_preference') : 'en') || 'en';
-  return lng.startsWith('bn') ? 'bn' : 'en';
+  const saved = typeof window !== 'undefined' ? localStorage.getItem('rx_locale_preference') : null;
+  const lng = saved || i18n.language || 'en';
+  return lng.toLowerCase().startsWith('bn') ? 'bn' : 'en';
 }
 
 /**
@@ -56,8 +68,16 @@ export function getCurrentLocale(): 'en' | 'bn' {
 export function setLocale(locale: 'en' | 'bn'): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem('rx_locale_preference', locale);
+    document.documentElement.lang = locale;
   }
   i18n.changeLanguage(locale);
+  queueMicrotask(() => {
+    localeListeners.forEach((l) => {
+      try {
+        l(locale);
+      } catch {}
+    });
+  });
 }
 
 /**

@@ -50,6 +50,7 @@ interface PharmaPulseSidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onExpiringClick?: () => void;
+  language?: 'EN' | 'BN';
 }
 
 interface SidebarGroup {
@@ -61,6 +62,7 @@ interface SidebarGroup {
     labelBn: string;
     icon: React.ComponentType<{ className?: string }>;
     badge?: string;
+    badgeBn?: string;
     badgeColor?: string;
   }[];
 }
@@ -71,8 +73,10 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse,
   onExpiringClick,
+  language = 'EN',
 }) => {
   const { hasAnyPermission, isSuperAdmin, currentUser, logout } = useAuth();
+  const isBn = language === 'BN';
 
   const now = Date.now();
   const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
@@ -110,9 +114,10 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
         {
           id: 'inventory',
           label: 'Inventory & FEFO',
-          labelBn: 'ইনভেন্টরি ও FEFO',
+          labelBn: 'ইনভেন্টরি ও ফেফো',
           icon: Boxes,
           badge: 'Alerts',
+          badgeBn: 'সতর্কতা',
           badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
         },
         { id: 'purchases', label: 'Suppliers & Purchase', labelBn: 'সাপ্লায়ার ও ক্রয়', icon: Truck },
@@ -123,6 +128,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           labelBn: 'অডিট ও ট্রেইল',
           icon: ShieldCheck,
           badge: 'Live',
+          badgeBn: 'লাইভ',
           badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
         },
       ]
@@ -137,6 +143,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           labelBn: 'সিইও ড্যাশবোর্ড',
           icon: Crown,
           badge: 'VIP',
+          badgeBn: 'ভিআইপি',
           badgeColor: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800',
         },
         { id: 'command_center', label: 'Command Center', labelBn: 'কমান্ড সেন্টার', icon: Activity },
@@ -147,17 +154,19 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           labelBn: 'মাল্টি-ব্রাঞ্চ',
           icon: Building2,
           badge: `${BranchService.getBranches().length} Br`,
+          badgeBn: `${BranchService.getBranches().length}টি শাখা`,
           badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
         },
         {
           id: 'analytics',
           label: 'Analytics & AI',
-          labelBn: 'এনালিটিক্স',
+          labelBn: 'অ্যানালিটিক্স ও এআই',
           icon: LineChart,
           badge: 'AI',
+          badgeBn: 'এআই',
           badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
         },
-        { id: 'settings', label: 'Settings & Roles', labelBn: 'সেটিংস', icon: Settings },
+        { id: 'settings', label: 'Settings & Roles', labelBn: 'সেটিংস ও রোল', icon: Settings },
       ]
     }
   ];
@@ -180,10 +189,10 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
             {!isCollapsed && (
               <div className="flex flex-col leading-tight min-w-0">
                 <span className="font-black text-base tracking-tight text-slate-900 dark:text-white truncate">
-                  PharmaPulse
+                  {isBn ? 'ফার্মাপালস' : 'PharmaPulse'}
                 </span>
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
-                  HOSPITAL &amp; RETAIL OS
+                  {isBn ? 'হাসপাতাল ও রিটেইল ওএস' : 'HOSPITAL & RETAIL OS'}
                 </span>
               </div>
             )}
@@ -228,8 +237,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
               <div key={gIdx} className="flex flex-col gap-1">
                 {!isCollapsed && (
                   <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-                    <span>{group.title}</span>
-                    <span className="text-[10px] font-normal text-slate-400 dark:text-slate-600">{group.titleBn}</span>
+                    <span>{isBn ? group.titleBn : group.title}</span>
                   </div>
                 )}
 
@@ -237,11 +245,13 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
                   {visibleItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
+                    const displayLabel = isBn ? item.labelBn : item.label;
+                    const displayBadge = isBn ? (item.badgeBn || item.badge) : item.badge;
                     return (
                       <button
                         key={item.id}
                         onClick={() => onSelectTab(item.id)}
-                        title={`${item.label} (${item.labelBn})`}
+                        title={displayLabel}
                         className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           isActive
                             ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-700/20'
@@ -251,10 +261,10 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
                         <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                         {!isCollapsed && (
                           <>
-                            <span className="truncate flex-1 text-left">{item.label}</span>
-                            {item.badge && (
+                            <span className="truncate flex-1 text-left">{displayLabel}</span>
+                            {displayBadge && (
                               <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${item.badgeColor}`}>
-                                {item.badge}
+                                {displayBadge}
                               </span>
                             )}
                             {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />}
@@ -283,17 +293,21 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
                   <Clock className="w-3.5 h-3.5" />
                 </div>
                 <div className="flex flex-col leading-tight truncate">
-                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Expiring Soon</span>
-                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">{expiringLotsCount} Lots &lt; 30d</span>
+                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                    {isBn ? 'মেয়াদ শেষের পথে' : 'Expiring Soon'}
+                  </span>
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                    {isBn ? `${expiringLotsCount}টি লট < ৩০ দিন` : `${expiringLotsCount} Lots < 30d`}
+                  </span>
                 </div>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             </button>
             <div className="flex items-center justify-between px-1 text-slate-400 dark:text-slate-500 text-[10px] font-medium">
-              <span>Terminal v4.12</span>
+              <span>{isBn ? 'টার্মিনাল সংস্করণ ৪.১২' : 'Terminal v4.12'}</span>
               <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Online
+                {isBn ? 'অনলাইন' : 'Online'}
               </span>
             </div>
 

@@ -3,6 +3,8 @@ import { PharmaPulseDashboard } from './components/pharmapulse/PharmaPulseDashbo
 import { LoginPage } from './components/auth/LoginPage';
 import { PharmacyService } from './services/pharmacyService';
 import { useAuth } from './context/AuthContext';
+import { initializeDomTranslator } from './i18n/domTranslator';
+import { getCurrentLocale } from './utils/i18nFormatter';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -62,6 +64,8 @@ export default function App() {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    document.documentElement.lang = getCurrentLocale();
+    initializeDomTranslator();
     PharmacyService.initialize();
   }, []);
 

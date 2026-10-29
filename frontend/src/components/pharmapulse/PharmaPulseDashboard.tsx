@@ -42,7 +42,7 @@ import { PharmacyService } from '../../services/pharmacyService';
 import { BranchService } from '../../services/branchService';
 import { CustomerService } from '../../services/customerService';
 import { Customer } from '../../types/customer';
-import { setLocale } from '../../utils/i18nFormatter';
+import { getCurrentLocale, setLocale, subscribeLocale } from '../../utils/i18nFormatter';
 
 interface Toast {
   id: string;
@@ -75,7 +75,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       return false;
     }
   });
-  const [language, setLanguage] = useState<'EN' | 'BN'>('EN');
+  const [language, setLanguage] = useState<'EN' | 'BN'>(() =>
+    getCurrentLocale() === 'bn' ? 'BN' : 'EN'
+  );
 
   // Active Cart State featuring cold chain, 28-day open expiry, and Rx metadata
   const [cart, setCart] = useState<PharmaCartItem[]>([]);
@@ -83,7 +85,17 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   // Prescribing Doctor & Bengali Thermal Receipt State
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorInfo | null>(REGISTERED_DOCTORS[0]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [isBengaliReceipt, setIsBengaliReceipt] = useState<boolean>(true);
+  const [isBengaliReceipt, setIsBengaliReceipt] = useState<boolean>(() =>
+    getCurrentLocale() === 'bn'
+  );
+
+  useEffect(() => {
+    return subscribeLocale((loc) => {
+      const next = loc === 'bn' ? 'BN' : 'EN';
+      setLanguage(next);
+      setIsBengaliReceipt(loc === 'bn');
+    });
+  }, []);
 
   // Modals
   const [isAnomalyModalOpen, setIsAnomalyModalOpen] = useState(false);
@@ -637,6 +649,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         onExpiringClick={() => setActiveTab('batches_expiry')}
+        language={language}
       />
 
       {/* Main App Workspace */}
@@ -646,10 +659,11 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
           language={language}
-          onToggleLanguage={() => {
-            const nextLang = language === 'EN' ? 'BN' : 'EN';
-            setLanguage(nextLang);
-            setLocale(nextLang === 'BN' ? 'bn' : 'en');
+          onToggleLanguage={(nextLang) => {
+            const target = nextLang || (language === 'EN' ? 'BN' : 'EN');
+            setLanguage(target);
+            setIsBengaliReceipt(target === 'BN');
+            setLocale(target === 'BN' ? 'bn' : 'en');
           }}
           onOpenSettings={() => setActiveTab('settings')}
           onOpenShortcuts={() =>

@@ -315,7 +315,7 @@ export class BranchService {
           }
         }
       }
-    } catch {}
+    } catch { }
 
     // Filter Batches (Inventory)
     const branchBatches = branchId === 'all'

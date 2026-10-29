@@ -3,6 +3,38 @@
 /* ── Dark mode: respond to .dark class (not OS preference) ── */
 @variant dark (&:where(.dark, .dark *));
 
+:root {
+  --font-en: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-bn: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+}
+
+/* ── Unified Font Enforcement per Active Language ── */
+html[lang="en"],
+html[lang="en"] body,
+html[lang="en"] *,
+html[lang="en"] .font-sans,
+html[lang="en"] .font-mono,
+html[lang="en"] kbd,
+html[lang="en"] input,
+html[lang="en"] button,
+html[lang="en"] select,
+html[lang="en"] textarea {
+  font-family: var(--font-en) !important;
+}
+
+html[lang="bn"],
+html[lang="bn"] body,
+html[lang="bn"] *,
+html[lang="bn"] .font-sans,
+html[lang="bn"] .font-mono,
+html[lang="bn"] kbd,
+html[lang="bn"] input,
+html[lang="bn"] button,
+html[lang="bn"] select,
+html[lang="bn"] textarea {
+  font-family: var(--font-bn) !important;
+}
+
 /* ── Smooth theme transitions ── */
 *, *::before, *::after {
   transition-property: background-color, border-color, color, fill, stroke;

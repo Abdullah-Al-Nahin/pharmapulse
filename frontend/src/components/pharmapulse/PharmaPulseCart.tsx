@@ -21,6 +21,7 @@ import {
 import { PharmaCartItem, AlternativeDrug } from '../../types/pharmapulse';
 import { PharmacyService } from '../../services/pharmacyService';
 import { useAuth } from '../../context/AuthContext';
+import { getCurrentLocale, subscribeLocale } from '../../utils/i18nFormatter';
 
 interface PharmaPulseCartProps {
   cart: PharmaCartItem[];
@@ -80,6 +81,9 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
 }) => {
   const { canViewProfits, canViewCosts } = useAuth();
   const [showProfitBreakdown, setShowProfitBreakdown] = useState<boolean>(true);
+  const [locale, setLocaleState] = useState<'en' | 'bn'>(() => getCurrentLocale());
+  React.useEffect(() => subscribeLocale((l) => setLocaleState(l)), []);
+  const isBn = locale === 'bn';
   const totalUnits = cart.reduce((sum, item) => sum + item.qty, 0);
 
   // Calculate cart profit economics
@@ -330,9 +334,9 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                       <span className="text-[11px] text-slate-500 dark:text-slate-400">
                         {item.sub} • {item.company}
                       </span>
-                      {item.dosageBn && (
+                      {(item.dosageBn || item.dosageEn) && (
                         <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans">
-                          মাত্রা: {item.dosageBn}
+                          {isBn ? `মাত্রা: ${item.dosageBn || item.dosageEn}` : `Dosage: ${item.dosageEn || 'As directed by physician'}`}
                         </span>
                       )}
                     </div>
@@ -529,8 +533,8 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                         {/* Dosage guidance in Bengali & English */}
                         {(item.dosageBn || item.dosageEn) && (
                           <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans mt-0.5">
-                            <span className="font-semibold">মাত্রা:</span>
-                            <span>{item.dosageBn || item.dosageEn}</span>
+                            <span className="font-semibold">{isBn ? 'মাত্রা:' : 'Dosage:'}</span>
+                            <span>{isBn ? (item.dosageBn || item.dosageEn) : (item.dosageEn || '1+0+1 as directed')}</span>
                           </div>
                         )}
                       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { getCurrentLocale, setLocale, subscribeLocale } from '../../utils/i18nFormatter';
 
 interface LoginPageProps {
   onLoginSuccess?: () => void;
@@ -16,6 +17,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [lang, setLang] = useState<'en' | 'bn'>(() => getCurrentLocale());
+
+  useEffect(() => {
+    return subscribeLocale((loc) => setLang(loc));
+  }, []);
 
   // Dark Mode State persistent across Login and Software Dashboard
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -47,12 +53,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
     const cleanId = employeeId.trim();
     if (!cleanId) {
-      setErrorMsg('ইউজারনেম প্রবেশ করান (Please enter your Username / Employee ID)');
+      setErrorMsg(lang === 'bn' ? 'ইউজারনেম প্রবেশ করান' : 'Please enter your Username / Employee ID');
       return;
     }
 
     if (!password) {
-      setErrorMsg('পাসওয়ার্ড প্রবেশ করান (Please enter your password)');
+      setErrorMsg(lang === 'bn' ? 'পাসওয়ার্ড প্রবেশ করান' : 'Please enter your password');
       return;
     }
 
@@ -63,7 +69,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         onLoginSuccess();
       }
     } else {
-      setErrorMsg(res.message || 'ভুল ইউজারনেম বা পাসওয়ার্ড (Invalid credentials)');
+      setErrorMsg(res.message || (lang === 'bn' ? 'ভুল ইউজারনেম বা পাসওয়ার্ড' : 'Invalid username or password'));
     }
   };
 
@@ -291,6 +297,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           : 'bg-white border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]'
       }`}>
         
+        {/* Upper-Left Language Toggle */}
+        <div
+          data-no-translate="true"
+          className="absolute top-6 left-6 z-20 flex items-center rounded-xl p-0.5 border text-[11px] font-bold bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+        >
+          <button
+            type="button"
+            onClick={() => setLocale('en')}
+            className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${
+              lang === 'en'
+                ? 'bg-white dark:bg-slate-700 text-[#0d9488] shadow-xs'
+                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocale('bn')}
+            className={`px-2 py-0.5 rounded-lg transition cursor-pointer ${
+              lang === 'bn'
+                ? 'bg-white dark:bg-slate-700 text-[#0d9488] shadow-xs'
+                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            বাং
+          </button>
+        </div>
+
         {/* Upper-Right Corner Info Icon with Hover Speech Bubble */}
         <div 
           className="absolute top-6 right-6 z-20"
@@ -430,13 +465,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             <label className={`text-[11px] font-bold block mb-1.5 ${
               isDark ? 'text-slate-300' : 'text-slate-700'
             }`}>
-              ইউজারনেম (USERNAME)
+              {lang === 'bn' ? 'ইউজারনেম' : 'USERNAME'}
             </label>
             <input
               type="text"
               required
               autoFocus
-              placeholder="e.g. admin"
+              placeholder={lang === 'bn' ? 'যেমন: admin' : 'e.g. admin'}
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
               className={`w-full px-3.5 py-2.5 border rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/20 transition-all font-medium ${
@@ -452,7 +487,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             <label className={`text-[11px] font-bold block mb-1.5 ${
               isDark ? 'text-slate-300' : 'text-slate-700'
             }`}>
-              পাসওয়ার্ড (PASSWORD)
+              {lang === 'bn' ? 'পাসওয়ার্ড' : 'PASSWORD'}
             </label>
             <div className="relative flex items-center">
               <input
@@ -484,7 +519,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               type="submit"
               className="w-full py-3 px-4 bg-[#0d9488] hover:bg-[#0f766e] active:bg-[#115e59] text-white rounded-xl font-bold text-xs tracking-wide shadow-md shadow-teal-600/25 transition-all cursor-pointer flex items-center justify-center text-center"
             >
-              লগইন করুন (LOGIN)
+              {lang === 'bn' ? 'লগইন করুন' : 'LOGIN'}
             </button>
           </div>
         </form>

@@ -215,7 +215,10 @@ export const PharmaPulseHeader: React.FC<PharmaPulseHeaderProps> = ({
         </button>
 
         {/* Language Toggle */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 text-xs font-bold">
+        <div
+          data-no-translate="true"
+          className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 text-xs font-bold"
+        >
           <button
             onClick={() => onToggleLanguage('EN')}
             className={`px-2 py-1 rounded-lg transition cursor-pointer ${

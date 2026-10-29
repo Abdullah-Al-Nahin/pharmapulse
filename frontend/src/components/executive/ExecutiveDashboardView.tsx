@@ -57,6 +57,7 @@ import { ExecutiveDashboardService } from '../../services/executiveDashboardServ
 import { PharmacyService } from '../../services/pharmacyService';
 import { BranchService } from '../../services/branchService';
 import { useAuth } from '../../context/AuthContext';
+import { getCurrentLocale, setLocale, subscribeLocale } from '../../utils/i18nFormatter';
 import { BranchInfo } from '../../types/pharmapulse';
 
 interface ExecutiveDashboardViewProps {
@@ -79,12 +80,20 @@ export const ExecutiveDashboardView: React.FC<ExecutiveDashboardViewProps> = ({
 
   // --- Timeframe state ---
   const [timeframe, setTimeframe] = useState<ExecutiveTimeframe>('today');
-  const [selectedLanguage, setSelectedLanguage] = useState<'EN' | 'BN'>('BN');
+  const [selectedLanguage, setSelectedLanguage] = useState<'EN' | 'BN'>(() =>
+    getCurrentLocale() === 'bn' ? 'BN' : 'EN'
+  );
   const [selectedStockCategory, setSelectedStockCategory] = useState<string>('all');
   const [selectedAnomalyCategory, setSelectedAnomalyCategory] = useState<string>('all');
   const [selectedForecastIndex, setSelectedForecastIndex] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    return subscribeLocale((loc) => {
+      setSelectedLanguage(loc === 'bn' ? 'BN' : 'EN');
+    });
+  }, []);
 
   // Subscribe to live changes in pharmacy and branch stores
   useEffect(() => {
@@ -319,11 +328,16 @@ export const ExecutiveDashboardView: React.FC<ExecutiveDashboardViewProps> = ({
             {/* Language switch & Refresh */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setSelectedLanguage(selectedLanguage === 'BN' ? 'EN' : 'BN')}
+                data-no-translate="true"
+                onClick={() => {
+                  const next = selectedLanguage === 'BN' ? 'EN' : 'BN';
+                  setSelectedLanguage(next);
+                  setLocale(next === 'BN' ? 'bn' : 'en');
+                }}
                 title="Toggle English / Bengali"
                 className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-600 transition-colors cursor-pointer"
               >
-                {selectedLanguage === 'BN' ? 'English' : 'বাংলা (BN)'}
+                {selectedLanguage === 'BN' ? 'EN' : 'বাং'}
               </button>
 
               <button
