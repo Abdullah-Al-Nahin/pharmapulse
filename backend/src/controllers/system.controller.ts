@@ -160,10 +160,10 @@ export const purgeDatabase = async (req: Request, res: Response) => {
           prisma.purchaseOrderItem.deleteMany({}),
           prisma.purchaseOrder.deleteMany({}),
           prisma.customer.updateMany({
-            data: { currentBalance: 0, loyaltyPoints: 0 },
+            data: { outstandingBalance: 0, loyaltyPointsBalance: 0 },
           }),
           prisma.supplier.updateMany({
-            data: { currentBalance: 0 },
+            data: { balancePayable: 0 },
           }),
         ]);
         summary = 'All financial transactions, POS sales, returns, purchase orders, and ledger balances cleared. Stock and catalog preserved.';
@@ -188,7 +188,7 @@ export const purgeDatabase = async (req: Request, res: Response) => {
           prisma.purchaseOrderItem.deleteMany({}),
           prisma.purchaseOrder.deleteMany({}),
           prisma.supplier.updateMany({
-            data: { currentBalance: 0 },
+            data: { balancePayable: 0 },
           }),
         ]);
         summary = 'All purchase orders, GRN records, and supplier payable balances cleared.';
@@ -199,7 +199,7 @@ export const purgeDatabase = async (req: Request, res: Response) => {
         await prisma.$transaction([
           prisma.loyaltyTransaction.deleteMany({}),
           prisma.customer.updateMany({
-            data: { currentBalance: 0, loyaltyPoints: 0 },
+            data: { outstandingBalance: 0, loyaltyPointsBalance: 0 },
           }),
         ]);
         summary = 'All customer due balances and loyalty points reset to zero.';
@@ -253,7 +253,6 @@ export const purgeDatabase = async (req: Request, res: Response) => {
             prisma.stockAdjustment.deleteMany({ where: { batchId: { in: batchIds } } }),
             prisma.saleReturnItem.deleteMany({ where: { batchId: { in: batchIds } } }),
             prisma.saleItem.deleteMany({ where: { batchId: { in: batchIds } } }),
-            prisma.purchaseOrderItem.deleteMany({ where: { batchId: { in: batchIds } } }),
             prisma.batch.deleteMany({ where: { id: { in: batchIds } } }),
           ]);
         }
@@ -346,7 +345,7 @@ export const purgeDatabase = async (req: Request, res: Response) => {
                 prisma.saleReturn.deleteMany({ where: { id: { in: returnIds } } }),
               ]
             : []),
-          prisma.expense.deleteMany({ where: { createdAt: { gte: cutoff } } }),
+          prisma.expense.deleteMany({ where: { expenseDate: { gte: cutoff } } }),
         ]);
         summary = `Cleared ${saleIds.length} sale(s) and ${returnIds.length} return(s) within selected time window.`;
         break;
