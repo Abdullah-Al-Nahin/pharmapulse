@@ -49,13 +49,16 @@ api.interceptors.response.use(
 const V2_CACHE_KEY = 'pharmapulse_v2_routes_supported';
 let v2SupportPromise: Promise<boolean> | null = null;
 
+const isLocalBackend =
+  resolvedBaseURL.includes('localhost') || resolvedBaseURL.includes('127.0.0.1');
+
 /**
  * Probes GET /health (which always returns HTTP 200 OK) once per session to check whether
  * the deployed backend supports v2 routes (/users, /branches, /transfers, /customers, /adjustments, /system).
  * Prevents Chrome DevTools from logging red 404 network errors if the cloud instance is still on v1.0.0.
  */
 async function hasV2Routes(): Promise<boolean> {
-  if (isLocalhost) return true;
+  if (isLocalBackend) return true;
   if (typeof window !== 'undefined') {
     const cached = sessionStorage.getItem(V2_CACHE_KEY);
     if (cached === 'true') return true;

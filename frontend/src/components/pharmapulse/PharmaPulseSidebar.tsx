@@ -184,6 +184,7 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
   return (
     <aside
       id="pharmapulse-sidebar"
+      data-no-translate="true"
       className={`shrink-0 h-screen bg-white dark:bg-[#12161f] border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-300 shadow-xs select-none z-30 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}

@@ -606,8 +606,7 @@ export class PharmacyService {
           dosageBn: m.description || '',
         };
       });
-    } catch (e) {
-      console.error("Failed to fetch live catalog from database", e);
+    } catch {
       return [];
     }
   }
@@ -916,9 +915,10 @@ export class PharmacyService {
           });
         }
       });
-      // Store back to local
-      this.cache.supplierLedgers = [...allLedgers, ...entries];
-    this.emitChange();
+      // Store back to local cache only if entries were generated (never emitChange inside a getter!)
+      if (entries.length > 0) {
+        this.cache.supplierLedgers = [...allLedgers, ...entries];
+      }
     }
     return entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }

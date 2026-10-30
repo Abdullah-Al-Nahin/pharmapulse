@@ -179,9 +179,12 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
   ]);
 
   const refreshData = () => {
-    setPurchases([...PharmacyService.getPurchases()]);
-    setSuppliers(PharmacyService.getSuppliers());
-    setMedicines(PharmacyService.getMedicines());
+    const nextPurchases = PharmacyService.getPurchases();
+    const nextSuppliers = PharmacyService.getSuppliers();
+    const nextMedicines = PharmacyService.getMedicines();
+    setPurchases((prev) => (prev === nextPurchases ? prev : [...nextPurchases]));
+    setSuppliers((prev) => (prev === nextSuppliers ? prev : nextSuppliers));
+    setMedicines((prev) => (prev === nextMedicines ? prev : nextMedicines));
     if (onDataChanged) onDataChanged();
   };
 

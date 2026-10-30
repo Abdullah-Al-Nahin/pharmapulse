@@ -620,7 +620,45 @@ export class ExecutiveDashboardService {
     });
 
     // Select candidate medicines (e.g. Paracetamol, Moxifloxacin, Antibiotics, or catalog tops)
-    const candidateMeds = medicines.slice(0, 4);
+    const fallbackCandidates = [
+      {
+        id: 'med-default-1',
+        name: 'Paracetamol 500mg',
+        genericName: 'Paracetamol',
+        strength: '500mg',
+        dosageForm: 'Tablet',
+        manufacturer: 'Beximco Pharmaceuticals Ltd',
+        category: 'Analgesic & Antipyretic',
+      },
+      {
+        id: 'med-default-2',
+        name: 'Sergel 20mg',
+        genericName: 'Esomeprazole',
+        strength: '20mg',
+        dosageForm: 'Capsule',
+        manufacturer: 'Healthcare Pharmaceuticals',
+        category: 'Proton Pump Inhibitor',
+      },
+      {
+        id: 'med-default-3',
+        name: 'Moxquin 500mg',
+        genericName: 'Moxifloxacin',
+        strength: '500mg',
+        dosageForm: 'Tablet',
+        manufacturer: 'Square Pharmaceuticals PLC',
+        category: 'Fluoroquinolone Antibiotic',
+      },
+      {
+        id: 'med-default-4',
+        name: 'Monas 10mg',
+        genericName: 'Montelukast',
+        strength: '10mg',
+        dosageForm: 'Tablet',
+        manufacturer: 'ACME Laboratories Ltd',
+        category: 'Respiratory / Anti-Asthmatic',
+      },
+    ];
+    const candidateMeds = medicines.length > 0 ? medicines.slice(0, 4) : fallbackCandidates;
     const now = new Date();
 
     return candidateMeds.map((med, idx) => {

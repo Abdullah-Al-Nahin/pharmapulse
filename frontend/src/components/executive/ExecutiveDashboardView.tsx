@@ -148,7 +148,23 @@ export const ExecutiveDashboardView: React.FC<ExecutiveDashboardViewProps> = ({
     [timeframe, selectedBranchId, version]
   );
 
-  const activeForecast = forecastMedicines[selectedForecastIndex] || forecastMedicines[0];
+  const activeForecast = forecastMedicines[selectedForecastIndex] || forecastMedicines[0] || {
+    id: 'forecast-fallback',
+    medicineName: 'Paracetamol 500mg (Paracetamol)',
+    genericName: 'Paracetamol',
+    strength: '500mg',
+    form: 'Tablet',
+    manufacturer: 'Beximco Pharmaceuticals Ltd',
+    leadTimeDays: 2,
+    currentStock: 180,
+    forecastDays: 14,
+    predictedDemand: 320,
+    recommendedPurchase: 200,
+    safetyBuffer: 60,
+    confidenceScore: 94.5,
+    primaryDriver: 'Baseline outpatient analgesic demand',
+    dailyForecast: [],
+  };
 
   const currentBranchObj = branches.find((b) => b.id === selectedBranchId);
   const activeBranchName =

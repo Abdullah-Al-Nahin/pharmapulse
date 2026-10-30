@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import { PharmaPulseSidebar } from './PharmaPulseSidebar';
 import { PharmaPulseHeader } from './PharmaPulseHeader';
 import { PharmaPulseKpiRow } from './PharmaPulseKpiRow';
@@ -53,6 +53,50 @@ interface Toast {
 
 interface PharmaPulseDashboardProps {
   onNavigateToTab?: (tab: string) => void;
+}
+
+interface TabErrorBoundaryProps {
+  tabId: string;
+  children: React.ReactNode;
+}
+
+interface TabErrorBoundaryState {
+  hasError: boolean;
+}
+
+class TabErrorBoundary extends Component<TabErrorBoundaryProps, TabErrorBoundaryState> {
+  public state: TabErrorBoundaryState = { hasError: false };
+  declare props: Readonly<TabErrorBoundaryProps>;
+  declare setState: Component<TabErrorBoundaryProps, TabErrorBoundaryState>['setState'];
+
+  static getDerivedStateFromError(): TabErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidUpdate(prevProps: TabErrorBoundaryProps) {
+    if (prevProps.tabId !== this.props.tabId && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#161b26] border border-slate-200 dark:border-slate-800 shadow-xs text-center space-y-3">
+          <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+            This module encountered a temporary display issue.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer"
+          >
+            Reload Module
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
@@ -686,8 +730,10 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
         {/* Scrollable Content View */}
         <main className="flex-1 overflow-y-auto px-4 md:px-6 py-5 flex flex-col gap-5 w-full">
-          {/* Main POS Interface */}
-          {activeTab === 'pos' && (
+          <TabErrorBoundary tabId={activeTab}>
+            <div key={activeTab} className="w-full flex flex-col gap-5">
+              {/* Main POS Interface */}
+              {activeTab === 'pos' && (
             <>
               {/* Central Layout: 8 cols Cart & Search + 4 cols Checkout & Billing */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1006,6 +1052,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
               <BatchExpiryView />
             </div>
           )}
+            </div>
+          </TabErrorBoundary>
         </main>
       </div>
 

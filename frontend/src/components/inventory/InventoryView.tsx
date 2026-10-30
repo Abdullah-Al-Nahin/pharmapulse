@@ -265,8 +265,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
       localStorage.setItem('rx_suppliers_v1', JSON.stringify(mappedSuppliers));
 
       if (onDataChanged) onDataChanged();
-    } catch (error) {
-      console.error("Failed to load inventory data:", error);
+    } catch {
+      setMedicines(PharmacyService.getMedicines());
+      setBatches(PharmacyService.getBatches());
+      setSuppliers(PharmacyService.getSuppliers());
     } finally {
       setLoading(false);
     }

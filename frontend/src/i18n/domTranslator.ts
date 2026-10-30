@@ -798,7 +798,8 @@ function shouldSkipTextNode(textNode: Text): boolean {
 }
 
 function shouldSkipElement(el: HTMLElement): boolean {
-  const tag = el.tagName;
+  if (el.namespaceURI === 'http://www.w3.org/2000/svg') return true;
+  const tag = el.tagName.toUpperCase();
   if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'SVG' || tag === 'PATH') return true;
   if (el.closest('[data-no-translate="true"]')) return true;
   return false;

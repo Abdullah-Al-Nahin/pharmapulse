@@ -106,7 +106,7 @@ export const MultiBranchHub: React.FC<MultiBranchHubProps> = ({
           localStorage.setItem(IBT_STORAGE_KEY, JSON.stringify(mapped));
         } catch {}
       }
-    }).catch(e => console.error('Failed to load transfers from DB:', e));
+    }).catch(() => {});
   }, []);
 
   // Sub-tabs: 'overview' | 'transfers' | 'comparison'
