@@ -43,6 +43,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 app.use(helmet());
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(), payment=(), usb=()');
+  next();
+});
 app.use(express.json());
 
 // Health Check

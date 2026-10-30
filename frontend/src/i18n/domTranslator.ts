@@ -830,8 +830,28 @@ function processTextNode(textNode: Text, locale: 'en' | 'bn'): void {
   }
 }
 
+let autoFieldCounter = 1;
+
+function ensureFormFieldAttributes(el: HTMLElement): void {
+  const tag = el.tagName;
+  if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') return;
+  if (!el.getAttribute('id') && !el.getAttribute('name')) {
+    const typeAttr = (el.getAttribute('type') || tag).toLowerCase().replace(/[^a-z0-9]/g, '');
+    el.setAttribute('name', `pp-${typeAttr}-${autoFieldCounter++}`);
+  }
+  if (
+    !el.getAttribute('aria-label') &&
+    !el.getAttribute('aria-labelledby') &&
+    !el.getAttribute('title') &&
+    !el.getAttribute('placeholder')
+  ) {
+    el.setAttribute('aria-label', el.getAttribute('name') || tag.toLowerCase());
+  }
+}
+
 function processElementAttributes(el: HTMLElement, locale: 'en' | 'bn'): void {
   if (shouldSkipElement(el)) return;
+  ensureFormFieldAttributes(el);
 
   const attrs = ['placeholder', 'title', 'aria-label'] as const;
   for (const attr of attrs) {
