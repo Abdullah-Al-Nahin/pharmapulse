@@ -159,7 +159,7 @@ export class BranchService {
         }
       }
     } catch (e) {
-      console.error('Failed to sync branches from database:', e);
+      // Offline / local fallback
     } finally {
       this.isSyncing = false;
     }
@@ -244,7 +244,7 @@ export class BranchService {
 
     const next = [...branches, newBranch];
     this.saveBranches(next);
-    branchApi.createBranch(newBranch).catch((e) => console.error('Failed to create branch in database:', e));
+    branchApi.createBranch(newBranch).catch(() => {});
     return newBranch;
   }
 
@@ -264,7 +264,7 @@ export class BranchService {
 
     branches[idx] = updated;
     this.saveBranches(branches);
-    branchApi.updateBranch(id, updates).catch((e) => console.error('Failed to update branch in database:', e));
+    branchApi.updateBranch(id, updates).catch(() => {});
     return updated;
   }
 
@@ -273,7 +273,7 @@ export class BranchService {
     const next = branches.filter((b) => b.id !== id);
     if (next.length === branches.length) return false;
     this.saveBranches(next);
-    branchApi.deleteBranch(id).catch((e) => console.error('Failed to delete branch in database:', e));
+    branchApi.deleteBranch(id).catch(() => {});
     return true;
   }
 

@@ -776,20 +776,43 @@ export function translateToBangla(raw: string): string {
 const originalTextMap = new WeakMap<Text, string>();
 const lastRenderedMap = new WeakMap<Text, string>();
 
-function shouldSkipNode(node: Node | null): boolean {
-  if (!node) return true;
-  const el = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement;
+const SKIP_TEXT_TAGS = new Set([
+  'SCRIPT',
+  'STYLE',
+  'NOSCRIPT',
+  'CODE',
+  'PRE',
+  'SVG',
+  'PATH',
+  'INPUT',
+  'TEXTAREA',
+]);
+
+function shouldSkipTextNode(textNode: Text): boolean {
+  const el = textNode.parentElement;
   if (!el) return true;
+  if (SKIP_TEXT_TAGS.has(el.tagName)) return true;
+  if (el.isContentEditable) return true;
+  if (el.closest('[data-no-translate="true"]')) return true;
+  return false;
+}
+
+function shouldSkipElement(el: HTMLElement): boolean {
   const tag = el.tagName;
-  if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'CODE') return true;
+  if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'SVG' || tag === 'PATH') return true;
   if (el.closest('[data-no-translate="true"]')) return true;
   return false;
 }
 
 function processTextNode(textNode: Text, locale: 'en' | 'bn'): void {
-  if (shouldSkipNode(textNode)) return;
+  if (shouldSkipTextNode(textNode)) return;
   const currentVal = textNode.nodeValue || '';
   if (!currentVal.trim()) return;
+
+  // Fast-path for English mode: if node was never translated by us and has no Bangla chars, do nothing (zero DOM writes)
+  if (locale === 'en' && !originalTextMap.has(textNode) && !HAS_BANGLA_REGEX.test(currentVal)) {
+    return;
+  }
 
   const lastOut = lastRenderedMap.get(textNode);
   if (lastOut === undefined || currentVal !== lastOut) {
@@ -802,13 +825,13 @@ function processTextNode(textNode: Text, locale: 'en' | 'bn'): void {
   if (nextVal !== currentVal) {
     lastRenderedMap.set(textNode, nextVal);
     textNode.nodeValue = nextVal;
-  } else {
+  } else if (lastOut !== currentVal) {
     lastRenderedMap.set(textNode, currentVal);
   }
 }
 
 function processElementAttributes(el: HTMLElement, locale: 'en' | 'bn'): void {
-  if (shouldSkipNode(el)) return;
+  if (shouldSkipElement(el)) return;
 
   const attrs = ['placeholder', 'title', 'aria-label'] as const;
   for (const attr of attrs) {
@@ -817,8 +840,13 @@ function processElementAttributes(el: HTMLElement, locale: 'en' | 'bn'): void {
 
     const origAttrName = `data-i18n-orig-${attr}`;
     const lastAttrName = `data-i18n-last-${attr}`;
-    const lastVal = el.getAttribute(lastAttrName);
 
+    // Fast-path for English mode: skip untouched pure-English attributes without mutating DOM
+    if (locale === 'en' && !el.hasAttribute(origAttrName) && !HAS_BANGLA_REGEX.test(val)) {
+      continue;
+    }
+
+    const lastVal = el.getAttribute(lastAttrName);
     if (lastVal === null || val !== lastVal) {
       el.setAttribute(origAttrName, val);
     }
@@ -829,7 +857,7 @@ function processElementAttributes(el: HTMLElement, locale: 'en' | 'bn'): void {
     if (nextVal !== val) {
       el.setAttribute(lastAttrName, nextVal);
       el.setAttribute(attr, nextVal);
-    } else {
+    } else if (lastVal !== val) {
       el.setAttribute(lastAttrName, val);
     }
   }
@@ -837,18 +865,24 @@ function processElementAttributes(el: HTMLElement, locale: 'en' | 'bn'): void {
 
 export function applyDomTranslation(root: Node = document.body, customLocale?: 'en' | 'bn'): void {
   if (typeof document === 'undefined' || !root) return;
-  const locale = customLocale || getCurrentLocale();
-  document.documentElement.lang = locale;
-
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
-  let current: Node | null = walker.currentNode;
-  while (current) {
-    if (current.nodeType === Node.TEXT_NODE) {
-      processTextNode(current as Text, locale);
-    } else if (current.nodeType === Node.ELEMENT_NODE) {
-      processElementAttributes(current as HTMLElement, locale);
+  try {
+    const locale = customLocale || getCurrentLocale();
+    if (document.documentElement.lang !== locale) {
+      document.documentElement.lang = locale;
     }
-    current = walker.nextNode();
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+    let current: Node | null = walker.currentNode;
+    while (current) {
+      if (current.nodeType === Node.TEXT_NODE) {
+        processTextNode(current as Text, locale);
+      } else if (current.nodeType === Node.ELEMENT_NODE) {
+        processElementAttributes(current as HTMLElement, locale);
+      }
+      current = walker.nextNode();
+    }
+  } catch {
+    // Never allow translation pass to throw or interrupt React rendering
   }
 }
 
@@ -859,39 +893,62 @@ export function initializeDomTranslator(): void {
   if (isInitialized || typeof window === 'undefined') return;
   isInitialized = true;
 
+  let observer: MutationObserver | null = null;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const observeBody = () => {
+    if (!observer || !document.body) return;
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  };
+
   const runPass = (locale?: 'en' | 'bn') => {
-    if (isApplying) return;
+    if (isApplying || !document.body) return;
     isApplying = true;
+    if (observer) observer.disconnect();
     try {
       applyDomTranslation(document.body, locale);
     } finally {
+      observeBody();
       isApplying = false;
     }
   };
 
+  observer = new MutationObserver((mutations) => {
+    if (isApplying) return;
+
+    // Ignore mutations that only occurred inside [data-no-translate="true"] (e.g. live clock)
+    const hasRelevantMutation = mutations.some((m) => {
+      const targetEl =
+        m.target.nodeType === Node.ELEMENT_NODE
+          ? (m.target as HTMLElement)
+          : m.target.parentElement;
+      if (!targetEl) return false;
+      if (targetEl.closest('[data-no-translate="true"]')) return false;
+      return true;
+    });
+
+    if (!hasRelevantMutation) return;
+
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null;
+      requestAnimationFrame(() => runPass());
+    }, 80);
+  });
+
   // Initial pass
   runPass();
 
-  // Re-run whenever locale changes
+  // Re-run immediately whenever user toggles EN / বাং
   subscribeLocale((newLocale) => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
     runPass(newLocale);
   });
-
-  // Observe DOM mutations so new modals, tabs, and dynamic rows are translated immediately
-  let scheduled = false;
-  const observer = new MutationObserver(() => {
-    if (isApplying || scheduled) return;
-    scheduled = true;
-    queueMicrotask(() => {
-      scheduled = false;
-      runPass();
-    });
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  });
 }
-

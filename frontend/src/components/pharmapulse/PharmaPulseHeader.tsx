@@ -195,7 +195,7 @@ export const PharmaPulseHeader: React.FC<PharmaPulseHeaderProps> = ({
         )}
 
         {/* System Live Clock */}
-        <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs">
+        <div data-no-translate="true" className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs">
           <Clock className="w-3.5 h-3.5 text-slate-400" />
           <span className="font-mono text-[11px] font-semibold">{currentTime}</span>
         </div>

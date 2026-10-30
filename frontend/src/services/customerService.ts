@@ -94,7 +94,7 @@ export class CustomerService {
         }
       }
     } catch (e) {
-      console.error('Failed to sync customers from database:', e);
+      // Offline / local fallback
     } finally {
       this.isSyncing = false;
     }
@@ -212,7 +212,7 @@ export class CustomerService {
         const updated = this.getCustomers().map((c) => (c.id === newCustomer.id ? { ...c, id: saved.id } : c));
         this.setLocal(STORAGE_KEYS.CUSTOMERS, updated);
       }
-    }).catch((e) => console.error('Failed to save customer to DB:', e));
+    }).catch(() => {});
     return newCustomer;
   }
 
@@ -223,7 +223,7 @@ export class CustomerService {
 
     list[idx] = { ...list[idx], ...updates };
     this.setLocal(STORAGE_KEYS.CUSTOMERS, list);
-    customerApi.updateCustomer(id, updates).catch((e) => console.error('Failed to update customer in DB:', e));
+    customerApi.updateCustomer(id, updates).catch(() => {});
     return list[idx];
   }
 

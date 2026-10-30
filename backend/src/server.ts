@@ -49,7 +49,7 @@ app.use(express.json());
 app.get('/health', async (_req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({ status: 'ok', database: 'connected', version: '1.0.0' });
+    res.status(200).json({ status: 'ok', database: 'connected', version: '2.0.0', capabilities: ['users', 'branches', 'customers', 'adjustments', 'transfers', 'system'] });
   } catch (error) {
     res.status(500).json({ status: 'error', database: 'disconnected', error: String(error) });
   }

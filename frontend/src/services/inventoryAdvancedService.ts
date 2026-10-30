@@ -183,7 +183,7 @@ export class InventoryAdvancedService {
         this.setLocal(STORAGE_KEYS.STOCK_TRANSFERS, dbTransfers);
       }
     } catch (e) {
-      console.error('Failed to sync transfers from database:', e);
+      // Offline / local fallback
     } finally {
       this.isSyncing = false;
     }
@@ -201,7 +201,7 @@ export class InventoryAdvancedService {
     const list = this.getTransfers();
     list.unshift(transfer);
     this.setLocal(STORAGE_KEYS.STOCK_TRANSFERS, list);
-    transferApi.createTransfer(transfer).catch(e => console.error('Failed to save transfer to DB:', e));
+    transferApi.createTransfer(transfer).catch(() => {});
   }
 
   public static dispatchTransfer(transferId: string, dispatcherName: string): void {
@@ -299,7 +299,7 @@ export class InventoryAdvancedService {
 
     batchApi.quarantineBatch(batch.id, `${reason}: ${details}`)
       .then(() => PharmacyService.syncDatabase())
-      .catch((e) => console.error('Failed to quarantine batch in DB:', e));
+      .catch(() => {});
   }
 
   public static releaseFromQuarantine(recordId: string, releasedBy: string, notes: string): void {
@@ -337,7 +337,7 @@ export class InventoryAdvancedService {
       if (target.batchId) {
         batchApi.updateBatch(target.batchId, { status: 'ACTIVE', quarantineReason: null })
           .then(() => PharmacyService.syncDatabase())
-          .catch((e) => console.error('Failed to release quarantine in DB:', e));
+          .catch(() => {});
       }
     }
   }

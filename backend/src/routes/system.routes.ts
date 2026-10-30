@@ -7,3 +7,4 @@ router.get('/stats', getDatabaseStats);
 router.post('/purge', purgeDatabase);
 
 export default router;
+

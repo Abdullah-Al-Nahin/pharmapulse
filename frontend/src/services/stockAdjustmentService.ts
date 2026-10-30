@@ -75,7 +75,7 @@ export class StockAdjustmentService {
         }
       }
     } catch (e) {
-      console.error('Failed to sync adjustments from database:', e);
+      // Offline / local fallback
     } finally {
       this.isSyncing = false;
     }
@@ -245,7 +245,7 @@ export class StockAdjustmentService {
       notes: params.notes,
       userId: params.requester.userId,
       requiresApproval
-    }).catch(e => console.error('Failed to create adjustment in database:', e));
+    }).catch(() => {});
 
     return {
       adjustment: newAdjustment,
