@@ -9,32 +9,6 @@ type BranchListener = () => void;
 
 const DEFAULT_BRANCHES: BranchInfo[] = [
   {
-    id: 'br-snakra',
-    name: 'snakra',
-    bnName: 'শাঁকরা ব্রাঞ্চ',
-    code: '1234',
-    type: 'retail_branch',
-    address: 'Shankra Main Road, Keraniganj',
-    phone: '+880 1919-191919',
-    managerName: 'nahin3',
-    licenseNo: 'BR-177324194412969-52',
-    color: '#10b981',
-    metrics: {
-      stockCount: 15,
-      stockValue: 42500,
-      todaySales: 2420.50,
-      monthSales: 68500,
-      monthlyPurchase: 45000,
-      cashBalance: 2420.50,
-      monthlyExpense: 12000,
-      monthlyProfit: 11500,
-      profitMargin: 16.8,
-      staffCount: 1,
-      activeSuppliers: 5,
-      registeredCustomers: 25,
-    }
-  },
-  {
     id: 'HQ-MAIN',
     name: 'Madina Eye Hospital & Central Pharmacy',
     bnName: 'মদিনা আই হসপিটাল ও সেন্ট্রাল ফার্মেসি',
@@ -42,74 +16,22 @@ const DEFAULT_BRANCHES: BranchInfo[] = [
     type: 'head_office',
     address: 'Plot 12, Mirpur Main Road, Dhaka',
     phone: '+880 1711-001122',
-    managerName: 'nahin3',
+    managerName: 'Super Admin',
     licenseNo: 'DGDA-DH-10492',
     color: '#10b981',
     metrics: {
-      stockCount: 45,
-      stockValue: 125000,
-      todaySales: 15400,
-      monthSales: 340000,
-      monthlyPurchase: 210000,
-      cashBalance: 15400,
-      monthlyExpense: 35000,
-      monthlyProfit: 95000,
-      profitMargin: 27.9,
-      staffCount: 8,
-      activeSuppliers: 12,
-      registeredCustomers: 120,
-    }
-  },
-  {
-    id: 'br-dhaka-central',
-    name: 'Dhaka Central Hub',
-    bnName: 'ঢাকা সেন্ট্রাল হাব',
-    code: 'BR-DHAKA-CENTRAL',
-    type: 'head_office',
-    address: 'Motijheel C/A, Dhaka',
-    phone: '+880 1711-223344',
-    managerName: 'nahin1',
-    licenseNo: 'DGDA-DH-99120',
-    color: '#3b82f6',
-    metrics: {
-      stockCount: 28,
-      stockValue: 84000,
-      todaySales: 8900,
-      monthSales: 195000,
-      monthlyPurchase: 120000,
-      cashBalance: 8900,
-      monthlyExpense: 22000,
-      monthlyProfit: 53000,
-      profitMargin: 27.1,
-      staffCount: 2,
-      activeSuppliers: 8,
-      registeredCustomers: 40,
-    }
-  },
-  {
-    id: 'br-sylhet',
-    name: 'Sylhet Care Center',
-    bnName: 'সিলেট কেয়ার সেন্টার',
-    code: 'BR-SYLHET',
-    type: 'retail_branch',
-    address: 'Zindabazar, Sylhet',
-    phone: '+880 1819-334455',
-    managerName: 'nahin',
-    licenseNo: 'DGDA-SY-33102',
-    color: '#8b5cf6',
-    metrics: {
-      stockCount: 18,
-      stockValue: 39000,
-      todaySales: 4100,
-      monthSales: 92000,
-      monthlyPurchase: 60000,
-      cashBalance: 4100,
-      monthlyExpense: 11000,
-      monthlyProfit: 21000,
-      profitMargin: 22.8,
+      stockCount: 0,
+      stockValue: 0,
+      todaySales: 0,
+      monthSales: 0,
+      monthlyPurchase: 0,
+      cashBalance: 0,
+      monthlyExpense: 0,
+      monthlyProfit: 0,
+      profitMargin: 0,
       staffCount: 1,
-      activeSuppliers: 4,
-      registeredCustomers: 15,
+      activeSuppliers: 0,
+      registeredCustomers: 0,
     }
   }
 ];
@@ -178,13 +100,6 @@ export class BranchService {
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            const existingIds = new Set(parsed.map((b: BranchInfo) => b.id));
-            const missing = DEFAULT_BRANCHES.filter((b) => !existingIds.has(b.id));
-            if (missing.length > 0) {
-              const merged = [...parsed, ...missing];
-              localStorage.setItem(STORAGE_KEY_BRANCHES, JSON.stringify(merged));
-              return merged;
-            }
             return parsed;
           }
         }
@@ -199,6 +114,14 @@ export class BranchService {
 
   public static getBranchById(branchId: string): BranchInfo | undefined {
     return this.getBranches().find((b) => b.id === branchId || b.code.toLowerCase() === branchId.toLowerCase());
+  }
+
+  public static resetToFactory(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY_BRANCHES, JSON.stringify(DEFAULT_BRANCHES));
+      sessionStorage.removeItem('branches_synced');
+    }
+    this.emitChange();
   }
 
   public static addBranch(data: {

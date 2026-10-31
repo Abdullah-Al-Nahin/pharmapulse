@@ -29,6 +29,7 @@ import {
 } from '../lib/initialData';
 import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi, systemApi } from '../lib/api';
 import { AuditService } from './auditService';
+import { BranchService } from './branchService';
 
 const STORAGE_KEYS = {
   MEDICINES: 'rx_medicines_v1',
@@ -312,6 +313,9 @@ export class PharmacyService {
           localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
           localStorage.setItem('rx_quarantine_items_v1', JSON.stringify([]));
           localStorage.setItem('rx_supplier_returns_v1', JSON.stringify([]));
+          BranchService.resetToFactory();
+          localStorage.removeItem('pharmerp_branches_db_v3');
+          sessionStorage.removeItem('branches_synced');
         } catch {}
         AuditService.clearLogsByWindow('all');
         break;

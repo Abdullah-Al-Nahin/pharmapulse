@@ -139,8 +139,27 @@ export const purgeDatabase = async (req: Request, res: Response) => {
           prisma.supplier.deleteMany({}),
           prisma.customer.deleteMany({}),
           prisma.auditLog.deleteMany({}),
+          prisma.branch.deleteMany({ where: { id: { not: 'HQ-MAIN' } } }),
         ]);
-        summary = 'Full database cleared (all transactions, stock, batches, catalog, customers, suppliers, prescriptions, and logs wiped). Super Admin preserved.';
+
+        const hqExists = await prisma.branch.findUnique({ where: { id: 'HQ-MAIN' } });
+        if (!hqExists) {
+          await prisma.branch.create({
+            data: {
+              id: 'HQ-MAIN',
+              name: 'Madina Eye Hospital & Central Pharmacy',
+              bnName: 'মদিনা আই হসপিটাল ও সেন্ট্রাল ফার্মেসি',
+              code: 'HQ-MAIN',
+              type: 'head_office',
+              address: 'Plot 12, Mirpur Main Road, Dhaka',
+              phone: '+880 1711-001122',
+              managerName: 'Super Admin',
+              licenseNo: 'DGDA-DH-10492',
+              color: '#10b981',
+            },
+          });
+        }
+        summary = 'Full database cleared (all transactions, stock, batches, catalog, customers, suppliers, prescriptions, logs, and secondary branches wiped). Super Admin & Head Office preserved.';
         break;
       }
 
