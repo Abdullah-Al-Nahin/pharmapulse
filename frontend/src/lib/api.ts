@@ -9,7 +9,6 @@ const defaultBaseURL = isLocalhost
   : 'https://pharmapulse-backend-wjf5.onrender.com/api';
 
 const resolvedBaseURL = import.meta.env.VITE_API_URL || defaultBaseURL;
-const healthURL = resolvedBaseURL.replace(/\/api\/?$/, '') + '/health';
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
@@ -45,47 +44,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-const V2_CACHE_KEY = 'pharmapulse_v2_routes_supported';
-let v2SupportPromise: Promise<boolean> | null = null;
-
-const isLocalBackend =
-  resolvedBaseURL.includes('localhost') || resolvedBaseURL.includes('127.0.0.1');
-
-/**
- * Probes GET /health (which always returns HTTP 200 OK) once per session to check whether
- * the deployed backend supports v2 routes (/users, /branches, /transfers, /customers, /adjustments, /system).
- * Prevents Chrome DevTools from logging red 404 network errors if the cloud instance is still on v1.0.0.
- */
-async function hasV2Routes(): Promise<boolean> {
-  if (isLocalBackend) return true;
-  if (typeof window !== 'undefined') {
-    const cached = sessionStorage.getItem(V2_CACHE_KEY);
-    if (cached === 'true') return true;
-    if (cached === 'false') return false;
-  }
-  if (!v2SupportPromise) {
-    v2SupportPromise = axios
-      .get(healthURL, { timeout: 6000 })
-      .then((res) => {
-        const data = res?.data;
-        const supported = Boolean(
-          data && (data.version === '2.0.0' || Array.isArray(data.capabilities))
-        );
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem(V2_CACHE_KEY, supported ? 'true' : 'false');
-        }
-        return supported;
-      })
-      .catch(() => {
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem(V2_CACHE_KEY, 'false');
-        }
-        return false;
-      });
-  }
-  return v2SupportPromise;
-}
 
 // Medicines (v1 + v2)
 export const inventoryApi = {
@@ -171,113 +129,43 @@ export const supplierApi = {
   },
 };
 
-// Users & Staff Directory (v2)
+// Users & Staff Directory
 export const userApi = {
-  getUsers: async () => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/users');
-    return res.data;
-  },
-  createUser: async (data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, ...data };
-    const res = await api.post('/users', data);
-    return res.data;
-  },
-  updateUser: async (id: string, data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id, ...data };
-    const res = await api.put(`/users/${id}`, data);
-    return res.data;
-  },
-  deleteUser: async (id: string) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id };
-    const res = await api.delete(`/users/${id}`);
-    return res.data;
-  },
-  getRoles: async () => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/users/roles');
-    return res.data;
-  },
-  login: async (credentials: { identifier: string; password?: string }) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true };
-    const res = await api.post('/users/login', credentials);
-    return res.data;
-  },
+  getUsers: async () => (await api.get('/users')).data,
+  createUser: async (data: any) => (await api.post('/users', data)).data,
+  updateUser: async (id: string, data: any) => (await api.put(`/users/${id}`, data)).data,
+  deleteUser: async (id: string) => (await api.delete(`/users/${id}`)).data,
+  getRoles: async () => (await api.get('/users/roles')).data,
+  login: async (credentials: { identifier: string; password?: string }) =>
+    (await api.post('/users/login', credentials)).data,
 };
 
-// Branches (v2)
+// Branches
 export const branchApi = {
-  getBranches: async () => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/branches');
-    return res.data;
-  },
-  createBranch: async (data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, ...data };
-    const res = await api.post('/branches', data);
-    return res.data;
-  },
-  updateBranch: async (id: string, data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id, ...data };
-    const res = await api.put(`/branches/${id}`, data);
-    return res.data;
-  },
-  deleteBranch: async (id: string) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id };
-    const res = await api.delete(`/branches/${id}`);
-    return res.data;
-  },
+  getBranches: async () => (await api.get('/branches')).data,
+  createBranch: async (data: any) => (await api.post('/branches', data)).data,
+  updateBranch: async (id: string, data: any) => (await api.put(`/branches/${id}`, data)).data,
+  deleteBranch: async (id: string) => (await api.delete(`/branches/${id}`)).data,
 };
 
-// Customers & Dues (v2)
+// Customers & Dues
 export const customerApi = {
-  getCustomers: async (params?: any) => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/customers', { params });
-    return res.data;
-  },
-  createCustomer: async (data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, ...data };
-    const res = await api.post('/customers', data);
-    return res.data;
-  },
-  updateCustomer: async (id: string, data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id, ...data };
-    const res = await api.put(`/customers/${id}`, data);
-    return res.data;
-  },
+  getCustomers: async (params?: any) => (await api.get('/customers', { params })).data,
+  createCustomer: async (data: any) => (await api.post('/customers', data)).data,
+  updateCustomer: async (id: string, data: any) => (await api.put(`/customers/${id}`, data)).data,
 };
 
-// Stock Adjustments (v2)
+// Stock Adjustments
 export const adjustmentApi = {
-  getAdjustments: async () => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/adjustments');
-    return res.data;
-  },
-  createAdjustment: async (data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, ...data };
-    const res = await api.post('/adjustments', data);
-    return res.data;
-  },
+  getAdjustments: async () => (await api.get('/adjustments')).data,
+  createAdjustment: async (data: any) => (await api.post('/adjustments', data)).data,
 };
 
-// Stock Transfers (v2)
+// Stock Transfers
 export const transferApi = {
-  getTransfers: async () => {
-    if (!(await hasV2Routes())) return [];
-    const res = await api.get('/transfers');
-    return res.data;
-  },
-  createTransfer: async (data: any) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, ...data };
-    const res = await api.post('/transfers', data);
-    return res.data;
-  },
-  receiveTransfer: async (id: string) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, id };
-    return (await api.put(`/transfers/${id}/receive`)).data;
-  },
+  getTransfers: async () => (await api.get('/transfers')).data,
+  createTransfer: async (data: any) => (await api.post('/transfers', data)).data,
+  receiveTransfer: async (id: string) => (await api.put(`/transfers/${id}/receive`)).data,
 };
 
 // Sales & POS Invoicing (v1 + v2)
@@ -295,16 +183,11 @@ export const purchaseOrderApi = {
   receiveGRN: async (id: string, data: any) => (await api.post(`/purchase-orders/${id}/grn`, data)).data,
 };
 
-// System & Super Admin Database Control (v2)
+// System & Super Admin Database Control
 export const systemApi = {
-  getStats: async () => {
-    if (!(await hasV2Routes())) return { offlineFallback: true };
-    return (await api.get('/system/stats')).data;
-  },
-  purgeDatabase: async (data: { scope: string; requesterRole?: string }) => {
-    if (!(await hasV2Routes())) return { offlineFallback: true, success: true };
-    return (await api.post('/system/purge', data)).data;
-  },
+  getStats: async () => (await api.get('/system/stats')).data,
+  purgeDatabase: async (data: { scope: string; requesterRole?: string }) =>
+    (await api.post('/system/purge', data)).data,
 };
 
 export default api;
