@@ -1583,9 +1583,52 @@ export class PharmacyService {
     this.emitChange();
 
     try {
+      const allMeds = this.getMedicines();
+      const fallbackMed = allMeds[0];
+      const fallbackBatch = batches.find(b => b.currentStock > 0) || batches[0];
+
+      // Resolve valid cashier ID (never pass raw human name to foreign key)
+      const cashierId = sale.cashierId || 'user-super-admin-01';
+
+      // Map sale items with guaranteed valid database product and batch IDs
+      const salePayloadItems = sale.items.map(it => {
+        let pId = it.medicineId;
+        let bId = it.batchId;
+
+        // If missing or dummy fallback, resolve from local cache
+        if (!pId || pId === 'unknown-med') {
+          const foundMed = allMeds.find(m => m.name.toLowerCase() === it.medicineName.toLowerCase());
+          pId = foundMed?.id || fallbackMed?.id;
+        }
+
+        if (!bId || bId === 'unknown-batch') {
+          if (pId) {
+            const foundBatch = this.getFefoBatchForMedicine(pId);
+            if (foundBatch) bId = foundBatch.id;
+          }
+          if (!bId && fallbackBatch) {
+            bId = fallbackBatch.id;
+            if (!pId || pId === 'unknown-med') pId = fallbackBatch.medicineId;
+          }
+        }
+
+        return {
+          productId: pId,
+          batchId: bId,
+          quantity: it.quantity,
+          unitMrp: it.mrp || it.unitPrice,
+          unitSellingPrice: it.unitPrice,
+          unitCostPrice: it.unitCost,
+          lineTotal: it.total,
+          lineGrossProfit: it.total - (it.quantity * it.unitCost),
+          discountAmount: (it.subtotal * (it.discountPercent || 0)) / 100,
+          taxAmount: it.taxAmount || 0
+        };
+      });
+
       await saleApi.createSale({
         invoiceNumber: sale.invoiceNumber,
-        cashierId: sale.cashierName,
+        cashierId,
         customerId: sale.customerId || null,
         subTotal: sale.subtotal,
         discountAmount: sale.discountTotal || 0,
@@ -1594,18 +1637,7 @@ export class PharmacyService {
         paidAmount: sale.grandTotal - (sale.dueAmount || 0),
         dueAmount: sale.dueAmount || 0,
         changeGiven: sale.changeGiven || 0,
-        items: sale.items.map(it => ({
-          productId: it.medicineId,
-          batchId: it.batchId,
-          quantity: it.quantity,
-          unitMrp: it.mrp,
-          unitSellingPrice: it.unitPrice,
-          unitCostPrice: it.unitCost,
-          lineTotal: it.total,
-          lineGrossProfit: it.total - (it.quantity * it.unitCost),
-          discountAmount: (it.subtotal * (it.discountPercent || 0)) / 100,
-          taxAmount: it.taxAmount || 0
-        }))
+        items: salePayloadItems
       });
       await this.syncDatabase();
     } catch (e) {

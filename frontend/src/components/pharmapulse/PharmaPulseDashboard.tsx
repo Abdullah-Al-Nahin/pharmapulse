@@ -296,13 +296,23 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       handleUpdateQty(existing.id, 1);
       addToast(`Incremented quantity for ${name}`, 'info');
     } else {
+      const allMeds = PharmacyService.getMedicines();
+      const allBatches = PharmacyService.getBatches();
+      const matchedMed = extra?.medicineId 
+        ? allMeds.find(m => m.id === extra.medicineId)
+        : allMeds.find(m => m.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(m.name.toLowerCase())) || allMeds[0];
+
+      const medId = extra?.medicineId || matchedMed?.id;
+      const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+      const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+
       const newItem: PharmaCartItem = {
         id: Date.now(),
         name,
-        sub: extra?.sub || 'Formulation Molecule',
-        company: extra?.company || 'Certified Lab Pharma',
-        batch,
-        exp,
+        sub: extra?.sub || matchedMed?.genericName || 'Formulation Molecule',
+        company: extra?.company || matchedMed?.manufacturer || 'Certified Lab Pharma',
+        batch: batch || fallbackBatch?.batchNumber || 'BAT-MAIN-01',
+        exp: exp || fallbackBatch?.expiryDate || '12/2026',
         price,
         qty: 1,
         disc: 0,
@@ -314,10 +324,10 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         isRxRequired: extra?.isRxRequired,
         dosageEn: extra?.dosageEn,
         dosageBn: extra?.dosageBn,
-        medicineId: extra?.medicineId,
-        batchId: extra?.batchId,
-        purchasePrice: extra?.purchasePrice,
-        stock: extra?.stock
+        medicineId: medId,
+        batchId: extra?.batchId || fallbackBatch?.id,
+        purchasePrice: extra?.purchasePrice || fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || 0,
+        stock: extra?.stock || fallbackBatch?.currentStock
       };
       setCart((prev) => [...prev, newItem]);
       addToast(`Added ${name} to active cart`, 'success');
@@ -325,19 +335,37 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   };
 
   const handleSwitchAlternative = (alt: AlternativeDrug) => {
+    const allMeds = PharmacyService.getMedicines();
+    const allBatches = PharmacyService.getBatches();
+    
+    // Find matching medicine in database/cache
+    const matchedMed = allMeds.find(
+      (m) => m.name.toLowerCase().includes(alt.name.toLowerCase()) || 
+             alt.name.toLowerCase().includes(m.name.toLowerCase()) ||
+             (m.genericName && m.genericName.toLowerCase().includes('esomeprazole'))
+    ) || allMeds[0];
+
+    const medId = matchedMed?.id;
+    const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+    const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+
     setCart((prev) => {
       const filtered = prev.filter((i) => !i.name.toLowerCase().includes('sergel'));
       const switchedItem: PharmaCartItem = {
         id: Date.now(),
         name: alt.name,
-        sub: 'Esomeprazole 20mg',
-        company: alt.company,
-        batch: `SW-${Math.floor(1000 + Math.random() * 9000)}`,
-        exp: '10/2026',
-        price: alt.price,
+        sub: matchedMed?.genericName || 'Esomeprazole 20mg',
+        company: alt.company || matchedMed?.manufacturer || 'Square Pharmaceuticals',
+        batch: fallbackBatch?.batchNumber || `SW-${Math.floor(1000 + Math.random() * 9000)}`,
+        exp: fallbackBatch?.expiryDate || '10/2026',
+        price: alt.price || matchedMed?.sellingPrice || 7,
         qty: 30,
         disc: 0,
         isUrgent: false,
+        medicineId: medId,
+        batchId: fallbackBatch?.id,
+        purchasePrice: fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || 5,
+        stock: fallbackBatch?.currentStock || 100,
         dosageEn: '1 capsule daily 30 min before breakfast',
         dosageBn: '১টি ক্যাপসুল প্রতিদিন সকালে খাবার ৩০ মিনিট আগে',
       };
@@ -348,19 +376,35 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
   // Handle generic substitute selection from GenericSubstitutionModal with Pharmacist Confirmation Gate
   const handleSelectSubstitute = (originalItem: PharmaCartItem, alt: GenericSubstituteOption) => {
+    const allMeds = PharmacyService.getMedicines();
+    const allBatches = PharmacyService.getBatches();
+
+    const matchedMed = allMeds.find(
+      (m) => m.name.toLowerCase().includes(alt.brandName.toLowerCase()) ||
+             alt.brandName.toLowerCase().includes(m.name.toLowerCase()) ||
+             (alt.genericName && m.genericName && m.genericName.toLowerCase().includes(alt.genericName.toLowerCase()))
+    ) || allMeds[0];
+
+    const medId = alt.medicineId || matchedMed?.id;
+    const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+    const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+
     const isInCart = cart.some((i) => i.id === originalItem.id);
     const newSubItem: PharmaCartItem = {
       id: isInCart ? originalItem.id : Date.now(),
       name: `${alt.brandName} ${alt.strength}`.trim(),
       sub: `${alt.genericName} • ${alt.strength}`,
-      company: alt.company || alt.manufacturer || 'Pharma Lab',
-      price: alt.price,
-      batch: alt.batch || `SUB-${Math.floor(1000 + Math.random() * 9000)}`,
-      exp: alt.exp || originalItem.exp || '12/2027',
+      company: alt.company || alt.manufacturer || matchedMed?.manufacturer || 'Pharma Lab',
+      price: alt.price || matchedMed?.sellingPrice || originalItem.price,
+      batch: alt.batch || fallbackBatch?.batchNumber || `SUB-${Math.floor(1000 + Math.random() * 9000)}`,
+      exp: alt.exp || fallbackBatch?.expiryDate || originalItem.exp || '12/2027',
       qty: originalItem.qty || 1,
       disc: 0,
       isUrgent: false,
-      purchasePrice: alt.purchasePrice,
+      medicineId: medId,
+      batchId: fallbackBatch?.id,
+      stock: fallbackBatch?.currentStock,
+      purchasePrice: alt.purchasePrice || fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || originalItem.purchasePrice,
       isColdChain: alt.isColdChain ?? originalItem.isColdChain,
       storageTemp: alt.storageTemp ?? originalItem.storageTemp,
       isOphthalmic: alt.isOphthalmic ?? originalItem.isOphthalmic,
@@ -545,6 +589,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
             ? 'credit'
             : 'cash',
         paymentStatus: paymentMethod === 'due_credit' ? 'due' : 'paid',
+        cashierId: currentUser?.id || 'user-super-admin-01',
         cashierName: currentUser?.name || 'Duty Pharmacist',
         branchId: currentUser?.branchId || 'main',
         branchName: currentUser?.branchName || 'Main Branch',

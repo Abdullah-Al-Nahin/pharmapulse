@@ -277,6 +277,7 @@ export interface Sale {
     cardAuthCode?: string;
   };
   paymentStatus: 'completed' | 'paid' | 'refunded' | 'partially_refunded' | 'due' | 'partially_paid';
+  cashierId?: string;
   cashierName: string;
   notes?: string;
   branchId?: string;
