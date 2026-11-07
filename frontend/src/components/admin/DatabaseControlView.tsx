@@ -506,12 +506,19 @@ export const DatabaseControlView: React.FC = () => {
 
       await fetchStats();
       setRefreshTick((t) => t + 1);
+      const isFullReset = activeConfirmAction.id === 'full_database';
       setStatusBanner({
         type: 'success',
-        message: res.message,
+        message: isFullReset ? `${res.message} Reloading system cleanly...` : res.message,
       });
       setActiveConfirmAction(null);
       setConfirmInput('');
+
+      if (isFullReset) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      }
     } catch (err: any) {
       setStatusBanner({
         type: 'error',

@@ -30,6 +30,9 @@ import {
 import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi, systemApi } from '../lib/api';
 import { AuditService } from './auditService';
 import { BranchService } from './branchService';
+import { CustomerService } from './customerService';
+import { InventoryAdvancedService } from './inventoryAdvancedService';
+import { StockAdjustmentService } from './stockAdjustmentService';
 
 const STORAGE_KEYS = {
   MEDICINES: 'rx_medicines_v1',
@@ -307,15 +310,24 @@ export class PharmacyService {
           if (k !== STORAGE_KEYS.CLEARED_SCOPES) setLocalItem(k, []);
         });
         try {
-          localStorage.setItem('rx_customers_v1', JSON.stringify([]));
-          localStorage.setItem('rx_customer_due_tx_v1', JSON.stringify([]));
-          localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
-          localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
-          localStorage.setItem('rx_quarantine_items_v1', JSON.stringify([]));
-          localStorage.setItem('rx_supplier_returns_v1', JSON.stringify([]));
+          CustomerService.resetToFactory();
           BranchService.resetToFactory();
+          InventoryAdvancedService.resetToFactory();
+          StockAdjustmentService.resetToFactory();
+          localStorage.removeItem('rx_customers_v1');
+          localStorage.removeItem('rx_customer_due_tx_v1');
+          localStorage.removeItem('rx_customers_db_v2');
+          localStorage.removeItem('rx_customer_ledgers_db_v2');
+          localStorage.removeItem('rx_loyalty_history_db_v2');
+          localStorage.removeItem('rx_stock_adjustments_db_v2');
+          localStorage.removeItem('rx_inter_branch_transfers_v1');
+          localStorage.removeItem('rx_quarantine_items_v1');
+          localStorage.removeItem('rx_supplier_returns_v1');
           localStorage.removeItem('pharmerp_branches_db_v3');
           sessionStorage.removeItem('branches_synced');
+          sessionStorage.removeItem('cust_synced_v2');
+          sessionStorage.removeItem('adj_synced_v2');
+          sessionStorage.removeItem('transfers_synced');
         } catch {}
         AuditService.clearLogsByWindow('all');
         break;
@@ -343,6 +355,7 @@ export class PharmacyService {
         setLocalItem(STORAGE_KEYS.SUPPLIER_LEDGERS, []);
         try {
           localStorage.setItem('rx_customer_due_tx_v1', JSON.stringify([]));
+          CustomerService.clearAllDues();
         } catch {}
         break;
       }
@@ -371,6 +384,7 @@ export class PharmacyService {
 
       case 'only_customer_dues': {
         try {
+          CustomerService.clearAllDues();
           const rawCust = localStorage.getItem('rx_customers_v1');
           if (rawCust) {
             const parsed = JSON.parse(rawCust);
@@ -389,6 +403,8 @@ export class PharmacyService {
         this.cache.batches = [];
         setLocalItem(STORAGE_KEYS.BATCHES, []);
         try {
+          StockAdjustmentService.resetToFactory();
+          InventoryAdvancedService.resetToFactory();
           localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
           localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
         } catch {}
@@ -402,6 +418,8 @@ export class PharmacyService {
         setLocalItem(STORAGE_KEYS.MEDICINES, []);
         setLocalItem(STORAGE_KEYS.BATCHES, []);
         try {
+          StockAdjustmentService.resetToFactory();
+          InventoryAdvancedService.resetToFactory();
           localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
           localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
         } catch {}
@@ -423,6 +441,8 @@ export class PharmacyService {
 
       case 'stock_transfers_adjustments': {
         try {
+          StockAdjustmentService.resetToFactory();
+          InventoryAdvancedService.resetToFactory();
           localStorage.setItem('rx_stock_adjustments_db_v2', JSON.stringify([]));
           localStorage.setItem('rx_inter_branch_transfers_v1', JSON.stringify([]));
         } catch {}

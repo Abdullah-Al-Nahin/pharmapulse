@@ -125,6 +125,36 @@ export class CustomerService {
     } catch {}
   }
 
+  public static resetToFactory(): void {
+    try {
+      this.isInitialized = true;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
+        localStorage.setItem(STORAGE_KEYS.CUSTOMER_LEDGERS, JSON.stringify(INITIAL_CUSTOMER_LEDGERS));
+        localStorage.setItem(STORAGE_KEYS.LOYALTY_HISTORY, JSON.stringify(INITIAL_LOYALTY_TRANSACTIONS));
+        localStorage.setItem(STORAGE_KEYS.LOYALTY_CONFIG, JSON.stringify(DEFAULT_LOYALTY_CONFIG));
+        sessionStorage.removeItem('cust_synced_v2');
+      }
+      this.emitChange();
+    } catch (e) {
+      console.error('CustomerService resetToFactory error:', e);
+    }
+  }
+
+  public static clearAllDues(): void {
+    try {
+      const customers = this.getCustomers().map((c) => ({
+        ...c,
+        outstandingBalance: 0,
+      }));
+      this.setLocal(STORAGE_KEYS.CUSTOMERS, customers);
+      this.setLocal(STORAGE_KEYS.CUSTOMER_LEDGERS, []);
+      this.emitChange();
+    } catch (e) {
+      console.error('CustomerService clearAllDues error:', e);
+    }
+  }
+
   // ==========================================
   // CUSTOMER CRUD
   // ==========================================

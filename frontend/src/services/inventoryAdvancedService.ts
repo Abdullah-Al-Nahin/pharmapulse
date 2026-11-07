@@ -37,7 +37,7 @@ const INITIAL_RACK_LOCATIONS: RackBinLocation[] = [
     bin: 'Bin 101',
     zone: 'ambient',
     capacityUnits: 500,
-    currentOccupancy: 380,
+    currentOccupancy: 0,
     temperatureRange: '15°C - 25°C',
     notes: 'Fast moving antibiotics & oral solids'
   },
@@ -49,7 +49,7 @@ const INITIAL_RACK_LOCATIONS: RackBinLocation[] = [
     bin: 'Bin 204',
     zone: 'ambient',
     capacityUnits: 600,
-    currentOccupancy: 450,
+    currentOccupancy: 0,
     temperatureRange: '15°C - 25°C',
     notes: 'Analgesics, Antipyretics & NSAIDs'
   },
@@ -61,7 +61,7 @@ const INITIAL_RACK_LOCATIONS: RackBinLocation[] = [
     bin: 'Cold Bin C-1',
     zone: 'cold_chain',
     capacityUnits: 250,
-    currentOccupancy: 120,
+    currentOccupancy: 0,
     temperatureRange: '2°C - 8°C (Monitored)',
     notes: 'Insulins, Prostaglandin Eye Drops, Vaccines'
   }
@@ -71,37 +71,7 @@ const INITIAL_TRANSFERS: StockTransfer[] = [];
 const INITIAL_QUARANTINE_RECORDS: QuarantineRecord[] = [];
 const INITIAL_DAMAGED_RECORDS: DamagedStockRecord[] = [];
 const INITIAL_BONUS_RECORDS: BonusStockRecord[] = [];
-
-const INITIAL_RESERVED_RECORDS: ReservedStockRecord[] = [
-  {
-    id: 'res-01',
-    medicineId: 'med-oph-01',
-    medicineName: 'Tobradex Ophthalmic Drop 5ml',
-    batchId: 'bat-oph-01',
-    batchNumber: 'TOB-2025-01',
-    quantity: 8,
-    reservedFor: 'OT Cataract Surgeries (4 Patients Scheduled Tomorrow)',
-    patientName: 'Khandakar M. / 3 Others',
-    doctorName: 'Prof. Dr. Mahbubur Rahman (Eye Surgeon)',
-    reservedAt: '2026-09-10T14:00:00Z',
-    validUntil: '2026-09-11T20:00:00Z',
-    status: 'active'
-  },
-  {
-    id: 'res-02',
-    medicineId: 'med-oph-03',
-    medicineName: 'Moxicin Eye Drop 5ml',
-    batchId: 'bat-oph-03',
-    batchNumber: 'MOX-2025-04',
-    quantity: 6,
-    reservedFor: 'Emergency Vitrectomy Procedure - OT 2',
-    patientName: 'Begum Rokeya (Bed #304)',
-    doctorName: 'Dr. Shamima Nasrin',
-    reservedAt: '2026-09-10T16:30:00Z',
-    validUntil: '2026-09-11T12:00:00Z',
-    status: 'active'
-  }
-];
+const INITIAL_RESERVED_RECORDS: ReservedStockRecord[] = [];
 
 type InventoryListener = () => void;
 
@@ -153,6 +123,20 @@ export class InventoryAdvancedService {
     } catch {
       // fallback
     }
+  }
+
+  public static resetToFactory(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.RACK_LOCATIONS, JSON.stringify(INITIAL_RACK_LOCATIONS));
+      localStorage.setItem(STORAGE_KEYS.STOCK_TRANSFERS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.QUARANTINE_RECORDS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.DAMAGED_RECORDS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.BONUS_RECORDS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.RESERVED_RECORDS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.NEGATIVE_OVERRIDES, JSON.stringify([]));
+      sessionStorage.removeItem('transfers_synced');
+    }
+    this.emitChange();
   }
 
   // --- RACK / SHELF / BIN LOCATIONS ---

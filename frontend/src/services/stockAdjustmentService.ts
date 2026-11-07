@@ -59,6 +59,14 @@ export class StockAdjustmentService {
     return APPROVAL_THRESHOLD;
   }
 
+  public static resetToFactory(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ADJUSTMENT_STORAGE_KEY, JSON.stringify([]));
+      sessionStorage.removeItem('adj_synced_v2');
+    }
+    this.emitChange();
+  }
+
   private static isSyncing = false;
 
   public static async syncFromDB(): Promise<void> {

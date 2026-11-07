@@ -53,6 +53,29 @@ export const INITIAL_CUSTOMERS: Customer[] = [
     creditLimit: 0,
     outstandingBalance: 0,
     loyaltyPoints: 0,
+    totalSpent: 0,
+    totalOrders: 0,
+    status: 'active',
+    notes: 'Default walk-in counter profile',
+    createdAt: '2026-01-01',
+  },
+];
+
+export const INITIAL_CUSTOMER_LEDGERS: CustomerLedgerEntry[] = [];
+export const INITIAL_LOYALTY_TRANSACTIONS: LoyaltyTransaction[] = [];
+
+export const DEMO_CUSTOMERS: Customer[] = [
+  {
+    id: 'cust-walkin',
+    name: 'Walk-In Customer',
+    phone: '01700-000000',
+    email: 'walkin@pharmapulse.bd',
+    address: 'Counter Direct, Dhaka',
+    customerType: 'retail',
+    pricingTier: 'retail',
+    creditLimit: 0,
+    outstandingBalance: 0,
+    loyaltyPoints: 0,
     totalSpent: 420.50,
     totalOrders: 6,
     status: 'active',
@@ -69,7 +92,7 @@ export const INITIAL_CUSTOMERS: Customer[] = [
     pricingTier: 'retail',
     creditLimit: 2500.00,
     outstandingBalance: 450.00,
-    loyaltyPoints: 185, // Worth ৳46.25 in discounts
+    loyaltyPoints: 185,
     totalSpent: 18500.00,
     totalOrders: 14,
     status: 'active',
@@ -86,7 +109,7 @@ export const INITIAL_CUSTOMERS: Customer[] = [
     pricingTier: 'retail',
     creditLimit: 3000.00,
     outstandingBalance: 0.00,
-    loyaltyPoints: 92, // Worth ৳23.00
+    loyaltyPoints: 92,
     totalSpent: 9200.00,
     totalOrders: 8,
     status: 'active',
@@ -160,7 +183,7 @@ export const INITIAL_CUSTOMERS: Customer[] = [
     customerType: 'institution',
     pricingTier: 'institution',
     creditLimit: 100000.00,
-    outstandingBalance: 98000.00, // Near credit limit warning!
+    outstandingBalance: 98000.00,
     loyaltyPoints: 610,
     totalSpent: 395000.00,
     totalOrders: 35,
@@ -173,7 +196,7 @@ export const INITIAL_CUSTOMERS: Customer[] = [
   },
 ];
 
-export const INITIAL_CUSTOMER_LEDGERS: CustomerLedgerEntry[] = [
+export const DEMO_CUSTOMER_LEDGERS: CustomerLedgerEntry[] = [
   // Tanvir Hossain
   {
     id: 'cldg-001',
@@ -315,7 +338,7 @@ export const INITIAL_CUSTOMER_LEDGERS: CustomerLedgerEntry[] = [
   },
 ];
 
-export const INITIAL_LOYALTY_TRANSACTIONS: LoyaltyTransaction[] = [
+export const DEMO_LOYALTY_TRANSACTIONS: LoyaltyTransaction[] = [
   {
     id: 'loy-001',
     customerId: 'cust-001',
