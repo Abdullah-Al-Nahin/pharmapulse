@@ -15,8 +15,7 @@ import {
   Check,
   Building2,
   Phone,
-  Calendar,
-  Keyboard
+  Calendar
 } from 'lucide-react';
 import {
   PharmaCartItem,
@@ -86,35 +85,6 @@ export const F10DispatchModal: React.FC<F10DispatchModalProps> = ({
   const [selectedMethod, setSelectedMethod] = useState<'print' | 'sms' | 'email' | 'both'>('print');
   const [phoneInput, setPhoneInput] = useState(customerPhone || '');
   const [emailInput, setEmailInput] = useState('');
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const methods: ('print' | 'sms' | 'email' | 'both')[] = ['print', 'sms', 'email', 'both'];
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isInputFocused = document.activeElement?.tagName === 'INPUT';
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        onConfirmDispatch(selectedMethod);
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      } else if (!isInputFocused && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) {
-        e.preventDefault();
-        setSelectedMethod((curr) => {
-          const idx = methods.indexOf(curr);
-          return methods[(idx + 1) % methods.length];
-        });
-      } else if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowUp')) {
-        e.preventDefault();
-        setSelectedMethod((curr) => {
-          const idx = methods.indexOf(curr);
-          return methods[(idx - 1 + methods.length) % methods.length];
-        });
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedMethod, onConfirmDispatch, onClose]);
 
   if (!isOpen) return null;
 
@@ -1083,151 +1053,6 @@ export const RxWarningModal: React.FC<RxWarningModalProps> = ({
               Pharmacist Override
             </button>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export interface PharmacistKeyboardShortcutsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const PharmacistKeyboardShortcutsModal: React.FC<PharmacistKeyboardShortcutsModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' || e.key === 'Enter') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  const shortcutGroups = [
-    {
-      title: 'POS Billing & Dispensing (কাউন্টার ও সেলস)',
-      shortcuts: [
-        { key: 'F2', desc: 'Focus Medicine Search (ওষুধ সার্চ বক্সে ফোকাস)', highlight: true },
-        { key: '↑ / ↓', desc: 'Navigate search results / Adjust Qty in cart (আইটেম সিলেক্ট / সংখ্যা পরিবর্তন)', highlight: true },
-        { key: '↵ Enter', desc: 'Add selected medicine / Jump to next input (কার্টে যুক্ত / পরের ঘরে যান)', highlight: true },
-        { key: 'F3', desc: 'Open Smart Barcode Scanner (স্মার্ট বারকোড স্ক্যানার)' },
-        { key: 'F4', desc: 'Clear Active Cart (কার্ট খালি করুন)' },
-        { key: 'F8', desc: 'Hold Order (অর্ডার হোল্ডে রাখুন)' },
-        { key: 'F9', desc: 'Focus Cash Tendered (নগদ গ্রহণ বক্সে জাম্প করুন)' },
-        { key: 'F10 / Ctrl+↵', desc: 'Complete Dispense & Bill (বিল ও ডিসপেন্স কনফার্ম)', highlight: true },
-        { key: 'Delete', desc: 'Remove focused row from cart (কার্ট থেকে লাইন আইটেম মুছুন)' },
-        { key: 'Esc', desc: 'Close search dropdowns & modals (ড্রপডাউন বা মোডাল বন্ধ)' },
-      ],
-    },
-    {
-      title: 'Payment & Receipt (পেমেন্ট ও রসিদ)',
-      shortcuts: [
-        { key: 'Alt + C', desc: 'Select Cash Payment (নগদ ক্যাশ)' },
-        { key: 'Alt + P', desc: 'Select Card / POS Machine (কার্ড / পয়েন্ট অব সেল)' },
-        { key: 'Alt + M', desc: 'Select MFS / bKash (বিকাশ / নগদ মোবাইল ব্যাংকিং)' },
-        { key: 'Alt + D', desc: 'Select Due / Credit Bill (বাকিতে বিল - অ্যাডমিন অনুমোদন সাপেক্ষ)' },
-        { key: 'Ctrl + P', desc: 'Print 80mm Thermal Receipt (থার্মাল রসিদ প্রিন্ট)' },
-      ],
-    },
-    {
-      title: 'Software Tabs Navigation (মডিউল ও ট্যাব নেভিগেশন)',
-      shortcuts: [
-        { key: 'Alt + 1', desc: 'POS Cash Counter (ক্যাশ কাউন্টার)' },
-        { key: 'Alt + 2', desc: 'Prescription Hub (প্রেসক্রিপশন হাব)' },
-        { key: 'Alt + 3', desc: 'Inventory & FEFO Stock (ইনভেন্টরি ও ফেফো)' },
-        { key: 'Alt + 4', desc: 'Suppliers & Purchases (সাপ্লায়ার ও ক্রয়)' },
-        { key: 'Alt + 5', desc: 'Customers & Receivables (কাস্টমার ও বাকি)' },
-        { key: 'Alt + 6', desc: 'Returns & Refunds (রিটার্ন ও রিফান্ড)' },
-        { key: 'Alt + 7', desc: 'Accounts & Ledger (হিসাব ও লেজার)' },
-        { key: 'Alt + 8', desc: 'Batches & Expiry (ব্যাচ ও মেয়াদ)' },
-        { key: 'Alt + 9', desc: 'Multi-Branch Hub (মাল্টি-ব্রাঞ্চ হাব)' },
-        { key: 'Alt + 0', desc: 'Executive Dashboard (সিইও ড্যাশবোর্ড)' },
-      ],
-    },
-  ];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-      <div className="w-full max-w-2xl bg-white dark:bg-[#161b26] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600">
-              <Keyboard className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Pharmacist Keyboard Master Guide</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
-                  Zero Mouse Required
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                কীবোর্ড ও অ্যারো কি দিয়ে সম্পূর্ণ সফটওয়্যার দ্রুত পরিচালনার নির্দেশিকা
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-5">
-          {shortcutGroups.map((grp, gIdx) => (
-            <div key={gIdx} className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                {grp.title}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {grp.shortcuts.map((sc, scIdx) => (
-                  <div
-                    key={scIdx}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs ${
-                      sc.highlight
-                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800'
-                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800'
-                    }`}
-                  >
-                    <span className="text-slate-700 dark:text-slate-300 font-medium">
-                      {sc.desc}
-                    </span>
-                    <kbd
-                      className={`font-mono font-bold px-2 py-1 rounded shadow-2xs text-[11px] whitespace-nowrap ml-2 ${
-                        sc.highlight
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
-                      }`}
-                    >
-                      {sc.key}
-                    </kbd>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-xs text-slate-400">
-            Press <kbd className="font-mono font-bold text-slate-600 dark:text-slate-300">Esc</kbd> or <kbd className="font-mono font-bold text-slate-600 dark:text-slate-300">Enter</kbd> to close
-          </span>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-md shadow-emerald-700/20 cursor-pointer"
-          >
-            Got It (Esc)
-          </button>
         </div>
       </div>
     </div>

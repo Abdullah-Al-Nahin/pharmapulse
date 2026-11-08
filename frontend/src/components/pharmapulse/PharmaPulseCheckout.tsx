@@ -260,11 +260,22 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
           </label>
           <div className="flex items-center gap-1.5">
             <input
+              id="customer-phone-input"
               type="text"
               placeholder="Phone (e.g. 017...)"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              className="flex-1 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-500"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft' && (e.currentTarget.selectionStart === 0 || !customerPhone)) {
+                  e.preventDefault();
+                  document.getElementById('alt-drug-2')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  const searchInput = document.querySelector('input[placeholder*="Scan Barcode"]') as HTMLInputElement | null;
+                  searchInput?.focus();
+                }
+              }}
+              className="flex-1 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
             />
             <button
               onClick={onToggleLoyalty}
@@ -529,23 +540,9 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <div className="flex items-center gap-1">
                 <span className="font-mono text-slate-400 text-xs">৳</span>
                 <input
-                  id="tendered-cash-input"
                   type="number"
                   value={tenderedAmount}
                   onChange={(e) => onChangeTendered(parseFloat(e.target.value) || 0)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'ArrowUp') {
-                      e.preventDefault();
-                      onChangeTendered((tenderedAmount || 0) + 50);
-                    } else if (e.key === 'ArrowDown') {
-                      e.preventDefault();
-                      onChangeTendered(Math.max(0, (tenderedAmount || 0) - 50));
-                    } else if (e.key === 'Enter') {
-                      e.preventDefault();
-                      onProcessDispense();
-                    }
-                  }}
-                  title="Arrow Up/Down: ±৳50 | Enter: Dispense & Confirm"
                   className="w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-right font-mono text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-2xs"
                 />
               </div>
@@ -675,7 +672,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
             ) : (
               <>
                 <CheckCircle2 className="w-5 h-5" />
-                <span>Process & Dispense (F10 / Ctrl+↵)</span>
+                <span>Process & Dispense (F10)</span>
               </>
             )}
           </button>

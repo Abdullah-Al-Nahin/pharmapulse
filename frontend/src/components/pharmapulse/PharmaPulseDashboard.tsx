@@ -10,7 +10,6 @@ import {
   GenericSubstitutionModal,
   RxWarningModal,
   REGISTERED_DOCTORS,
-  PharmacistKeyboardShortcutsModal,
 } from './PharmaPulseModals';
 import { SmartBarcodeModal } from './SmartBarcodeModal';
 import { PriceHistoryModal } from './PriceHistoryModal';
@@ -153,7 +152,6 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
   const [substituteTargetItem, setSubstituteTargetItem] = useState<PharmaCartItem | null>(null);
   const [isSmartBarcodeModalOpen, setIsSmartBarcodeModalOpen] = useState(false);
   const [isPriceHistoryModalOpen, setIsPriceHistoryModalOpen] = useState(false);
-  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const [priceHistoryTargetDrug, setPriceHistoryTargetDrug] = useState<string>('Napa 500');
 
   // Checkout calculations
@@ -665,100 +663,22 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     }
   };
 
-  // Keyboard shortcut listener for Pharmacist Rapid Operation
+  // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // F1: Open Keyboard Hotkey Guide
-      if (e.key === 'F1') {
+      if (e.key === 'F2') {
         e.preventDefault();
-        setIsShortcutsModalOpen(true);
-      }
-      // F2: Focus Search Omnibox
-      else if (e.key === 'F2') {
-        e.preventDefault();
-        if (activeTab !== 'pos') {
-          setActiveTab('pos');
-        }
-        setTimeout(() => {
-          searchInputRef.current?.focus();
-        }, 50);
-      }
-      // F3: Smart Barcode Scanner
-      else if (e.key === 'F3') {
+        searchInputRef.current?.focus();
+      } else if (e.key === 'F3') {
         e.preventDefault();
         setIsSmartBarcodeModalOpen(true);
-      }
-      // F4: Clear Active Cart
-      else if (e.key === 'F4') {
-        e.preventDefault();
-        handleClearCart();
-      }
-      // F8: Hold Current Order
-      else if (e.key === 'F8') {
+      } else if (e.key === 'F8') {
         e.preventDefault();
         handleHoldOrder();
-      }
-      // F9: Focus Cash Tendered Input
-      else if (e.key === 'F9') {
-        e.preventDefault();
-        const tenderInput = document.getElementById('tendered-cash-input');
-        if (tenderInput) {
-          tenderInput.focus();
-        } else {
-          handleProcessDispense();
-        }
-      }
-      // F10 or Ctrl+Enter: Process & Dispense
-      else if (e.key === 'F10' || (e.ctrlKey && e.key === 'Enter')) {
+      } else if (e.key === 'F10') {
         e.preventDefault();
         handleProcessDispense();
-      }
-      // Alt + 1..9, 0: Instant Tab Navigation
-      else if (e.altKey && !e.ctrlKey) {
-        const tabMap: Record<string, PharmaNavTab> = {
-          '1': 'pos',
-          '2': 'prescriptions',
-          '3': 'inventory',
-          '4': 'purchases',
-          '5': 'customers',
-          '6': 'returns',
-          '7': 'accounts',
-          '8': 'batches_expiry',
-          '9': 'multi_branch',
-          '0': 'executive_dashboard',
-        };
-        if (tabMap[e.key]) {
-          e.preventDefault();
-          handleNavSelect(tabMap[e.key]);
-          return;
-        }
-
-        // Alt + Payment method shortcuts
-        if (e.key.toLowerCase() === 'c') {
-          e.preventDefault();
-          setPaymentMethod('cash');
-          addToast('Payment switched to: Cash', 'info');
-        } else if (e.key.toLowerCase() === 'p') {
-          e.preventDefault();
-          setPaymentMethod('card');
-          addToast('Payment switched to: Card / POS', 'info');
-        } else if (e.key.toLowerCase() === 'm') {
-          e.preventDefault();
-          setPaymentMethod('mfs');
-          addToast('Payment switched to: MFS (bKash)', 'info');
-        } else if (e.key.toLowerCase() === 'd') {
-          e.preventDefault();
-          setPaymentMethod('due_credit');
-          addToast('Payment switched to: Due / বাকিতে', 'info');
-        }
-      }
-      // Ctrl + P: Thermal Receipt print
-      else if (e.ctrlKey && e.key === 'p') {
-        e.preventDefault();
-        setIsThermalModalOpen(true);
-      }
-      // Escape: Close all modals & dropdowns
-      else if (e.key === 'Escape') {
+      } else if (e.key === 'Escape') {
         setShowSearchDropdown(false);
         setIsF10ModalOpen(false);
         setIsThermalModalOpen(false);
@@ -766,13 +686,15 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         setSubstituteTargetItem(null);
         setIsSmartBarcodeModalOpen(false);
         setIsPriceHistoryModalOpen(false);
-        setIsShortcutsModalOpen(false);
+      } else if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        setIsThermalModalOpen(true);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cart, selectedDoctor, heldCount, activeTab]);
+  }, [cart, selectedDoctor, heldCount]);
 
   const handleNavSelect = (tab: PharmaNavTab) => {
     setActiveTab(tab);
@@ -834,7 +756,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
             setLocale(target === 'BN' ? 'bn' : 'en');
           }}
           onOpenSettings={() => setActiveTab('settings')}
-          onOpenShortcuts={() => setIsShortcutsModalOpen(true)}
+          onOpenShortcuts={() =>
+            addToast('Hotkeys: F2 (Search), F3 (Smart Barcode), F8 (Hold), F10 (Dispense), Ctrl+P (Thermal Receipt)', 'info')
+          }
           onHoldOrder={handleHoldOrder}
           onOpenBarcodeScanner={handleOpenSmartBarcode}
           onOpenInventoryAnomalies={() => setIsAnomalyModalOpen(true)}
@@ -1368,12 +1292,6 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           </div>
         </div>
       )}
-
-      {/* Pharmacist Keyboard Master Guide Modal */}
-      <PharmacistKeyboardShortcutsModal
-        isOpen={isShortcutsModalOpen}
-        onClose={() => setIsShortcutsModalOpen(false)}
-      />
     </div>
   );
 };
