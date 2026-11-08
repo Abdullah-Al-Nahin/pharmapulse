@@ -240,54 +240,87 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           )}
 
           {/* Categorized Navigation Groups */}
-          {sidebarGroups.map((group, gIdx) => {
-            const visibleItems = group.items.filter((item) => isTabAllowed(item.id));
-            if (visibleItems.length === 0) return null;
-
-            return (
-              <div key={gIdx} className="flex flex-col gap-1">
-                {!isCollapsed && (
-                  <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
-                    <span>{isBn ? group.titleBn : group.title}</span>
-                  </div>
-                )}
-
-                <div className="flex flex-col gap-0.5">
-                  {visibleItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeTab === item.id;
-                    const displayLabel = isBn ? item.labelBn : item.label;
-                    const displayBadge = isBn ? (item.badgeBn || item.badge) : item.badge;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => onSelectTab(item.id)}
-                        title={displayLabel}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          isActive
-                            ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-700/20'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
-                        } ${isCollapsed ? 'justify-center px-2 py-2.5' : ''}`}
-                      >
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
-                        {!isCollapsed && (
-                          <>
-                            <span className="truncate flex-1 text-left">{displayLabel}</span>
-                            {displayBadge && (
-                              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${item.badgeColor}`}>
-                                {displayBadge}
-                              </span>
-                            )}
-                            {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />}
-                          </>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          {(() => {
+            const allVisibleTabIds = sidebarGroups.flatMap((g) =>
+              g.items.filter((item) => isTabAllowed(item.id)).map((item) => item.id)
             );
-          })}
+
+            return sidebarGroups.map((group, gIdx) => {
+              const visibleItems = group.items.filter((item) => isTabAllowed(item.id));
+              if (visibleItems.length === 0) return null;
+
+              return (
+                <div key={gIdx} className="flex flex-col gap-1">
+                  {!isCollapsed && (
+                    <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+                      <span>{isBn ? group.titleBn : group.title}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-0.5">
+                    {visibleItems.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeTab === item.id;
+                      const displayLabel = isBn ? item.labelBn : item.label;
+                      const displayBadge = isBn ? (item.badgeBn || item.badge) : item.badge;
+                      const currentTabIdx = allVisibleTabIds.indexOf(item.id);
+
+                      return (
+                        <button
+                          key={item.id}
+                          id={`sidebar-nav-${item.id}`}
+                          onClick={() => onSelectTab(item.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              if (currentTabIdx < allVisibleTabIds.length - 1) {
+                                document.getElementById(`sidebar-nav-${allVisibleTabIds[currentTabIdx + 1]}`)?.focus();
+                              }
+                            } else if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              if (currentTabIdx > 0) {
+                                document.getElementById(`sidebar-nav-${allVisibleTabIds[currentTabIdx - 1]}`)?.focus();
+                              }
+                            } else if (e.key === 'ArrowRight') {
+                              e.preventDefault();
+                              const target =
+                                (document.querySelector('input[placeholder*="Scan Barcode"]') as HTMLElement | null) ||
+                                (document.querySelector('input[placeholder*="Search"]') as HTMLElement | null) ||
+                                document.getElementById('alt-drug-0') ||
+                                document.getElementById('customer-phone-input');
+                              target?.focus();
+                            } else if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectTab(item.id);
+                            }
+                          }}
+                          title={displayLabel}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                            isActive
+                              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-700/20'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
+                          } ${isCollapsed ? 'justify-center px-2 py-2.5' : ''}`}
+                        >
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
+                          {!isCollapsed && (
+                            <>
+                              <span className="truncate flex-1 text-left">{displayLabel}</span>
+                              {displayBadge && (
+                                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${item.badgeColor}`}>
+                                  {displayBadge}
+                                </span>
+                              )}
+                              {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />}
+                            </>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
       </div>
 

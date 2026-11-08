@@ -335,6 +335,12 @@ export const CustomerManagementView: React.FC = () => {
             placeholder="Search customer by name, phone, email, institution, or tax ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('customer-row-0')?.focus();
+              }
+            }}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:bg-white"
           />
         </div>
@@ -411,14 +417,41 @@ export const CustomerManagementView: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((cust) => {
+                filteredCustomers.map((cust, idx) => {
                   const creditPercent = cust.creditLimit > 0 
                     ? Math.min(100, Math.round((cust.outstandingBalance / cust.creditLimit) * 100))
                     : 0;
                   const isOverCredit = cust.creditLimit > 0 && cust.outstandingBalance >= cust.creditLimit;
 
                   return (
-                    <tr key={cust.id} className="hover:bg-slate-50/70 transition">
+                    <tr
+                      key={cust.id}
+                      id={`customer-row-${idx}`}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          if (idx < filteredCustomers.length - 1) {
+                            document.getElementById(`customer-row-${idx + 1}`)?.focus();
+                          }
+                        } else if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          if (idx > 0) {
+                            document.getElementById(`customer-row-${idx - 1}`)?.focus();
+                          } else {
+                            document.getElementById('customer-search-input')?.focus();
+                          }
+                        } else if (e.key === 'ArrowRight') {
+                          e.preventDefault();
+                          document.getElementById(`btn-manage-due-loyalty-${cust.id}`)?.focus();
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedCustomerForModal(cust);
+                          setModalInitialTab(cust.outstandingBalance > 0 ? 'payment' : 'ledger');
+                        }
+                      }}
+                      className="hover:bg-slate-50/70 transition focus:outline-none focus:bg-emerald-50/50"
+                    >
                       {/* Customer Details */}
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-900 text-sm">{cust.name}</div>

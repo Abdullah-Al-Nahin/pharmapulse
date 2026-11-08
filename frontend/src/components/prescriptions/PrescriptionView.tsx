@@ -128,20 +128,52 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
         <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
+            id="rx-search-input"
             type="text"
             placeholder="Search by patient name, doctor, Rx number, diagnosis..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('rx-card-0')?.focus();
+              } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length || !search)) {
+                e.preventDefault();
+                document.getElementById('rx-filter-all')?.focus();
+              }
+            }}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
         <div className="flex items-center gap-1.5">
-          {['all', 'pending', 'dispensed'].map(st => (
+          {['all', 'pending', 'dispensed'].map((st, idx, arr) => (
             <button
               key={st}
+              id={`rx-filter-${st}`}
               onClick={() => setStatusFilter(st as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize cursor-pointer transition-all ${
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  if (idx < arr.length - 1) {
+                    document.getElementById(`rx-filter-${arr[idx + 1]}`)?.focus();
+                  }
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  if (idx > 0) {
+                    document.getElementById(`rx-filter-${arr[idx - 1]}`)?.focus();
+                  } else {
+                    document.getElementById('rx-search-input')?.focus();
+                  }
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('rx-card-0')?.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setStatusFilter(st as any);
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 statusFilter === st
                   ? 'bg-slate-900 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -155,13 +187,36 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
 
       {/* Prescriptions Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map(rx => {
+        {filtered.map((rx, idx) => {
           const isPending = rx.status === 'pending';
 
           return (
             <div
               key={rx.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:border-emerald-500 transition-all space-y-4"
+              id={`rx-card-${idx}`}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  if (idx < filtered.length - 1) {
+                    document.getElementById(`rx-card-${idx + 1}`)?.focus();
+                  }
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  if (idx > 0) {
+                    document.getElementById(`rx-card-${idx - 1}`)?.focus();
+                  } else {
+                    document.getElementById('rx-search-input')?.focus();
+                  }
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (isPending) {
+                    onDispenseRxInPOS(rx);
+                  }
+                }
+              }}
+              className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:border-emerald-500 transition-all space-y-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <div>
                 {/* Header info */}

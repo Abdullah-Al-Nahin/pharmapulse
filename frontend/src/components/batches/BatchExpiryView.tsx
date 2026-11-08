@@ -234,10 +234,20 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
           <div className="relative flex-1 w-full sm:max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
+              id="batch-search-input"
               type="text"
               placeholder="Search by batch #, medicine name, distributor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('batch-row-0')?.focus();
+                } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length || !search)) {
+                  e.preventDefault();
+                  document.getElementById('batch-radar-all')?.focus();
+                }
+              }}
               className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
@@ -250,11 +260,33 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
               { id: 'near', label: `Near Expiry (${riskMetrics.nearCount})` },
               { id: 'healthy', label: `Healthy (${riskMetrics.healthyCount})` },
               { id: 'quarantined', label: `Quarantine (${riskMetrics.quarantinedCount})` },
-            ].map(tab => (
+            ].map((tab, idx, arr) => (
               <button
                 key={tab.id}
+                id={`batch-radar-${tab.id}`}
                 onClick={() => setActiveRadarTab(tab.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (idx < arr.length - 1) {
+                      document.getElementById(`batch-radar-${arr[idx + 1].id}`)?.focus();
+                    }
+                  } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (idx > 0) {
+                      document.getElementById(`batch-radar-${arr[idx - 1].id}`)?.focus();
+                    } else {
+                      document.getElementById('batch-search-input')?.focus();
+                    }
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('batch-row-0')?.focus();
+                  } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveRadarTab(tab.id as any);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                   activeRadarTab === tab.id
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -292,14 +324,31 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                   </td>
                 </tr>
               ) : (
-                filtered.map(b => {
+                filtered.map((b, idx) => {
                   const isExpired = b.category === 'expired';
                   const isQuarantined = b.status === 'quarantined';
 
                   return (
                     <tr
                       key={b.id}
-                      className={`hover:bg-slate-50/80 transition-colors ${
+                      id={`batch-row-${idx}`}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          if (idx < filtered.length - 1) {
+                            document.getElementById(`batch-row-${idx + 1}`)?.focus();
+                          }
+                        } else if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          if (idx > 0) {
+                            document.getElementById(`batch-row-${idx - 1}`)?.focus();
+                          } else {
+                            document.getElementById('batch-search-input')?.focus();
+                          }
+                        }
+                      }}
+                      className={`hover:bg-slate-50/80 transition-colors focus:outline-none focus:bg-emerald-50/50 ${
                         isExpired
                           ? 'bg-red-50/50'
                           : b.category === 'critical'

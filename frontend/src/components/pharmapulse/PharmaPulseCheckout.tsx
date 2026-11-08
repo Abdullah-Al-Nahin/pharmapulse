@@ -268,11 +268,22 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'ArrowLeft' && (e.currentTarget.selectionStart === 0 || !customerPhone)) {
                   e.preventDefault();
-                  document.getElementById('alt-drug-2')?.focus();
+                  const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0') || document.getElementById('alt-drug-2') || document.getElementById('alt-drug-0');
+                  target?.focus();
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
                   const searchInput = document.querySelector('input[placeholder*="Scan Barcode"]') as HTMLInputElement | null;
                   searchInput?.focus();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  const specialDisc = document.getElementById('checkout-special-disc');
+                  if (specialDisc) specialDisc.focus();
+                  else document.getElementById('pay-method-cash')?.focus();
+                } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const specialDisc = document.getElementById('checkout-special-disc');
+                  if (specialDisc) specialDisc.focus();
+                  else document.getElementById('pay-method-cash')?.focus();
                 }
               }}
               className="flex-1 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-800 dark:text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
@@ -331,6 +342,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <span>Special Discount</span>
               <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md overflow-hidden shadow-2xs">
                 <input
+                  id="checkout-special-disc"
                   type="number"
                   min="0"
                   max="100"
@@ -345,7 +357,23 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
                       onToggleSpecialDisc();
                     }
                   }}
-                  className="w-10 px-1 py-0.5 text-center font-mono font-bold text-xs bg-transparent text-slate-900 dark:text-white focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      document.getElementById('customer-phone-input')?.focus();
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      document.getElementById('pay-method-cash')?.focus();
+                    } else if (e.key === 'ArrowLeft' && (e.currentTarget.selectionStart === 0 || !e.currentTarget.value)) {
+                      e.preventDefault();
+                      const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0');
+                      target?.focus();
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      document.getElementById('pay-method-cash')?.focus();
+                    }
+                  }}
+                  className="w-10 px-1 py-0.5 text-center font-mono font-bold text-xs bg-transparent text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
                 <span className="px-1.5 py-0.5 text-[10px] font-extrabold bg-emerald-500 text-white select-none">
                   %
@@ -412,8 +440,28 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             <button
+              id="pay-method-cash"
               onClick={() => onSelectPaymentMethod('cash')}
-              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-card')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('checkout-tendered-input')?.focus() || document.getElementById('checkout-dispense-btn')?.focus();
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0');
+                  target?.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectPaymentMethod('cash');
+                }
+              }}
+              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 paymentMethod === 'cash'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-700/20'
                   : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
@@ -423,8 +471,27 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <span>Cash</span>
             </button>
             <button
+              id="pay-method-card"
               onClick={() => onSelectPaymentMethod('card')}
-              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-cash')?.focus();
+                } else if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-mfs')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('checkout-dispense-btn')?.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectPaymentMethod('card');
+                }
+              }}
+              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 paymentMethod === 'card'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-700/20'
                   : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
@@ -434,8 +501,27 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <span>Card / POS</span>
             </button>
             <button
+              id="pay-method-mfs"
               onClick={() => onSelectPaymentMethod('mfs')}
-              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-card')?.focus();
+                } else if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-due')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('checkout-dispense-btn')?.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectPaymentMethod('mfs');
+                }
+              }}
+              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 paymentMethod === 'mfs'
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-700/20'
                   : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
@@ -445,8 +531,24 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <span>MFS (bKash)</span>
             </button>
             <button
+              id="pay-method-due"
               onClick={() => onSelectPaymentMethod('due_credit')}
-              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all relative ${
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  document.getElementById('pay-method-mfs')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('checkout-dispense-btn')?.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectPaymentMethod('due_credit');
+                }
+              }}
+              className={`py-2 px-1.5 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition-all relative focus:outline-none focus:ring-2 focus:ring-rose-500 ${
                 paymentMethod === 'due_credit'
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-700/20'
                   : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
@@ -540,10 +642,29 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <div className="flex items-center gap-1">
                 <span className="font-mono text-slate-400 text-xs">৳</span>
                 <input
+                  id="checkout-tendered-input"
                   type="number"
                   value={tenderedAmount}
                   onChange={(e) => onChangeTendered(parseFloat(e.target.value) || 0)}
-                  className="w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-right font-mono text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-2xs"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      document.getElementById('pay-method-cash')?.focus();
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      const preset = document.getElementById('preset-exact');
+                      if (preset) preset.focus();
+                      else document.getElementById('checkout-dispense-btn')?.focus();
+                    } else if (e.key === 'ArrowLeft' && (e.currentTarget.selectionStart === 0 || !tenderedAmount)) {
+                      e.preventDefault();
+                      const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0');
+                      target?.focus();
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      onProcessDispense();
+                    }
+                  }}
+                  className="w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-right font-mono text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 shadow-2xs"
                 />
               </div>
             </div>
@@ -589,32 +710,106 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
             {/* Quick Tendered Presets */}
             <div className="flex items-center gap-1 mt-0.5">
               <button
+                id="preset-exact"
                 onClick={() => onChangeTendered(grandTotal)}
-                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    document.getElementById('preset-500')?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    document.getElementById('checkout-tendered-input')?.focus();
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('checkout-dispense-btn')?.focus();
+                  }
+                }}
+                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
                 Exact
               </button>
               <button
+                id="preset-500"
                 onClick={() => onChangeTendered(500)}
-                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    document.getElementById('preset-exact')?.focus();
+                  } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    document.getElementById('preset-1000')?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    document.getElementById('checkout-tendered-input')?.focus();
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('checkout-dispense-btn')?.focus();
+                  }
+                }}
+                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
                 ৳500
               </button>
               <button
+                id="preset-1000"
                 onClick={() => onChangeTendered(1000)}
-                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    document.getElementById('preset-500')?.focus();
+                  } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    document.getElementById('preset-1500')?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    document.getElementById('checkout-tendered-input')?.focus();
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('checkout-dispense-btn')?.focus();
+                  }
+                }}
+                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
                 ৳1000
               </button>
               <button
+                id="preset-1500"
                 onClick={() => onChangeTendered(1500)}
-                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    document.getElementById('preset-1000')?.focus();
+                  } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    document.getElementById('preset-2000')?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    document.getElementById('checkout-tendered-input')?.focus();
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('checkout-dispense-btn')?.focus();
+                  }
+                }}
+                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
                 ৳1500
               </button>
               <button
+                id="preset-2000"
                 onClick={() => onChangeTendered(2000)}
-                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    document.getElementById('preset-1500')?.focus();
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    document.getElementById('checkout-tendered-input')?.focus();
+                  } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    document.getElementById('checkout-dispense-btn')?.focus();
+                  }
+                }}
+                className="flex-1 py-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
                 ৳2000
               </button>
@@ -650,6 +845,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
         {/* Primary & Secondary Actions */}
         <div className="flex flex-col gap-2 mt-1">
           <button
+            id="checkout-dispense-btn"
             onClick={() => {
               if (paymentMethod === 'due_credit' && !isDueAuthorized) {
                 alert('অননুমোদিত অ্যাক্সেস: ADMIN প্যানেল ব্যাতিত অন্য কেউ বাকিতে বিল করতে পারবে না। অনুগ্রহ করে অ্যাডমিন পিন (PIN: 9999) দিয়ে অনুমোদন নিন।');
@@ -657,8 +853,27 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               }
               onProcessDispense();
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (paymentMethod === 'cash') {
+                  const exact = document.getElementById('preset-exact');
+                  if (exact) exact.focus();
+                  else document.getElementById('checkout-tendered-input')?.focus();
+                } else {
+                  document.getElementById('pay-method-cash')?.focus();
+                }
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('checkout-thermal-btn')?.focus();
+              } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0');
+                target?.focus();
+              }
+            }}
             disabled={paymentMethod === 'due_credit' && !isDueAuthorized}
-            className={`w-full py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
+            className={`w-full py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
               paymentMethod === 'due_credit' && !isDueAuthorized
                 ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300 dark:border-slate-700'
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-700/25 active:scale-[0.99] cursor-pointer'
@@ -678,15 +893,35 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
           </button>
           <div className="grid grid-cols-2 gap-2">
             <button
+              id="checkout-thermal-btn"
               onClick={onPrintThermal}
-              className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  document.getElementById('checkout-hold-btn')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-dispense-btn')?.focus();
+                }
+              }}
+              className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
             >
               <Printer className="w-3.5 h-3.5 text-slate-400" />
               <span>Thermal Bill (Ctrl+P)</span>
             </button>
             <button
+              id="checkout-hold-btn"
               onClick={onHoldOrder}
-              className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  document.getElementById('checkout-thermal-btn')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('checkout-dispense-btn')?.focus();
+                }
+              }}
+              className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 hover:bg-orange-50 dark:hover:bg-orange-950/40 text-orange-600 dark:text-orange-400 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs focus:ring-2 focus:ring-orange-500 focus:outline-none transition"
             >
               <PauseCircle className="w-3.5 h-3.5" />
               <span>Hold Order (F8)</span>

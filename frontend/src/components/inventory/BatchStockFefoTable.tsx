@@ -152,10 +152,17 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
+            id="inventory-search-input"
             type="text"
             placeholder="Search medicine, generic formula, batch number, or rack/shelf/bin location..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('inv-card-0')?.focus();
+              }
+            }}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
@@ -233,13 +240,34 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
             <p className="text-xs text-slate-400 mt-1">Try changing the search keyword, category, or stock filter above.</p>
           </div>
         ) : (
-          filteredData.map(({ medicine, batches: medBatches, totalPhysicalStock, reservedCount, netAvailableForSale, isLowStock, isColdChain }) => {
+          filteredData.map(({ medicine, batches: medBatches, totalPhysicalStock, reservedCount, netAvailableForSale, isLowStock, isColdChain }, idx) => {
             const isExpanded = expandedMedIds.has(medicine.id);
 
             return (
               <div 
                 key={medicine.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all"
+                id={`inv-card-${idx}`}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (idx < filteredData.length - 1) {
+                      document.getElementById(`inv-card-${idx + 1}`)?.focus();
+                    }
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (idx > 0) {
+                      document.getElementById(`inv-card-${idx - 1}`)?.focus();
+                    } else {
+                      document.getElementById('inventory-search-input')?.focus();
+                    }
+                  } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleExpand(medicine.id);
+                  }
+                }}
+                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 {/* Medicine Header Row */}
                 <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-50/50">

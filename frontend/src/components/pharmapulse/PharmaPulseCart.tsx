@@ -254,16 +254,47 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
               onFocus={() => onSetShowSearchDropdown(true)}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowDown') {
-                  if (!showSearchDropdown || filteredCatalog.length === 0) {
-                    e.preventDefault();
-                    const targetCard = document.getElementById('alt-drug-2') || document.getElementById('alt-drug-0');
+                  e.preventDefault();
+                  if (showSearchDropdown && filteredCatalog.length > 0) {
+                    document.getElementById('search-result-0')?.focus();
+                  } else if (cart.length > 0) {
+                    document.getElementById('cart-qty-0')?.focus();
+                  } else {
+                    const targetCard = document.getElementById('alt-drug-0') || document.getElementById('alt-drug-2');
                     targetCard?.focus();
                   }
-                } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length)) {
+                } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length || !searchQuery)) {
                   e.preventDefault();
                   document.getElementById('customer-phone-input')?.focus();
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  document.getElementById('hotkey-f2')?.focus();
                 } else if (e.key === 'Escape') {
                   onSetShowSearchDropdown(false);
+                } else if (e.key === 'Enter') {
+                  if (showSearchDropdown && filteredCatalog.length > 0) {
+                    e.preventDefault();
+                    const topItem = filteredCatalog[0];
+                    onFastAddItem(topItem.name, topItem.price, topItem.batch, topItem.exp, topItem.isUrgent, {
+                      medicineId: (topItem as any).medicineId,
+                      batchId: (topItem as any).batchId,
+                      sub: topItem.sub,
+                      company: topItem.company,
+                      isColdChain: topItem.isColdChain,
+                      storageTemp: topItem.storageTemp,
+                      isOphthalmic: topItem.isOphthalmic,
+                      afterOpeningDays: topItem.afterOpeningDays,
+                      isRxRequired: topItem.isRxRequired,
+                      dosageEn: topItem.dosageEn,
+                      dosageBn: topItem.dosageBn,
+                      purchasePrice: (topItem as any).purchasePrice,
+                      stock: topItem.stock
+                    });
+                    onSetShowSearchDropdown(false);
+                    setTimeout(() => {
+                      document.getElementById('cart-qty-0')?.focus();
+                    }, 50);
+                  }
                 }
               }}
               placeholder="Scan Barcode (UPC) or Search Medicine, Generic (e.g. Latanoprost, Moxacin, Insulin, Sergel)... [F2]"
@@ -288,6 +319,9 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
               {filteredCatalog.map((item, idx) => (
                 <div
                   key={idx}
+                  id={`search-result-${idx}`}
+                  tabIndex={0}
+                  role="button"
                   onClick={() => {
                     onFastAddItem(item.name, item.price, item.batch, item.exp, item.isUrgent, {
                       medicineId: (item as any).medicineId,
@@ -305,8 +339,51 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                       stock: item.stock
                     });
                     onSetShowSearchDropdown(false);
+                    setTimeout(() => {
+                      document.getElementById('cart-qty-0')?.focus();
+                    }, 50);
                   }}
-                  className={`flex items-center justify-between p-2.5 rounded-xl transition cursor-pointer ${
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      if (idx < filteredCatalog.length - 1) {
+                        document.getElementById(`search-result-${idx + 1}`)?.focus();
+                      }
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      if (idx > 0) {
+                        document.getElementById(`search-result-${idx - 1}`)?.focus();
+                      } else {
+                        searchInputRef.current?.focus();
+                      }
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onFastAddItem(item.name, item.price, item.batch, item.exp, item.isUrgent, {
+                        medicineId: (item as any).medicineId,
+                        batchId: (item as any).batchId,
+                        sub: item.sub,
+                        company: item.company,
+                        isColdChain: item.isColdChain,
+                        storageTemp: item.storageTemp,
+                        isOphthalmic: item.isOphthalmic,
+                        afterOpeningDays: item.afterOpeningDays,
+                        isRxRequired: item.isRxRequired,
+                        dosageEn: item.dosageEn,
+                        dosageBn: item.dosageBn,
+                        purchasePrice: (item as any).purchasePrice,
+                        stock: item.stock
+                      });
+                      onSetShowSearchDropdown(false);
+                      setTimeout(() => {
+                        document.getElementById('cart-qty-0')?.focus();
+                      }, 50);
+                    } else if (e.key === 'Escape') {
+                      e.preventDefault();
+                      onSetShowSearchDropdown(false);
+                      searchInputRef.current?.focus();
+                    }
+                  }}
+                  className={`flex items-center justify-between p-2.5 rounded-xl transition cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-emerald-50 dark:focus:bg-slate-800 ${
                     item.isUrgent
                       ? 'bg-orange-50/70 dark:bg-orange-950/40 hover:bg-orange-100/70 border border-orange-200 dark:border-orange-800'
                       : 'hover:bg-slate-50 dark:hover:bg-slate-800/80'
@@ -442,7 +519,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {cart.map((item) => {
+              {cart.map((item, idx) => {
                 const lineTotal = item.price * item.qty * (1 - item.disc / 100);
 
                 // Feature ④ Profit by Medicine calculation
@@ -611,13 +688,39 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                           -
                         </button>
                         <input
+                          id={`cart-qty-${idx}`}
                           type="text"
                           value={item.qty}
                           onChange={(e) => {
                             const val = parseInt(e.target.value, 10);
                             onSetQty(item.id, isNaN(val) ? 1 : val);
                           }}
-                          className="w-8 bg-transparent text-center font-mono text-xs font-bold text-slate-900 dark:text-white outline-none border-0 p-0"
+                          onKeyDown={(e) => {
+                            if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              if (idx > 0) {
+                                document.getElementById(`cart-qty-${idx - 1}`)?.focus();
+                              } else {
+                                searchInputRef.current?.focus();
+                              }
+                            } else if (e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              if (idx < cart.length - 1) {
+                                document.getElementById(`cart-qty-${idx + 1}`)?.focus();
+                              } else {
+                                const alt = document.getElementById('alt-drug-0');
+                                if (alt) alt.focus();
+                                else document.getElementById('customer-phone-input')?.focus();
+                              }
+                            } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length || !e.currentTarget.value)) {
+                              e.preventDefault();
+                              document.getElementById(`cart-disc-${idx}`)?.focus();
+                            } else if (e.key === 'Enter') {
+                              e.preventDefault();
+                              document.getElementById(`cart-disc-${idx}`)?.focus();
+                            }
+                          }}
+                          className="w-8 bg-transparent text-center font-mono text-xs font-bold text-slate-900 dark:text-white outline-none border border-transparent focus:border-emerald-500 focus:bg-emerald-50/30 dark:focus:bg-emerald-950/30 rounded p-0"
                         />
                         <button
                           onClick={() => onUpdateQty(item.id, 1)}
@@ -629,10 +732,41 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                     </td>
                     <td className="py-3 px-2.5 text-right">
                       <input
+                        id={`cart-disc-${idx}`}
                         type="number"
                         value={item.disc}
                         onChange={(e) => onSetDisc(item.id, parseFloat(e.target.value) || 0)}
-                        className="w-10 text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-800 dark:text-slate-200 font-mono text-xs outline-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'ArrowLeft' && (e.currentTarget.selectionStart === 0 || !e.currentTarget.value)) {
+                            e.preventDefault();
+                            document.getElementById(`cart-qty-${idx}`)?.focus();
+                          } else if (e.key === 'ArrowRight' && (e.currentTarget.selectionStart === e.currentTarget.value.length || !e.currentTarget.value)) {
+                            e.preventDefault();
+                            document.getElementById(`cart-del-${idx}`)?.focus();
+                          } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            if (idx > 0) {
+                              document.getElementById(`cart-disc-${idx - 1}`)?.focus();
+                            } else {
+                              searchInputRef.current?.focus();
+                            }
+                          } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (idx < cart.length - 1) {
+                              document.getElementById(`cart-disc-${idx + 1}`)?.focus();
+                            } else {
+                              document.getElementById('customer-phone-input')?.focus();
+                            }
+                          } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (idx < cart.length - 1) {
+                              document.getElementById(`cart-qty-${idx + 1}`)?.focus();
+                            } else {
+                              document.getElementById('customer-phone-input')?.focus();
+                            }
+                          }
+                        }}
+                        className="w-10 text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-800 dark:text-slate-200 font-mono text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                       />
                     </td>
                     <td
@@ -646,6 +780,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                     {/* Generic Substitute Trigger */}
                     <td className="py-3 px-2.5 text-center">
                       <button
+                        id={`cart-sub-${idx}`}
                         onClick={() => onOpenSubstituteModal && onOpenSubstituteModal(item)}
                         title="Generic Substitution / বিকল্প ওষুধ খুঁজুন"
                         className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 dark:text-slate-300 font-medium text-[11px] border border-slate-200 dark:border-slate-700 flex items-center gap-1 mx-auto transition"
@@ -657,8 +792,24 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
 
                     <td className="py-3 px-2.5 text-center">
                       <button
+                        id={`cart-del-${idx}`}
                         onClick={() => onRemoveItem(item.id)}
-                        className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 transition"
+                        onKeyDown={(e) => {
+                          if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            document.getElementById(`cart-disc-${idx}`)?.focus();
+                          } else if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            document.getElementById('customer-phone-input')?.focus();
+                          } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            if (idx > 0) document.getElementById(`cart-del-${idx - 1}`)?.focus();
+                          } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (idx < cart.length - 1) document.getElementById(`cart-del-${idx + 1}`)?.focus();
+                          }
+                        }}
+                        className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 focus:ring-2 focus:ring-rose-500 focus:outline-none transition"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -746,8 +897,19 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                   }
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
-                  searchInputRef.current?.focus();
-                } else if (e.key === 'Enter') {
+                  if (cart.length > 0) {
+                    document.getElementById(`cart-qty-${cart.length - 1}`)?.focus();
+                  } else {
+                    searchInputRef.current?.focus();
+                  }
+                } else if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  if (cart.length > 0) {
+                    document.getElementById('cart-qty-0')?.focus();
+                  } else {
+                    document.getElementById('customer-phone-input')?.focus();
+                  }
+                } else if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   if (!drug.isActive) {
                     onSwitchAlternative(drug);
