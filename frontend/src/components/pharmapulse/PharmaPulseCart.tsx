@@ -81,10 +81,39 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
 }) => {
   const { canViewProfits, canViewCosts } = useAuth();
   const [showProfitBreakdown, setShowProfitBreakdown] = useState<boolean>(true);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
   const [locale, setLocaleState] = useState<'en' | 'bn'>(() => getCurrentLocale());
   React.useEffect(() => subscribeLocale((l) => setLocaleState(l)), []);
   const isBn = locale === 'bn';
   const totalUnits = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  // Auto reset highlighted search row on search change
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [searchQuery]);
+
+  const handleAddCatalogItem = (item: any) => {
+    onFastAddItem(item.name, item.price, item.batch, item.exp, item.isUrgent, {
+      medicineId: item.medicineId,
+      batchId: item.batchId,
+      sub: item.sub,
+      company: item.company,
+      isColdChain: item.isColdChain,
+      storageTemp: item.storageTemp,
+      isOphthalmic: item.isOphthalmic,
+      afterOpeningDays: item.afterOpeningDays,
+      isRxRequired: item.isRxRequired,
+      dosageEn: item.dosageEn,
+      dosageBn: item.dosageBn,
+      purchasePrice: item.purchasePrice,
+      stock: item.stock
+    });
+    onSetShowSearchDropdown(false);
+    onSearchChange('');
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 40);
+  };
 
   // Calculate cart profit economics
   const totalCartCost = cart.reduce((sum, item) => {
@@ -252,7 +281,44 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                 onSetShowSearchDropdown(true);
               }}
               onFocus={() => onSetShowSearchDropdown(true)}
-              placeholder="Scan Barcode (UPC) or Search Medicine, Generic (e.g. Latanoprost, Moxacin, Insulin, Sergel)... [F2]"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  if (!showSearchDropdown) {
+                    onSetShowSearchDropdown(true);
+                    return;
+                  }
+                  if (filteredCatalog.length > 0) {
+                    setHighlightedIndex((prev) => {
+                      const next = (prev + 1) % filteredCatalog.length;
+                      document.getElementById(`search-result-item-${next}`)?.scrollIntoView({ block: 'nearest' });
+                      return next;
+                    });
+                  }
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  if (filteredCatalog.length > 0) {
+                    setHighlightedIndex((prev) => {
+                      const next = (prev - 1 + filteredCatalog.length) % filteredCatalog.length;
+                      document.getElementById(`search-result-item-${next}`)?.scrollIntoView({ block: 'nearest' });
+                      return next;
+                    });
+                  }
+                } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (showSearchDropdown && filteredCatalog.length > 0) {
+                    const sel = filteredCatalog[highlightedIndex] || filteredCatalog[0];
+                    if (sel) handleAddCatalogItem(sel);
+                  } else if (cart.length > 0) {
+                    document.getElementById('cart-qty-input-0')?.focus();
+                  }
+                } else if (e.key === 'Escape') {
+                  e.preventDefault();
+                  onSetShowSearchDropdown(false);
+                  onSearchChange('');
+                }
+              }}
+              placeholder="Scan Barcode (UPC) or Search Medicine, Generic (e.g. Latanoprost, Moxacin, Insulin, Sergel)... [F2] [↑/↓ Navigate, Enter Add]"
               className="w-full bg-transparent text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none"
             />
             {searchQuery && (
@@ -268,104 +334,141 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
             )}
           </div>
 
-          {/* Search Results Dropdown with Rich Specialty Badges */}
+          {/* Search Results Dropdown with Rich Specialty Badges & Keyboard Navigation */}
           {showSearchDropdown && filteredCatalog.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1.5 z-30 bg-white dark:bg-[#161b26] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl max-h-72 overflow-y-auto p-1.5 flex flex-col gap-1 animate-scale-in">
-              {filteredCatalog.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => {
-                    onFastAddItem(item.name, item.price, item.batch, item.exp, item.isUrgent, {
-                      medicineId: (item as any).medicineId,
-                      batchId: (item as any).batchId,
-                      sub: item.sub,
-                      company: item.company,
-                      isColdChain: item.isColdChain,
-                      storageTemp: item.storageTemp,
-                      isOphthalmic: item.isOphthalmic,
-                      afterOpeningDays: item.afterOpeningDays,
-                      isRxRequired: item.isRxRequired,
-                      dosageEn: item.dosageEn,
-                      dosageBn: item.dosageBn,
-                      purchasePrice: (item as any).purchasePrice,
-                      stock: item.stock
-                    });
-                    onSetShowSearchDropdown(false);
-                  }}
-                  className={`flex items-center justify-between p-2.5 rounded-xl transition cursor-pointer ${
-                    item.isUrgent
-                      ? 'bg-orange-50/70 dark:bg-orange-950/40 hover:bg-orange-100/70 border border-orange-200 dark:border-orange-800'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/80'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={`p-1.5 rounded-lg ${
-                        item.isColdChain
-                          ? 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400'
-                          : item.isUrgent
-                          ? 'bg-orange-100 text-orange-600'
-                          : 'bg-emerald-50 text-emerald-600'
-                      }`}
-                    >
-                      {item.isColdChain ? <Snowflake className="w-4 h-4" /> : <Pill className="w-4 h-4" />}
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-xs text-slate-900 dark:text-white">
-                          {item.name}
+              {filteredCatalog.map((item, idx) => {
+                const isSelected = highlightedIndex === idx;
+                return (
+                  <div
+                    key={idx}
+                    id={`search-result-item-${idx}`}
+                    onClick={() => handleAddCatalogItem(item)}
+                    onMouseEnter={() => setHighlightedIndex(idx)}
+                    className={`flex items-center justify-between p-2.5 rounded-xl transition cursor-pointer ${
+                      isSelected
+                        ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-2 border-emerald-500 shadow-sm ring-2 ring-emerald-500/20'
+                        : item.isUrgent
+                        ? 'bg-orange-50/70 dark:bg-orange-950/40 hover:bg-orange-100/70 border border-orange-200 dark:border-orange-800'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={`p-1.5 rounded-lg ${
+                          item.isColdChain
+                            ? 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400'
+                            : item.isUrgent
+                            ? 'bg-orange-100 text-orange-600'
+                            : 'bg-emerald-50 text-emerald-600'
+                        }`}
+                      >
+                        {item.isColdChain ? <Snowflake className="w-4 h-4" /> : <Pill className="w-4 h-4" />}
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-bold text-xs text-slate-900 dark:text-white">
+                            {item.name}
+                          </span>
+                          {item.isColdChain && (
+                            <span className="px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 border border-sky-200 text-[9px] font-bold flex items-center gap-0.5">
+                              <Snowflake className="w-2.5 h-2.5" /> ২°-৮° সে.
+                            </span>
+                          )}
+                          {item.afterOpeningDays && (
+                            <span className="px-1.5 py-0.2 rounded bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 text-[9px] font-bold flex items-center gap-0.5">
+                              <Clock className="w-2.5 h-2.5" /> খোলার পর ২৮ দিন
+                            </span>
+                          )}
+                          {item.isRxRequired && (
+                            <span className="px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 text-[9px] font-bold">
+                              💊 Rx
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {item.sub} • {item.company}
                         </span>
-                        {item.isColdChain && (
-                          <span className="px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 border border-sky-200 text-[9px] font-bold flex items-center gap-0.5">
-                            <Snowflake className="w-2.5 h-2.5" /> ২°-৮° সে.
-                          </span>
-                        )}
-                        {item.afterOpeningDays && (
-                          <span className="px-1.5 py-0.2 rounded bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 text-[9px] font-bold flex items-center gap-0.5">
-                            <Clock className="w-2.5 h-2.5" /> খোলার পর ২৮ দিন
-                          </span>
-                        )}
-                        {item.isRxRequired && (
-                          <span className="px-1.5 py-0.2 rounded bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 text-[9px] font-bold">
-                            💊 Rx
+                        {(item.dosageBn || item.dosageEn) && (
+                          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans">
+                            {isBn ? `মাত্রা: ${item.dosageBn || item.dosageEn}` : `Dosage: ${item.dosageEn || 'As directed by physician'}`}
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {item.sub} • {item.company}
-                      </span>
-                      {(item.dosageBn || item.dosageEn) && (
-                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans">
-                          {isBn ? `মাত্রা: ${item.dosageBn || item.dosageEn}` : `Dosage: ${item.dosageEn || 'As directed by physician'}`}
+                    </div>
+                    <div className="flex items-center gap-2.5 text-right">
+                      {isSelected && (
+                        <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-600 text-white font-mono text-[9px] font-bold shadow-xs">
+                          ↵ Add
                         </span>
                       )}
+                      <div className="flex flex-col">
+                        <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
+                          ৳ {item.price.toFixed(2)}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          Stock: {item.stock}
+                        </span>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                          item.isUrgent
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        }`}
+                      >
+                        {item.batch} ({item.exp})
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-right">
-                    <div className="flex flex-col">
-                      <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">
-                        ৳ {item.price.toFixed(2)}
-                      </span>
-                      <span className="text-[10px] text-slate-400">
-                        Stock: {item.stock}
-                      </span>
-                    </div>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
-                        item.isUrgent
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      }`}
-                    >
-                      {item.batch} ({item.exp})
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
+      </div>
+
+      {/* Pharmacist Keyboard Navigation Bar */}
+      <div className="flex items-center justify-between flex-wrap gap-2 px-3.5 py-2 rounded-xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            ⌨️ Pharmacist Controls:
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">F2</kbd>
+            <span>Search</span>
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">↑ / ↓</kbd>
+            <span>Navigate List & Qty</span>
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">↵ Enter</kbd>
+            <span>Add / Next Field</span>
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">F8</kbd>
+            <span>Hold</span>
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">F9</kbd>
+            <span>Cash Tendered</span>
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-mono font-bold text-[10px]">F10 / Ctrl+↵</kbd>
+            <span>Pay & Dispense</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono font-bold text-slate-700 dark:text-slate-200 text-[10px]">Alt+1..9</kbd>
+          <span>Switch Tabs</span>
+        </div>
       </div>
 
       {/* Active Prescription Cart Table */}
@@ -428,7 +531,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {cart.map((item) => {
+              {cart.map((item, cartIdx) => {
                 const lineTotal = item.price * item.qty * (1 - item.disc / 100);
 
                 // Feature ④ Profit by Medicine calculation
@@ -597,13 +700,38 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                           -
                         </button>
                         <input
+                          id={`cart-qty-input-${cartIdx}`}
                           type="text"
                           value={item.qty}
                           onChange={(e) => {
                             const val = parseInt(e.target.value, 10);
                             onSetQty(item.id, isNaN(val) ? 1 : val);
                           }}
-                          className="w-8 bg-transparent text-center font-mono text-xs font-bold text-slate-900 dark:text-white outline-none border-0 p-0"
+                          onKeyDown={(e) => {
+                            if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              onUpdateQty(item.id, 1);
+                            } else if (e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              onUpdateQty(item.id, -1);
+                            } else if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const discInput = document.getElementById(`cart-disc-input-${cartIdx}`);
+                              if (discInput) {
+                                discInput.focus();
+                              } else {
+                                const nextQty = document.getElementById(`cart-qty-input-${cartIdx + 1}`);
+                                if (nextQty) nextQty.focus();
+                              }
+                            } else if (e.key === 'Delete' || (e.ctrlKey && e.key === 'Backspace')) {
+                              e.preventDefault();
+                              onRemoveItem(item.id);
+                            } else if (e.key === 'Escape') {
+                              searchInputRef.current?.focus();
+                            }
+                          }}
+                          className="w-8 bg-transparent text-center font-mono text-xs font-bold text-slate-900 dark:text-white outline-none border border-transparent focus:border-emerald-500 rounded p-0"
+                          title="Arrow Up/Down: Change Qty | Enter: Next | Del: Remove"
                         />
                         <button
                           onClick={() => onUpdateQty(item.id, 1)}
@@ -615,10 +743,33 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                     </td>
                     <td className="py-3 px-2.5 text-right">
                       <input
+                        id={`cart-disc-input-${cartIdx}`}
                         type="number"
                         value={item.disc}
                         onChange={(e) => onSetDisc(item.id, parseFloat(e.target.value) || 0)}
-                        className="w-10 text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-800 dark:text-slate-200 font-mono text-xs outline-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            onSetDisc(item.id, Math.min(100, (item.disc || 0) + 1));
+                          } else if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            onSetDisc(item.id, Math.max(0, (item.disc || 0) - 1));
+                          } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const nextQty = document.getElementById(`cart-qty-input-${cartIdx + 1}`);
+                            if (nextQty) {
+                              nextQty.focus();
+                            } else {
+                              const tenderInput = document.getElementById('tendered-cash-input');
+                              if (tenderInput) tenderInput.focus();
+                              else searchInputRef.current?.focus();
+                            }
+                          } else if (e.key === 'Escape') {
+                            searchInputRef.current?.focus();
+                          }
+                        }}
+                        className="w-10 text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-800 dark:text-slate-200 font-mono text-xs outline-none focus:border-emerald-500"
+                        title="Arrow Up/Down: Adjust Discount % | Enter: Next"
                       />
                     </td>
                     <td

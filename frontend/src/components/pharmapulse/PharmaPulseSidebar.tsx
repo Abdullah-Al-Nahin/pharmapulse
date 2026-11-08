@@ -45,6 +45,19 @@ const TAB_PERMISSIONS: Partial<Record<PharmaNavTab, Permission[]>> = {
   settings: ['rbac:roles:manage', 'rbac:users:manage'],
 };
 
+const TAB_HOTKEYS: Partial<Record<PharmaNavTab, string>> = {
+  pos: 'Alt+1',
+  prescriptions: 'Alt+2',
+  inventory: 'Alt+3',
+  purchases: 'Alt+4',
+  customers: 'Alt+5',
+  returns: 'Alt+6',
+  accounts: 'Alt+7',
+  batches_expiry: 'Alt+8',
+  multi_branch: 'Alt+9',
+  executive_dashboard: 'Alt+0',
+};
+
 interface PharmaPulseSidebarProps {
   activeTab: PharmaNavTab;
   onSelectTab: (tab: PharmaNavTab) => void;
@@ -277,6 +290,13 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
                               <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${item.badgeColor}`}>
                                 {displayBadge}
                               </span>
+                            )}
+                            {TAB_HOTKEYS[item.id] && (
+                              <kbd className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                                isActive ? 'bg-emerald-700/80 text-emerald-100' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
+                              }`}>
+                                {TAB_HOTKEYS[item.id]}
+                              </kbd>
                             )}
                             {isActive && <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />}
                           </>

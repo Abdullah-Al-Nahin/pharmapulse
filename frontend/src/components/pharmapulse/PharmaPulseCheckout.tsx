@@ -529,9 +529,23 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
               <div className="flex items-center gap-1">
                 <span className="font-mono text-slate-400 text-xs">৳</span>
                 <input
+                  id="tendered-cash-input"
                   type="number"
                   value={tenderedAmount}
                   onChange={(e) => onChangeTendered(parseFloat(e.target.value) || 0)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      onChangeTendered((tenderedAmount || 0) + 50);
+                    } else if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      onChangeTendered(Math.max(0, (tenderedAmount || 0) - 50));
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      onProcessDispense();
+                    }
+                  }}
+                  title="Arrow Up/Down: ±৳50 | Enter: Dispense & Confirm"
                   className="w-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-right font-mono text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 shadow-2xs"
                 />
               </div>
@@ -661,7 +675,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
             ) : (
               <>
                 <CheckCircle2 className="w-5 h-5" />
-                <span>Process & Dispense (F10)</span>
+                <span>Process & Dispense (F10 / Ctrl+↵)</span>
               </>
             )}
           </button>
