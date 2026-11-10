@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Barcode,
   X,
@@ -22,6 +22,8 @@ import { PharmaCartItem, AlternativeDrug } from '../../types/pharmapulse';
 import { PharmacyService } from '../../services/pharmacyService';
 import { useAuth } from '../../context/AuthContext';
 import { getCurrentLocale, subscribeLocale } from '../../utils/i18nFormatter';
+import { playScannerBeep } from '../../utils/scannerAudio';
+import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 
 interface PharmaPulseCartProps {
   cart: PharmaCartItem[];
@@ -141,12 +143,16 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
   }, [refreshTrigger]);
 
   const filteredCatalog = searchQuery.trim()
-    ? searchCatalog.filter(
-        (m) =>
-          m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.sub.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.batch.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? searchCatalog.filter((m) => {
+        const q = searchQuery.trim().toLowerCase();
+        return (
+          m.name.toLowerCase().includes(q) ||
+          (m.sub && m.sub.toLowerCase().includes(q)) ||
+          (m.batch && m.batch.toLowerCase().includes(q)) ||
+          (m.barcode && m.barcode.toLowerCase().includes(q)) ||
+          (m.sku && m.sku.toLowerCase().includes(q))
+        );
+      })
     : searchCatalog;
 
   return (
@@ -272,28 +278,79 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                 } else if (e.key === 'Escape') {
                   onSetShowSearchDropdown(false);
                 } else if (e.key === 'Enter') {
-                  if (showSearchDropdown && filteredCatalog.length > 0) {
-                    e.preventDefault();
-                    const topItem = filteredCatalog[0];
-                    onFastAddItem(topItem.name, topItem.price, topItem.batch, topItem.exp, topItem.isUrgent, {
-                      medicineId: (topItem as any).medicineId,
-                      batchId: (topItem as any).batchId,
-                      sub: topItem.sub,
-                      company: topItem.company,
-                      isColdChain: topItem.isColdChain,
-                      storageTemp: topItem.storageTemp,
-                      isOphthalmic: topItem.isOphthalmic,
-                      afterOpeningDays: topItem.afterOpeningDays,
-                      isRxRequired: topItem.isRxRequired,
-                      dosageEn: topItem.dosageEn,
-                      dosageBn: topItem.dosageBn,
-                      purchasePrice: (topItem as any).purchasePrice,
-                      stock: topItem.stock
+                  const query = searchQuery.trim().toLowerCase();
+                  if (!query) return;
+                  e.preventDefault();
+
+                  // 1. Exact match by barcode or SKU
+                  let matched = searchCatalog.find(
+                    (m) =>
+                      (m.barcode && m.barcode.toLowerCase() === query) ||
+                      (m.sku && m.sku.toLowerCase() === query)
+                  );
+
+                  // 2. Filtered catalog top item
+                  if (!matched && filteredCatalog.length > 0) {
+                    matched = filteredCatalog[0];
+                  }
+
+                  // 3. Fall back to SMART_BARCODE_DATABASE
+                  if (!matched) {
+                    const smart = SMART_BARCODE_DATABASE.find(
+                      (s) =>
+                        (s.barcode && s.barcode.toLowerCase() === query) ||
+                        s.brandName.toLowerCase() === query
+                    );
+                    if (smart) {
+                      matched = {
+                        medicineId: `smart-${smart.barcode}`,
+                        batchId: `batch-${smart.batch}`,
+                        name: smart.brandName,
+                        sub: `${smart.genericName} ${smart.strength}`,
+                        company: smart.company,
+                        batch: smart.batch,
+                        exp: smart.exp,
+                        price: smart.sellingPrice,
+                        purchasePrice: smart.purchasePrice,
+                        stock: smart.stock,
+                        barcode: smart.barcode,
+                        sku: smart.barcode,
+                        isColdChain: smart.isColdChain,
+                        storageTemp: smart.storageTemp,
+                        isOphthalmic: smart.isOphthalmic,
+                        afterOpeningDays: smart.afterOpeningDays || 28,
+                        isRxRequired: smart.isRxRequired,
+                        dosageEn: smart.dosageEn,
+                        dosageBn: smart.dosageBn,
+                      };
+                    }
+                  }
+
+                  if (matched) {
+                    onFastAddItem(matched.name, matched.price, matched.batch, matched.exp, matched.isUrgent, {
+                      medicineId: (matched as any).medicineId,
+                      batchId: (matched as any).batchId,
+                      sub: matched.sub,
+                      company: matched.company,
+                      isColdChain: matched.isColdChain,
+                      storageTemp: matched.storageTemp,
+                      isOphthalmic: matched.isOphthalmic,
+                      afterOpeningDays: matched.afterOpeningDays,
+                      isRxRequired: matched.isRxRequired,
+                      dosageEn: matched.dosageEn,
+                      dosageBn: matched.dosageBn,
+                      purchasePrice: (matched as any).purchasePrice,
+                      stock: matched.stock,
+                      barcode: (matched as any).barcode,
                     });
+                    playScannerBeep('success');
+                    onSearchChange('');
                     onSetShowSearchDropdown(false);
-                    setTimeout(() => {
-                      document.getElementById('cart-qty-0')?.focus();
-                    }, 50);
+                    // Keep focus in search omnibox for consecutive barcode scans
+                    searchInputRef.current?.focus();
+                  } else {
+                    playScannerBeep('alert');
+                    searchInputRef.current?.select();
                   }
                 }
               }}
@@ -336,8 +393,10 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                       dosageEn: item.dosageEn,
                       dosageBn: item.dosageBn,
                       purchasePrice: (item as any).purchasePrice,
-                      stock: item.stock
+                      stock: item.stock,
+                      barcode: (item as any).barcode,
                     });
+                    playScannerBeep('success');
                     onSetShowSearchDropdown(false);
                     setTimeout(() => {
                       document.getElementById('cart-qty-0')?.focus();
@@ -371,8 +430,10 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                         dosageEn: item.dosageEn,
                         dosageBn: item.dosageBn,
                         purchasePrice: (item as any).purchasePrice,
-                        stock: item.stock
+                        stock: item.stock,
+                        barcode: (item as any).barcode,
                       });
+                      playScannerBeep('success');
                       onSetShowSearchDropdown(false);
                       setTimeout(() => {
                         document.getElementById('cart-qty-0')?.focus();

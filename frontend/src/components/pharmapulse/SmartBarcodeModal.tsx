@@ -22,6 +22,7 @@ import { SmartBarcodeItem, PharmaCartItem } from '../../types/pharmapulse';
 import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 import { PharmacyService } from '../../services/pharmacyService';
 import { useAuth } from '../../context/AuthContext';
+import { playScannerBeep } from '../../utils/scannerAudio';
 
 interface SmartBarcodeModalProps {
   isOpen: boolean;
@@ -31,37 +32,7 @@ interface SmartBarcodeModalProps {
   onOpenPriceHistory?: (drugName: string) => void;
 }
 
-// Audio beep synthesizer using Web Audio API for authentic hardware barcode sound
-const playScannerBeep = (type: 'success' | 'alert' = 'success') => {
-  try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
 
-    if (type === 'success') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1760, ctx.currentTime); // High pitch crisp beep
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.12);
-    } else {
-      // Alert double beep
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    }
-  } catch {
-    // AudioContext blocked or not supported
-  }
-};
 
 export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
   isOpen,
@@ -121,6 +92,7 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
     const realMedicines = PharmacyService.getMedicines();
     let matchedMedicine = realMedicines.find(
       (m) => (m.barcode && m.barcode.toLowerCase() === searchLower) || 
+             (m.sku && m.sku.toLowerCase() === searchLower) ||
              (m.name && m.name.toLowerCase().includes(searchLower)) ||
              (m.genericName && m.genericName.toLowerCase().includes(searchLower)) ||
              (m.brandName && m.brandName.toLowerCase().includes(searchLower))
@@ -131,7 +103,7 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
     if (matchedMedicine) {
       const fefoInfo = PharmacyService.getFefoBatchForMedicine(matchedMedicine.id, currentUser?.branchId);
       matched = {
-        barcode: matchedMedicine.barcode || 'N/A',
+        barcode: matchedMedicine.barcode || matchedMedicine.sku || 'N/A',
         brandName: matchedMedicine.name,
         genericName: matchedMedicine.genericName || '',
         strength: matchedMedicine.strength || '',
@@ -147,6 +119,16 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
         isColdChain: (matchedMedicine.rackLocation || '').toLowerCase().includes('fridge'),
         storageTemp: matchedMedicine.rackLocation,
       };
+    } else {
+      // 2. Fall back to SMART_BARCODE_DATABASE catalog
+      const smartMatch = SMART_BARCODE_DATABASE.find(
+        (b) => (b.barcode && b.barcode.toLowerCase() === searchLower) ||
+               (b.brandName && b.brandName.toLowerCase().includes(searchLower)) ||
+               (b.genericName && b.genericName.toLowerCase().includes(searchLower))
+      );
+      if (smartMatch) {
+        matched = smartMatch;
+      }
     }
 
     if (matched) {

@@ -44,6 +44,8 @@ import { BranchService } from '../../services/branchService';
 import { CustomerService } from '../../services/customerService';
 import { Customer } from '../../types/customer';
 import { getCurrentLocale, setLocale, subscribeLocale } from '../../utils/i18nFormatter';
+import { useBarcodeScanner } from '../../hooks/useBarcodeScanner';
+import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 
 interface Toast {
   id: string;
@@ -327,7 +329,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         medicineId: medId,
         batchId: extra?.batchId || fallbackBatch?.id,
         purchasePrice: extra?.purchasePrice || fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || 0,
-        stock: extra?.stock || fallbackBatch?.currentStock
+        stock: extra?.stock || fallbackBatch?.currentStock,
+        barcode: extra?.barcode
       };
       setCart((prev) => [...prev, newItem]);
       addToast(`Added ${name} to active cart`, 'success');
@@ -695,6 +698,105 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cart, selectedDoctor, heldCount]);
+
+  // Global Hardware Barcode Gun Wedge Listener (HID Scanner support)
+  useBarcodeScanner({
+    enabled: activeTab === 'pos' && !isF10ModalOpen && !isThermalModalOpen && !isRxWarningModalOpen && !isSmartBarcodeModalOpen,
+    onScan: (scannedCode) => {
+      const code = scannedCode.trim().toLowerCase();
+      if (!code) return false;
+
+      // 1. Search live medicines & FEFO batches
+      const liveMeds = PharmacyService.getMedicines();
+      let matched = liveMeds.find(
+        (m) =>
+          (m.barcode && m.barcode.toLowerCase() === code) ||
+          (m.sku && m.sku.toLowerCase() === code) ||
+          (m.name && m.name.toLowerCase() === code)
+      );
+
+      let itemToAdd: any = null;
+
+      if (matched) {
+        const fefo = PharmacyService.getFefoBatchForMedicine(matched.id, currentUser?.branchId);
+        itemToAdd = {
+          name: matched.name,
+          price: fefo.batch ? Number(fefo.batch.sellingPrice) : (matched.sellingPrice || 10),
+          batch: fefo.batch?.batchNumber || 'GEN-01',
+          exp: fefo.batch?.expiryDate || '2026-12-31',
+          isUrgent: false,
+          extra: {
+            medicineId: matched.id,
+            batchId: fefo.batch?.id,
+            sub: matched.genericName || matched.strength || '',
+            company: matched.manufacturer || '',
+            isColdChain: (matched.rackLocation || '').toLowerCase().includes('fridge'),
+            storageTemp: matched.rackLocation || 'Room Temp',
+            isRxRequired: matched.requiresPrescription || false,
+            dosageEn: matched.description || '',
+            dosageBn: matched.description || '',
+            purchasePrice: fefo.batch ? Number(fefo.batch.purchasePrice) : (matched.purchasePrice || 8),
+            stock: fefo.batch ? fefo.batch.currentStock : 100,
+            barcode: matched.barcode || matched.sku || code,
+          }
+        };
+      } else {
+        // 2. Check SMART_BARCODE_DATABASE verified catalog
+        const smart = SMART_BARCODE_DATABASE.find(
+          (s) =>
+            (s.barcode && s.barcode.toLowerCase() === code) ||
+            s.brandName.toLowerCase() === code
+        );
+        if (smart) {
+          itemToAdd = {
+            name: smart.brandName,
+            price: smart.sellingPrice,
+            batch: smart.batch,
+            exp: smart.exp,
+            isUrgent: false,
+            extra: {
+              medicineId: `smart-${smart.barcode}`,
+              batchId: `batch-${smart.batch}`,
+              sub: `${smart.genericName} ${smart.strength}`,
+              company: smart.company,
+              isColdChain: smart.isColdChain,
+              storageTemp: smart.storageTemp,
+              isOphthalmic: smart.isOphthalmic,
+              afterOpeningDays: smart.afterOpeningDays || 28,
+              isRxRequired: smart.isRxRequired,
+              dosageEn: smart.dosageEn,
+              dosageBn: smart.dosageBn,
+              purchasePrice: smart.purchasePrice,
+              stock: smart.stock,
+              barcode: smart.barcode,
+            }
+          };
+        }
+      }
+
+      if (itemToAdd) {
+        handleFastAddItem(
+          itemToAdd.name,
+          itemToAdd.price,
+          itemToAdd.batch,
+          itemToAdd.exp,
+          itemToAdd.isUrgent,
+          itemToAdd.extra
+        );
+        addToast(`Scanned: ${itemToAdd.name} [${scannedCode}]`, 'success');
+        setSearchQuery('');
+        setShowSearchDropdown(false);
+        searchInputRef.current?.focus();
+        return true;
+      } else {
+        addToast(`Barcode not recognized: "${scannedCode}"`, 'error');
+        setSearchQuery(scannedCode);
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+        return false;
+      }
+    }
+  });
 
   const handleNavSelect = (tab: PharmaNavTab) => {
     setActiveTab(tab);
