@@ -81,3 +81,4 @@ export function useBarcodeScanner({
     };
   }, [enabled, maxIntervalMs, minLength]);
 }
+

@@ -33,3 +33,4 @@ export const playScannerBeep = (type: 'success' | 'alert' = 'success') => {
     // AudioContext blocked by browser autoplay policy or unsupported
   }
 };
+
