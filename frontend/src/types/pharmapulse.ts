@@ -83,12 +83,15 @@ export interface DoctorInfo {
 
 export interface GenericSubstituteOption {
   id: string;
+  medicineId?: string;
   brandName: string;
   genericName: string;
   strength: string;
   company: string;
   manufacturer?: string;
   price: number;
+  mrp?: number;
+  marginPercent?: number;
   purchasePrice?: number;
   stock: number;
   form: string;

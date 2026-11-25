@@ -6,6 +6,8 @@
  * drag events, or text editing within inputs.
  */
 
+import type React from 'react';
+
 export type SpatialDirection = 'up' | 'down' | 'left' | 'right';
 
 export interface SpatialNavConfig {

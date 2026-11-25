@@ -1,34 +1,112 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  ClockAlert, 
-  AlertTriangle, 
-  ShieldAlert, 
-  CheckCircle2, 
-  Search, 
-  Trash2, 
-  RotateCcw, 
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  ClockAlert,
+  AlertTriangle,
+  ShieldAlert,
+  CheckCircle2,
+  Search,
+  Trash2,
+  RotateCcw,
   ShieldCheck,
   Building,
   DollarSign,
   Calendar,
-  Layers
+  Layers,
+  Plus
 } from 'lucide-react';
-import { Batch } from '../../types/pharmacy';
+import { Batch, Medicine, Supplier } from '../../types/pharmacy';
 import { PharmacyService } from '../../services/pharmacyService';
+import { inventoryApi, batchApi, supplierApi } from '../../lib/api';
+import { PermissionGuard } from '../common/PermissionGuard';
+import { InvoiceInwardBatchModal } from '../inventory/InvoiceInwardBatchModal';
+import { getCurrentLocale, subscribeLocale } from '../../utils/i18nFormatter';
 
 interface BatchExpiryViewProps {
   onDataChanged?: () => void;
 }
 
 export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged }) => {
+  const [locale, setLocaleState] = useState<'en' | 'bn'>(() => getCurrentLocale());
+  useEffect(() => subscribeLocale((loc) => setLocaleState(loc)), []);
+  const isBn = locale === 'bn';
+
+  const [medicines, setMedicines] = useState<Medicine[]>(() => PharmacyService.getMedicines());
   const [batches, setBatches] = useState<Batch[]>(() => PharmacyService.getBatches());
+  const [suppliers, setSuppliers] = useState<Supplier[]>(() => PharmacyService.getSuppliers());
+  const [inwardModalOpen, setInwardModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [activeRadarTab, setActiveRadarTab] = useState<'all' | 'expired' | 'critical' | 'near' | 'healthy' | 'quarantined'>('all');
 
-  const refreshBatches = () => {
-    setBatches(PharmacyService.getBatches());
+  const refreshBatches = async () => {
+    try {
+      const [medsData, batchesData, suppliersData] = await Promise.all([
+        inventoryApi.getMedicines().catch(() => PharmacyService.getMedicines()),
+        batchApi.getBatches().catch(() => PharmacyService.getBatches()),
+        supplierApi.getSuppliers().catch(() => PharmacyService.getSuppliers()),
+      ]);
+
+      const mappedMeds = (medsData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        genericName: p.generic?.name || p.genericName || 'Unknown',
+        brandName: p.name,
+        barcode: p.barcode,
+        category: p.category?.name || p.category || 'Other',
+        dosageForm: p.dosageForm,
+        strength: p.strength,
+        manufacturer: p.manufacturer?.name || p.manufacturer || 'Unknown',
+        unitOfMeasure: p.unitOfMeasure || 'Strip',
+        packSize: p.packSize || 10,
+        reorderLevel: p.reorderLevel || 20,
+        rackLocation: p.defaultRackLocation || p.rackLocation || 'Unassigned',
+        requiresPrescription: !!p.requiresPrescription,
+        isNarcoticOrSedative: !!p.isNarcoticOrSedative,
+        taxRate: Number(p.vatRate ?? p.taxRate ?? 5),
+        purchasePrice: Number(p.purchasePrice || 0),
+        mrp: Number(p.mrp || 0),
+        sellingPrice: Number(p.sellingPrice || 0),
+        createdAt: p.createdAt || new Date().toISOString(),
+      }));
+
+      const mappedBatches = (batchesData || []).map((b: any) => ({
+        id: b.id,
+        medicineId: b.productId || b.medicineId,
+        medicineName: b.product?.name || b.medicineName || 'Unknown',
+        batchNumber: b.batchNumber,
+        invoiceNumber: b.invoiceNumber || undefined,
+        invoiceDate: b.invoiceDate ? new Date(b.invoiceDate).toISOString().split('T')[0] : undefined,
+        manufacturingDate: b.manufacturingDate ? String(b.manufacturingDate).split('T')[0] : '',
+        expiryDate: b.expiryDate ? String(b.expiryDate).split('T')[0] : '',
+        purchasePrice: Number(b.purchasePrice || 0),
+        mrp: Number(b.mrp || 0),
+        sellingPrice: Number(b.unitSellingPrice ?? b.sellingPrice ?? 0),
+        initialQuantity: Number(b.initialQuantity || 0),
+        currentStock: Number(b.currentStock || 0),
+        status: String(b.status || 'active').toLowerCase() as Batch['status'],
+        supplierId: b.supplierId,
+        supplierName: b.supplier?.name || b.supplier?.companyName || b.supplierName || 'Unknown',
+        rackLocation: b.rackLocation,
+      }));
+
+      const mappedSuppliers = (suppliersData || []).map((s: any) => ({
+        ...s,
+        balancePayable: Number(s.balancePayable) || 0,
+      }));
+
+      setMedicines(mappedMeds);
+      setBatches(mappedBatches);
+      setSuppliers(mappedSuppliers);
+    } catch {
+      setMedicines(PharmacyService.getMedicines());
+      setBatches(PharmacyService.getBatches());
+      setSuppliers(PharmacyService.getSuppliers());
+    }
     if (onDataChanged) onDataChanged();
   };
+
+  useEffect(() => {
+    refreshBatches();
+  }, []);
 
   const nowTime = new Date().getTime();
 
@@ -37,7 +115,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
     return batches.map(b => {
       const expDate = new Date(b.expiryDate);
       const diffDays = Math.ceil((expDate.getTime() - nowTime) / (1000 * 60 * 60 * 24));
-      
+
       let category: 'expired' | 'critical' | 'near' | 'healthy';
       if (diffDays <= 0 || b.status === 'expired') {
         category = 'expired';
@@ -107,7 +185,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
   // Filtering
   const filtered = useMemo(() => {
     return analyzedBatches.filter(b => {
-      const matchSearch = 
+      const matchSearch =
         b.batchNumber.toLowerCase().includes(search.toLowerCase()) ||
         b.medicineName.toLowerCase().includes(search.toLowerCase()) ||
         (b.supplierName && b.supplierName.toLowerCase().includes(search.toLowerCase()));
@@ -148,7 +226,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
 
   return (
     <div className="p-4 md:p-6 bg-slate-100 min-h-[calc(100vh-85px)] space-y-4">
-      
+
       {/* Title ribbon */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
         <div>
@@ -161,11 +239,20 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Zero-Tolerance Lockout: Active</span>
           </div>
+          <PermissionGuard permission="inventory:product:create">
+            <button
+              onClick={() => setInwardModalOpen(true)}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isBn ? 'ওষুধ / ব্যাচ যোগ করুন' : 'Add Medicine'}</span>
+            </button>
+          </PermissionGuard>
         </div>
       </div>
 
@@ -179,7 +266,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
           <div>
             <div className="text-[11px] font-bold uppercase text-red-700">Expired Stock (Locked)</div>
             <div className="text-lg font-extrabold text-red-900 mt-0.5">
-              ${(riskMetrics?.expiredCost ?? 0).toFixed(2)}
+              ৳{(riskMetrics?.expiredCost ?? 0).toFixed(2)}
             </div>
             <p className="text-[10px] text-red-600">{riskMetrics?.expiredCount ?? 0} batches zero-tolerance blocked</p>
           </div>
@@ -193,7 +280,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
           <div>
             <div className="text-[11px] font-bold uppercase text-rose-700">Critical Expiry (&lt;30d)</div>
             <div className="text-lg font-extrabold text-rose-900 mt-0.5">
-              ${(riskMetrics?.criticalCost ?? 0).toFixed(2)}
+              ৳{(riskMetrics?.criticalCost ?? 0).toFixed(2)}
             </div>
             <p className="text-[10px] text-rose-600">{riskMetrics?.criticalCount ?? 0} batches require immediate return/use</p>
           </div>
@@ -207,7 +294,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
           <div>
             <div className="text-[11px] font-bold uppercase text-amber-700">Near Expiry (30-90d)</div>
             <div className="text-lg font-extrabold text-amber-900 mt-0.5">
-              ${(riskMetrics?.nearCost ?? 0).toFixed(2)}
+              ৳{(riskMetrics?.nearCost ?? 0).toFixed(2)}
             </div>
             <p className="text-[10px] text-amber-600">{riskMetrics.nearCount} batches in FEFO priority queue</p>
           </div>
@@ -286,11 +373,10 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                     setActiveRadarTab(tab.id as any);
                   }
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  activeRadarTab === tab.id
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 ${activeRadarTab === tab.id
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                } ${tab.alert && activeRadarTab !== tab.id ? 'text-red-600 ring-1 ring-red-300' : ''}`}
+                  } ${tab.alert && activeRadarTab !== tab.id ? 'text-red-600 ring-1 ring-red-300' : ''}`}
               >
                 {tab.label}
               </button>
@@ -348,18 +434,22 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                           }
                         }
                       }}
-                      className={`hover:bg-slate-50/80 transition-colors focus:outline-none focus:bg-emerald-50/50 ${
-                        isExpired
+                      className={`hover:bg-slate-50/80 transition-colors focus:outline-none focus:bg-emerald-50/50 ${isExpired
                           ? 'bg-red-50/50'
                           : b.category === 'critical'
-                          ? 'bg-rose-50/30'
-                          : b.category === 'near'
-                          ? 'bg-amber-50/30'
-                          : ''
-                      }`}
+                            ? 'bg-rose-50/30'
+                            : b.category === 'near'
+                              ? 'bg-amber-50/30'
+                              : ''
+                        }`}
                     >
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                        {b.batchNumber}
+                        <div>{b.batchNumber}</div>
+                        {b.invoiceNumber && (
+                          <div className="text-[10px] font-sans font-semibold text-emerald-700">
+                            Inv: {b.invoiceNumber}
+                          </div>
+                        )}
                         {b.supplierName && (
                           <div className="text-[10px] text-slate-400 font-sans font-normal truncate max-w-[150px]">
                             {b.supplierName}
@@ -460,6 +550,14 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
         </div>
       </div>
 
+      <InvoiceInwardBatchModal
+        isOpen={inwardModalOpen}
+        onClose={() => setInwardModalOpen(false)}
+        medicines={medicines}
+        batches={batches}
+        suppliers={suppliers}
+        onSaved={refreshBatches}
+      />
     </div>
   );
 };

@@ -448,10 +448,10 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
                   document.getElementById('pay-method-card')?.focus();
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
-                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                  (document.getElementById('checkout-special-disc') || document.getElementById('customer-phone-input'))?.focus();
                 } else if (e.key === 'ArrowDown') {
                   e.preventDefault();
-                  document.getElementById('checkout-tendered-input')?.focus() || document.getElementById('checkout-dispense-btn')?.focus();
+                  (document.getElementById('checkout-tendered-input') || document.getElementById('checkout-dispense-btn'))?.focus();
                 } else if (e.key === 'ArrowLeft') {
                   e.preventDefault();
                   const target = document.getElementById('cart-disc-0') || document.getElementById('cart-qty-0');
@@ -482,7 +482,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
                   document.getElementById('pay-method-mfs')?.focus();
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
-                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                  (document.getElementById('checkout-special-disc') || document.getElementById('customer-phone-input'))?.focus();
                 } else if (e.key === 'ArrowDown') {
                   e.preventDefault();
                   document.getElementById('checkout-dispense-btn')?.focus();
@@ -512,7 +512,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
                   document.getElementById('pay-method-due')?.focus();
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
-                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                  (document.getElementById('checkout-special-disc') || document.getElementById('customer-phone-input'))?.focus();
                 } else if (e.key === 'ArrowDown') {
                   e.preventDefault();
                   document.getElementById('checkout-dispense-btn')?.focus();
@@ -539,7 +539,7 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
                   document.getElementById('pay-method-mfs')?.focus();
                 } else if (e.key === 'ArrowUp') {
                   e.preventDefault();
-                  document.getElementById('checkout-special-disc')?.focus() || document.getElementById('customer-phone-input')?.focus();
+                  (document.getElementById('checkout-special-disc') || document.getElementById('customer-phone-input'))?.focus();
                 } else if (e.key === 'ArrowDown') {
                   e.preventDefault();
                   document.getElementById('checkout-dispense-btn')?.focus();

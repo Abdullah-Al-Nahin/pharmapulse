@@ -30,9 +30,11 @@ import { InventoryAnalyticsEoqView } from './InventoryAnalyticsEoqView';
 import { StockSegregationHub } from './StockSegregationHub';
 import { StockTransferHub } from './StockTransferHub';
 import { RackBinManager } from './RackBinManager';
+import { InvoiceInwardBatchModal } from './InvoiceInwardBatchModal';
 import { inventoryApi, batchApi, supplierApi } from '../../lib/api';
 import { PharmacyService } from '../../services/pharmacyService';
 import { InventoryAdvancedService } from '../../services/inventoryAdvancedService';
+import { getCurrentLocale, subscribeLocale } from '../../utils/i18nFormatter';
 import { 
   QuarantineRecord, 
   DamagedStockRecord, 
@@ -50,6 +52,10 @@ interface InventoryViewProps {
 
 export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) => {
   const { canViewCosts } = usePermission();
+  const [locale, setLocaleState] = useState<'en' | 'bn'>(() => getCurrentLocale());
+  useEffect(() => subscribeLocale((loc) => setLocaleState(loc)), []);
+  const isBn = locale === 'bn';
+
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -161,8 +167,9 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
   // Accordion expanded medicine IDs
   const [expandedMedIds, setExpandedMedIds] = useState<Set<string>>(new Set());
 
-  // Add Medicine Modal
+  // Add Medicine Master Modal & Invoice-Wise Inward Batch Modal
   const [showAddModal, setShowAddModal] = useState(false);
+  const [inwardModalOpen, setInwardModalOpen] = useState(false);
   const [newMed, setNewMed] = useState<Partial<Medicine>>({
     name: '',
     genericName: '',
@@ -179,22 +186,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
     requiresPrescription: true,
     isNarcoticOrSedative: false,
     taxRate: 5,
-    description: ''
-  });
-
-  // Add Batch Modal
-  const [batchModalMed, setBatchModalMed] = useState<Medicine | null>(null);
-  const [newBatch, setNewBatch] = useState<Partial<Batch>>({
-    batchNumber: '',
-    manufacturingDate: new Date().toISOString().split('T')[0],
-    expiryDate: '',
     purchasePrice: 0,
     mrp: 0,
     sellingPrice: 0,
-    initialQuantity: 100,
-    currentStock: 100,
-    status: 'active'
+    description: ''
   });
+
+  // Selected medicine for Invoice-Wise Inward Batch Modal
+  const [batchModalMed, setBatchModalMed] = useState<Medicine | null>(null);
 
   // Deduct Batch Modal
   const [deductModal, setDeductModal] = useState<{ batch: any; med: Medicine } | null>(null);
@@ -227,6 +226,9 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         requiresPrescription: p.requiresPrescription,
         isNarcoticOrSedative: p.isNarcoticOrSedative,
         taxRate: p.vatRate,
+        purchasePrice: Number(p.purchasePrice || 0),
+        mrp: Number(p.mrp || 0),
+        sellingPrice: Number(p.sellingPrice || 0),
         description: p.description,
         createdAt: p.createdAt
       }));
@@ -237,8 +239,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         medicineId: b.productId,
         medicineName: b.product?.name || 'Unknown',
         batchNumber: b.batchNumber,
-        manufacturingDate: b.manufacturingDate,
-        expiryDate: b.expiryDate,
+        invoiceNumber: b.invoiceNumber || undefined,
+        invoiceDate: b.invoiceDate ? new Date(b.invoiceDate).toISOString().split('T')[0] : undefined,
+        manufacturingDate: b.manufacturingDate ? String(b.manufacturingDate).split('T')[0] : '',
+        expiryDate: b.expiryDate ? String(b.expiryDate).split('T')[0] : '',
         purchasePrice: b.purchasePrice,
         mrp: b.mrp,
         sellingPrice: b.unitSellingPrice,
@@ -246,7 +250,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         currentStock: b.currentStock,
         status: b.status.toLowerCase(),
         supplierId: b.supplierId,
-        supplierName: b.supplier?.name || 'Unknown',
+        supplierName: b.supplier?.name || b.supplier?.companyName || 'Unknown',
         rackLocation: b.rackLocation,
       }));
 
@@ -341,6 +345,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
       const payload = {
         name: newMed.name,
         sku: `SKU-${Date.now()}`,
+        barcode: newMed.barcode?.trim() || null,
         dosageForm: newMed.dosageForm || 'TABLET',
         strength: newMed.strength || '500mg',
         unitOfMeasure: newMed.unitOfMeasure || 'Strip',
@@ -350,6 +355,9 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         requiresPrescription: !!newMed.requiresPrescription,
         isNarcoticOrSedative: !!newMed.isNarcoticOrSedative,
         vatRate: Number(newMed.taxRate) || 5,
+        purchasePrice: Number(newMed.purchasePrice) || 0,
+        mrp: Number(newMed.mrp) || 0,
+        sellingPrice: Number(newMed.sellingPrice) || 0,
         description: newMed.description || '',
         genericName: newMed.genericName,
         categoryName: newMed.category,
@@ -375,43 +383,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         requiresPrescription: true,
         isNarcoticOrSedative: false,
         taxRate: 5,
+        purchasePrice: 0,
+        mrp: 0,
+        sellingPrice: 0,
         description: ''
       });
     } catch (e) {
       console.error("Failed to add medicine", e);
       alert("Failed to add medicine. See console.");
-    }
-  };
-
-  // Submit Add Batch to existing medicine
-  const handleSaveBatch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!batchModalMed || !newBatch.batchNumber || !newBatch.expiryDate) {
-      alert('Please provide batch number and expiry date.');
-      return;
-    }
-
-    try {
-      const payload = {
-        productId: batchModalMed.id,
-        batchNumber: newBatch.batchNumber,
-        manufacturingDate: newBatch.manufacturingDate ? new Date(newBatch.manufacturingDate).toISOString() : new Date().toISOString(),
-        expiryDate: new Date(newBatch.expiryDate).toISOString(),
-        purchasePrice: Number(newBatch.purchasePrice) || 0,
-        mrp: Number(newBatch.mrp) || 0,
-        unitSellingPrice: Number(newBatch.sellingPrice) || 0,
-        initialQuantity: Number(newBatch.initialQuantity) || 100,
-        currentStock: Number(newBatch.initialQuantity) || 100,
-        status: 'ACTIVE',
-        rackLocation: batchModalMed.rackLocation
-      };
-
-      await batchApi.createBatch(payload);
-      refreshData();
-      setBatchModalMed(null);
-    } catch (e) {
-      console.error("Failed to add batch", e);
-      alert("Failed to add batch. See console.");
     }
   };
 
@@ -529,11 +508,14 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         <div className="flex items-center gap-2">
           <PermissionGuard permission="inventory:product:create">
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => {
+                setBatchModalMed(null);
+                setInwardModalOpen(true);
+              }}
               className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Medicine</span>
+              <span>{isBn ? 'ওষুধ / ব্যাচ যোগ করুন' : 'Add Medicine'}</span>
             </button>
           </PermissionGuard>
         </div>
@@ -549,17 +531,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
           bonusBatches={[]}
           onAddBatch={(med) => {
             setBatchModalMed(med);
-            setNewBatch({
-              batchNumber: `BAT-${Date.now().toString().slice(-4)}`,
-              manufacturingDate: new Date().toISOString().split('T')[0],
-              expiryDate: '',
-              purchasePrice: 0,
-              mrp: 0,
-              sellingPrice: 0,
-              initialQuantity: 100,
-              currentStock: 100,
-              status: 'active'
-            });
+            setInwardModalOpen(true);
           }}
           onTransferBatch={() => {}}
           onQuarantineBatch={() => {}}
@@ -588,15 +560,29 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
               </p>
             </div>
 
-            <PermissionGuard permission="inventory:product:create">
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New Medicine</span>
-              </button>
-            </PermissionGuard>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <PermissionGuard permission="inventory:product:create">
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{isBn ? 'প্রোডাক্ট মাস্টার নিবন্ধন' : 'Add Product Master'}</span>
+                </button>
+              </PermissionGuard>
+              <PermissionGuard permission="inventory:product:create">
+                <button
+                  onClick={() => {
+                    setBatchModalMed(null);
+                    setInwardModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{isBn ? 'ইনভয়েস ভিত্তিক ব্যাচ এন্ট্রি' : 'Inward Batch Entry'}</span>
+                </button>
+              </PermissionGuard>
+            </div>
           </div>
 
       {/* Filter and Search Bar */}
@@ -736,7 +722,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
 
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setBatchModalMed(med)}
+                        onClick={() => {
+                          setBatchModalMed(med);
+                          setInwardModalOpen(true);
+                        }}
                         className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
                       >
                         + Batch
@@ -805,8 +794,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                                   <td className="py-2 text-slate-600 font-medium">
                                     <MaskedCost value={b.purchasePrice} />
                                   </td>
-                                  <td className="py-2 text-slate-600">${Number(b.mrp ?? b.sellingPrice ?? 0).toFixed(2)}</td>
-                                  <td className="py-2 font-bold text-slate-900">${Number(b.sellingPrice ?? 0).toFixed(2)}</td>
+                                  <td className="py-2 text-slate-600">৳{Number(b.mrp ?? b.sellingPrice ?? 0).toFixed(2)}</td>
+                                  <td className="py-2 font-bold text-slate-900">৳{Number(b.sellingPrice ?? 0).toFixed(2)}</td>
                                   <td className="py-2 text-right font-extrabold">{b.currentStock}</td>
                                   <td className="py-2 text-center">
                                     <div className="flex items-center justify-center gap-2">
@@ -1042,6 +1031,49 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                   />
                 </div>
 
+                {/* Master Unit Pricing (Auto-fetched during Invoice-Wise Batch Entry) */}
+                <div className="col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="font-bold text-slate-700">
+                      {isBn ? 'মাস্টার ক্রয়মূল্য (৳)' : 'Master Cost Price (৳)'}
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={newMed.purchasePrice ?? 0}
+                      onChange={(e) => setNewMed({ ...newMed, purchasePrice: parseFloat(e.target.value) || 0 })}
+                      className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-700">
+                      {isBn ? 'মাস্টার এমআরপি (৳)' : 'Master MRP (৳)'}
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={newMed.mrp ?? 0}
+                      onChange={(e) => setNewMed({ ...newMed, mrp: parseFloat(e.target.value) || 0 })}
+                      className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-emerald-700">
+                      {isBn ? 'মাস্টার বিক্রয়মূল্য (৳)' : 'Master Selling Price (৳)'}
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={newMed.sellingPrice ?? 0}
+                      onChange={(e) => setNewMed({ ...newMed, sellingPrice: parseFloat(e.target.value) || 0 })}
+                      className="w-full mt-1 px-2.5 py-1.5 border border-emerald-300 bg-emerald-50/40 rounded-lg text-xs font-mono font-bold text-emerald-900"
+                    />
+                  </div>
+                </div>
+
                 {/* Product Barcode / GTIN Integration */}
                 <div className="col-span-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
@@ -1113,121 +1145,19 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
         </div>
       )}
 
-      {/* --- ADD BATCH MODAL --- */}
-      {batchModalMed && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
-            <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-bold">Inward Batch Entry</h3>
-                <p className="text-xs text-slate-400">{batchModalMed.name}</p>
-              </div>
-              <button onClick={() => setBatchModalMed(null)} className="text-slate-400 hover:text-white cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveBatch} className="p-5 space-y-3.5 text-xs">
-              <div>
-                <label className="font-bold text-slate-700">Batch Number *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. BTH-2026-901"
-                  value={newBatch.batchNumber}
-                  onChange={(e) => setNewBatch({ ...newBatch, batchNumber: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label className="font-bold text-slate-700">Manufacturing Date</label>
-                  <input
-                    type="date"
-                    value={newBatch.manufacturingDate}
-                    onChange={(e) => setNewBatch({ ...newBatch, manufacturingDate: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700">Expiry Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={newBatch.expiryDate}
-                    onChange={(e) => setNewBatch({ ...newBatch, expiryDate: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold text-emerald-800"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="font-bold text-slate-700">Cost Price ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newBatch.purchasePrice}
-                    onChange={(e) => setNewBatch({ ...newBatch, purchasePrice: parseFloat(e.target.value) || 0 })}
-                    className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700">MRP ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newBatch.mrp}
-                    onChange={(e) => setNewBatch({ ...newBatch, mrp: parseFloat(e.target.value) || 0 })}
-                    className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700">Selling Price ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newBatch.sellingPrice}
-                    onChange={(e) => setNewBatch({ ...newBatch, sellingPrice: parseFloat(e.target.value) || 0 })}
-                    className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold text-slate-900"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="font-bold text-slate-700">Initial Received Quantity ({batchModalMed.unitOfMeasure}s)</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={newBatch.initialQuantity}
-                  onChange={(e) => setNewBatch({ ...newBatch, initialQuantity: parseInt(e.target.value) || 1 })}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setBatchModalMed(null)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs cursor-pointer"
-                >
-                  Confirm Inward Batch
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* --- INVOICE-WISE INWARD BATCH ENTRY MODAL --- */}
+      <InvoiceInwardBatchModal
+        isOpen={inwardModalOpen}
+        onClose={() => {
+          setInwardModalOpen(false);
+          setBatchModalMed(null);
+        }}
+        medicines={medicines}
+        batches={batches}
+        suppliers={suppliers}
+        initialMedicine={batchModalMed}
+        onSaved={refreshData}
+      />
 
       {/* --- DEDUCT BATCH MODAL --- */}
       {deductModal && (

@@ -79,6 +79,20 @@ async function main() {
     );
   `);
   console.log('✓ rack_locations table created');
+
+  // 5. Ensure master pricing columns on products and invoice tracking columns on batches
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "products"
+      ADD COLUMN IF NOT EXISTS "purchasePrice" DECIMAL(12, 2) DEFAULT 0.00,
+      ADD COLUMN IF NOT EXISTS "mrp" DECIMAL(12, 2) DEFAULT 0.00,
+      ADD COLUMN IF NOT EXISTS "sellingPrice" DECIMAL(12, 2) DEFAULT 0.00;
+  `);
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "batches"
+      ADD COLUMN IF NOT EXISTS "invoiceNumber" VARCHAR(60),
+      ADD COLUMN IF NOT EXISTS "invoiceDate" DATE;
+  `);
+  console.log('✓ products pricing & batches invoice columns ensured');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

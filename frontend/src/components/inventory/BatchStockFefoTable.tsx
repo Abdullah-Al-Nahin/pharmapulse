@@ -431,12 +431,19 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                                   }`}
                                 >
                                   <td className="py-2.5">{fefoBadge}</td>
-                                  <td className="py-2.5 font-mono font-bold text-slate-900 flex items-center gap-1.5">
-                                    <span>{batch.batchNumber}</span>
-                                    {isBonusBatch && (
-                                      <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1 py-0.5 rounded flex items-center gap-0.5" title="Trade Bonus Stock">
-                                        <Tag className="w-2.5 h-2.5" /> Bonus
-                                      </span>
+                                  <td className="py-2.5 font-mono font-bold text-slate-900">
+                                    <div className="flex items-center gap-1.5">
+                                      <span>{batch.batchNumber}</span>
+                                      {isBonusBatch && (
+                                        <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1 py-0.5 rounded flex items-center gap-0.5" title="Trade Bonus Stock">
+                                          <Tag className="w-2.5 h-2.5" /> Bonus
+                                        </span>
+                                      )}
+                                    </div>
+                                    {batch.invoiceNumber && (
+                                      <div className="text-[10px] font-sans font-semibold text-emerald-700 mt-0.5">
+                                        Inv: {batch.invoiceNumber}
+                                      </div>
                                     )}
                                   </td>
                                   <td className="py-2.5">

@@ -305,8 +305,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         : allMeds.find(m => m.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(m.name.toLowerCase())) || allMeds[0];
 
       const medId = extra?.medicineId || matchedMed?.id;
-      const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-      const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+      const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+      const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
 
       const newItem: PharmaCartItem = {
         id: Date.now(),
@@ -349,8 +349,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     ) || allMeds[0];
 
     const medId = matchedMed?.id;
-    const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-    const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+    const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+    const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
 
     setCart((prev) => {
       const filtered = prev.filter((i) => !i.name.toLowerCase().includes('sergel'));
@@ -389,8 +389,8 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     ) || allMeds[0];
 
     const medId = alt.medicineId || matchedMed?.id;
-    const fefoBatch = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-    const fallbackBatch = fefoBatch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+    const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
+    const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
 
     const isInCart = cart.some((i) => i.id === originalItem.id);
     const newSubItem: PharmaCartItem = {

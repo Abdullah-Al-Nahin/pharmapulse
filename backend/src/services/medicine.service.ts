@@ -86,7 +86,7 @@ export class MedicineService {
   }
 
   static async createMedicine(data: any) {
-    const { genericName, manufacturerName, categoryName, ...productData } = data;
+    const { genericName, manufacturerName, categoryName, rackLocation, ...productData } = data;
     
     // Default to the first ones if nothing is provided (safeguard)
     let genericId = productData.genericId;
@@ -127,17 +127,98 @@ export class MedicineService {
       categoryId = fallbackCat.id;
     }
 
-    return prisma.product.create({ 
+    const cleanBarcode =
+      productData.barcode && String(productData.barcode).trim() !== ''
+        ? String(productData.barcode).trim()
+        : null;
+
+    return prisma.product.create({
       data: {
-        ...productData,
+        sku: productData.sku || `SKU-${Date.now()}`,
+        barcode: cleanBarcode,
+        name: productData.name,
+        dosageForm: productData.dosageForm || 'TABLET',
+        route: productData.route || 'ORAL',
+        strength: productData.strength || '500mg',
+        unitOfMeasure: productData.unitOfMeasure || 'Strip',
+        packSize: Number(productData.packSize) || 10,
+        reorderLevel: Number(productData.reorderLevel) || 20,
+        maxStockLevel: Number(productData.maxStockLevel) || 500,
+        defaultRackLocation: productData.defaultRackLocation || rackLocation || 'Rack A-01',
+        requiresPrescription: !!productData.requiresPrescription,
+        isNarcoticOrSedative: !!productData.isNarcoticOrSedative,
+        isAntibiotic: !!productData.isAntibiotic,
+        vatRate: Number(productData.vatRate ?? productData.taxRate ?? 5),
+        description: productData.description || '',
+        storageInstructions: productData.storageInstructions || undefined,
+        purchasePrice: Number(productData.purchasePrice) || 0,
+        mrp: Number(productData.mrp) || 0,
+        sellingPrice: Number(productData.sellingPrice) || 0,
         genericId,
         manufacturerId,
-        categoryId
-      } 
+        categoryId,
+      },
+      include: {
+        generic: true,
+        manufacturer: true,
+        category: true,
+      },
     });
   }
+
   static async updateMedicine(id: string, data: any) {
-    return prisma.product.update({ where: { id }, data });
+    const updatePayload: any = {};
+    const allowedFields = [
+      'name',
+      'dosageForm',
+      'route',
+      'strength',
+      'unitOfMeasure',
+      'packSize',
+      'reorderLevel',
+      'maxStockLevel',
+      'defaultRackLocation',
+      'requiresPrescription',
+      'isNarcoticOrSedative',
+      'isAntibiotic',
+      'vatRate',
+      'description',
+      'storageInstructions',
+      'isActive',
+    ];
+
+    for (const key of allowedFields) {
+      if (data[key] !== undefined) {
+        updatePayload[key] = data[key];
+      }
+    }
+
+    if (data.rackLocation !== undefined && updatePayload.defaultRackLocation === undefined) {
+      updatePayload.defaultRackLocation = data.rackLocation;
+    }
+    if (data.barcode !== undefined) {
+      updatePayload.barcode =
+        data.barcode && String(data.barcode).trim() !== '' ? String(data.barcode).trim() : null;
+    }
+    if (data.purchasePrice !== undefined) {
+      updatePayload.purchasePrice = Number(data.purchasePrice) || 0;
+    }
+    if (data.mrp !== undefined) {
+      updatePayload.mrp = Number(data.mrp) || 0;
+    }
+    if (data.sellingPrice !== undefined) {
+      updatePayload.sellingPrice = Number(data.sellingPrice) || 0;
+    }
+
+    return prisma.product.update({
+      where: { id },
+      data: updatePayload,
+      include: {
+        generic: true,
+        manufacturer: true,
+        category: true,
+      },
+    });
   }
 
   static async getInventorySummary() {

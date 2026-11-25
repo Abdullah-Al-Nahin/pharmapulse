@@ -41,6 +41,8 @@ export interface Batch {
   status: BatchStatus;
   supplierId?: string;
   supplierName?: string;
+  invoiceNumber?: string;
+  invoiceDate?: string;
   barcode?: string;
   rackLocation?: string;
   wholesalePrice?: number;
@@ -52,6 +54,7 @@ export interface Batch {
 
 export interface Medicine {
   id: string;
+  sku?: string;
   name: string;
   genericName: string;
   brandName?: string;
@@ -67,6 +70,9 @@ export interface Medicine {
   requiresPrescription: boolean; // Schedule H / Rx
   isNarcoticOrSedative: boolean; // Strict record keeping
   taxRate: number; // e.g. 5, 12, 18%
+  purchasePrice?: number;
+  mrp?: number;
+  sellingPrice?: number;
   description?: string;
   storageInstructions?: string;
   barcode?: string;

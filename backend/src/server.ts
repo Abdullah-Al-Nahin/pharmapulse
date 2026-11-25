@@ -68,9 +68,29 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
+async function ensureInvoiceAndPricingColumns() {
+  try {
+    await prisma.$executeRawUnsafe(`
+      ALTER TABLE "products"
+        ADD COLUMN IF NOT EXISTS "purchasePrice" DECIMAL(12, 2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "mrp" DECIMAL(12, 2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "sellingPrice" DECIMAL(12, 2) DEFAULT 0.00;
+    `);
+    await prisma.$executeRawUnsafe(`
+      ALTER TABLE "batches"
+        ADD COLUMN IF NOT EXISTS "invoiceNumber" VARCHAR(60),
+        ADD COLUMN IF NOT EXISTS "invoiceDate" DATE;
+    `);
+  } catch (err) {
+    console.warn('[server]: Column auto-migration skipped or failed:', err);
+  }
+}
+
 // Start Server
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-  console.log(`[server]: Health check at http://localhost:${port}/health`);
-  console.log(`[server]: Telemetry API at http://localhost:${port}/api/telemetry/snapshot`);
+ensureInvoiceAndPricingColumns().finally(() => {
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+    console.log(`[server]: Health check at http://localhost:${port}/health`);
+    console.log(`[server]: Telemetry API at http://localhost:${port}/api/telemetry/snapshot`);
+  });
 });

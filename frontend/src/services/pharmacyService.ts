@@ -174,12 +174,14 @@ export class PharmacyService {
         apiMedicines, 
         apiBatches, 
         apiSuppliers,
-        apiSales
+        apiSales,
+        apiPurchases
       ] = await Promise.all([
         inventoryApi.getMedicines().catch(() => (cleared.medicines ? [] : INITIAL_MEDICINES)),
         batchApi.getBatches().catch(() => (cleared.batches ? [] : INITIAL_BATCHES)),
         supplierApi.getSuppliers().catch(() => []),
         saleApi.getSales().catch(() => []),
+        purchaseOrderApi.getPurchaseOrders().catch(() => []),
       ]);
 
       const rawMedicines = apiMedicines.length > 0 ? apiMedicines : (cleared.medicines ? [] : INITIAL_MEDICINES);
@@ -188,13 +190,25 @@ export class PharmacyService {
         manufacturer: typeof m.manufacturer === 'object' && m.manufacturer ? m.manufacturer.name : (m.manufacturer || ''),
         genericName: typeof m.generic === 'object' && m.generic ? m.generic.name : (m.genericName || m.generic || ''),
         category: typeof m.category === 'object' && m.category ? m.category.name : (m.category || ''),
+        rackLocation: m.rackLocation || m.defaultRackLocation || 'Unassigned',
+        purchasePrice: Number(m.purchasePrice || 0),
+        mrp: Number(m.mrp || 0),
+        sellingPrice: Number(m.sellingPrice || 0),
       }));
 
       const rawBatches = apiBatches.length > 0 ? apiBatches : (cleared.batches ? [] : INITIAL_BATCHES);
       const newBatches = rawBatches.map((b: any) => ({
         ...b,
         medicineId: b.medicineId || b.productId, // map Prisma's productId to frontend's medicineId
-        sellingPrice: b.sellingPrice !== undefined ? b.sellingPrice : b.unitSellingPrice // map Prisma's unitSellingPrice to frontend's sellingPrice
+        medicineName: b.medicineName || b.product?.name || 'Unknown',
+        sellingPrice: b.sellingPrice !== undefined ? Number(b.sellingPrice) : Number(b.unitSellingPrice || 0),
+        purchasePrice: Number(b.purchasePrice || 0),
+        mrp: Number(b.mrp || 0),
+        invoiceNumber: b.invoiceNumber || undefined,
+        invoiceDate: b.invoiceDate ? new Date(b.invoiceDate).toISOString().split('T')[0] : undefined,
+        supplierName: b.supplier?.name || b.supplier?.companyName || b.supplierName || '',
+        expiryDate: b.expiryDate ? String(b.expiryDate).split('T')[0] : '',
+        manufacturingDate: b.manufacturingDate ? String(b.manufacturingDate).split('T')[0] : '',
       }));
 
       const newSuppliers = apiSuppliers.length > 0 ? apiSuppliers : (cleared.suppliers ? [] : INITIAL_SUPPLIERS);
@@ -241,16 +255,61 @@ export class PharmacyService {
         syncedSales = formattedSales;
       }
 
+      let syncedPurchases = this.cache.purchases;
+      if (Array.isArray(apiPurchases) && apiPurchases.length > 0) {
+        syncedPurchases = apiPurchases.map((po: any) => ({
+          id: po.id,
+          poNumber: po.poNumber,
+          invoiceNumber: po.invoiceNumber,
+          supplierId: po.supplierId,
+          supplierName: po.supplier?.name || po.supplier?.companyName || 'Supplier',
+          orderDate: po.orderDate ? String(po.orderDate).split('T')[0] : '',
+          purchaseDate: po.receivedDate ? String(po.receivedDate).split('T')[0] : (po.orderDate ? String(po.orderDate).split('T')[0] : ''),
+          dueDate: po.orderDate ? String(po.orderDate).split('T')[0] : '',
+          status: String(po.status || 'received').toLowerCase() as any,
+          paymentStatus: po.paymentStatus === 'PAID' ? 'paid' : po.paymentStatus === 'PARTIALLY_PAID' ? 'partial' : 'pending',
+          subtotal: Number(po.subTotal || 0),
+          taxAmount: Number(po.taxAmount || 0),
+          discountAmount: Number(po.discountAmount || 0),
+          totalAmount: Number(po.grandTotal || 0),
+          paidAmount: Number(po.paidAmount || 0),
+          dueAmount: Number(po.dueAmount || 0),
+          notes: po.notes || '',
+          items: (po.items || []).map((it: any) => ({
+            id: it.id,
+            medicineId: it.productId,
+            medicineName: it.product?.name || 'Item',
+            dosageForm: (it.product?.dosageForm || 'Tablet') as any,
+            batchNumber: it.batchNumber,
+            manufacturingDate: it.manufacturingDate ? String(it.manufacturingDate).split('T')[0] : '',
+            expiryDate: it.expiryDate ? String(it.expiryDate).split('T')[0] : '',
+            quantity: Number(it.receivedQuantity || it.orderedQuantity || 0),
+            receivedQuantity: Number(it.receivedQuantity || 0),
+            freeQuantity: Number(it.freeQuantity || 0),
+            purchasePrice: Number(it.unitPurchasePrice || 0),
+            mrp: Number(it.mrp || 0),
+            sellingPrice: Number(it.sellingPrice || 0),
+            taxRate: Number(it.taxRate || 0),
+            totalAmount: Number(it.lineTotal || 0),
+          })),
+        }));
+      }
+
       const nextSales = syncedSales.length > 0 ? syncedSales : (cleared.sales ? [] : INITIAL_SALES);
+      const nextPurchases = syncedPurchases.length > 0 ? syncedPurchases : (cleared.purchases ? [] : INITIAL_PURCHASES);
       const hasChanged =
         JSON.stringify(this.cache.medicines) !== JSON.stringify(newMedicines) ||
         JSON.stringify(this.cache.batches) !== JSON.stringify(newBatches) ||
         JSON.stringify(this.cache.suppliers) !== JSON.stringify(newSuppliers) ||
-        JSON.stringify(this.cache.sales) !== JSON.stringify(nextSales);
+        JSON.stringify(this.cache.sales) !== JSON.stringify(nextSales) ||
+        JSON.stringify(this.cache.purchases) !== JSON.stringify(nextPurchases);
 
       if (hasChanged) {
         if (Array.isArray(apiSales) && apiSales.length > 0) {
           setLocalItem(STORAGE_KEYS.SALES, syncedSales);
+        }
+        if (Array.isArray(apiPurchases) && apiPurchases.length > 0) {
+          setLocalItem(STORAGE_KEYS.PURCHASES, syncedPurchases);
         }
 
         this.cache = {
@@ -258,7 +317,7 @@ export class PharmacyService {
           batches: newBatches,
           suppliers: newSuppliers,
           prescriptions: this.cache.prescriptions.length > 0 ? this.cache.prescriptions : (cleared.prescriptions ? [] : INITIAL_PRESCRIPTIONS),
-          purchases: this.cache.purchases.length > 0 ? this.cache.purchases : (cleared.purchases ? [] : INITIAL_PURCHASES),
+          purchases: nextPurchases,
           sales: nextSales,
           returns: this.cache.returns.length > 0 ? this.cache.returns : (cleared.returns ? [] : INITIAL_RETURNS),
           accounting: this.cache.accounting.length > 0 ? this.cache.accounting : (cleared.accounting ? [] : INITIAL_ACCOUNTING_TRANSACTIONS),
@@ -617,7 +676,7 @@ export class PharmacyService {
           company: m.manufacturer?.name || m.manufacturer || 'Unknown',
           batch: fefoBatch ? fefoBatch.batchNumber : 'OOS',
           exp: fefoBatch ? new Date(fefoBatch.expiryDate).toISOString().split('T')[0] : 'N/A',
-          price: fefoBatch ? Number(fefoBatch.unitSellingPrice || fefoBatch.sellingPrice) : (Number(m.sellingPrice) || 0),
+          price: fefoBatch ? Number(fefoBatch.unitSellingPrice || fefoBatch.sellingPrice) : (Number(m.sellingPrice || m.mrp) || 0),
           purchasePrice: fefoBatch ? Number(fefoBatch.purchasePrice) : (Number(m.purchasePrice) || 0),
           stock: totalStock,
           barcode: m.barcode || m.sku || '',
@@ -1689,8 +1748,8 @@ export class PharmacyService {
 
         if (!bId || bId === 'unknown-batch') {
           if (pId) {
-            const foundBatch = this.getFefoBatchForMedicine(pId);
-            if (foundBatch) bId = foundBatch.id;
+            const foundFefo = this.getFefoBatchForMedicine(pId);
+            if (foundFefo?.batch) bId = foundFefo.batch.id;
           }
           if (!bId && fallbackBatch) {
             bId = fallbackBatch.id;
