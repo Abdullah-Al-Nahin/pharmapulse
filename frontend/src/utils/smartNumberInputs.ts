@@ -37,18 +37,20 @@ export function installSmartNumberInputs(): void {
       if (target.type !== 'number' || target.readOnly || target.disabled) return;
 
       const currentVal = target.value;
-      if (isZeroText(currentVal)) {
-        const hadPlaceholder = target.hasAttribute('placeholder');
-        const prevPlaceholder = target.getAttribute('placeholder') || '';
+      const prevPlaceholder = target.getAttribute('placeholder') || '';
+      const hasZeroPlaceholder = prevPlaceholder !== '' && isZeroText(prevPlaceholder);
+
+      if (isZeroText(currentVal) || (currentVal === '' && hasZeroPlaceholder)) {
         zeroMetaMap.set(target, {
-          hadPlaceholder,
+          hadPlaceholder: target.hasAttribute('placeholder'),
           prevPlaceholder,
           restoreValue: currentVal,
         });
-        if (!hadPlaceholder || !prevPlaceholder) {
-          target.setAttribute('placeholder', '0');
+        // Clear both value and zero-looking placeholder while focused so the box looks cleanly blank
+        target.setAttribute('placeholder', '');
+        if (currentVal !== '') {
+          target.value = '';
         }
-        target.value = '';
         userClearedSet.add(target);
       }
     },
@@ -73,8 +75,8 @@ export function installSmartNumberInputs(): void {
               : '0',
           });
         }
-        if (!target.getAttribute('placeholder')) {
-          target.setAttribute('placeholder', '0');
+        if (!target.hasAttribute('placeholder')) {
+          target.setAttribute('placeholder', '');
         }
 
         // Wait for React controlled onChange ("|| 0" / "|| 1") to finish synchronously,

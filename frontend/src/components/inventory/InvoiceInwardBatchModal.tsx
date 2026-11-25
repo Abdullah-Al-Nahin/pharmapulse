@@ -516,7 +516,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
       aria-modal="true"
       aria-labelledby="inward-modal-title"
     >
-      <div className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
+      <div className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[94vh] dark:bg-[#111827] dark:text-white dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
         {/* Dark Navy Header matching Reference Screenshot 1 */}
         <div className="bg-[#0f172a] text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
           <div className="min-w-0">
@@ -548,27 +548,27 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
             e.preventDefault();
             handleSubmit(false);
           }}
-          className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 text-xs bg-slate-50/40"
+          className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 text-xs bg-slate-50/40 dark:bg-slate-900/70"
         >
           {/* Feedback Banners */}
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-2 text-xs font-semibold">
-              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-2 text-xs font-semibold dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5 dark:text-rose-400" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-start gap-2 text-xs font-semibold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-start gap-2 text-xs font-semibold dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 dark:text-emerald-400" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* CARD 1: 1. INVOICE / CHALAN INFO */}
-          <div className="bg-emerald-50/50 border border-emerald-200/90 rounded-xl p-3.5 sm:p-4 space-y-3">
+          <div className="bg-emerald-50/50 border border-emerald-200/90 rounded-xl p-3.5 sm:p-4 space-y-3 dark:bg-emerald-950/40 dark:border-emerald-800/70">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-extrabold tracking-wide uppercase text-slate-800">
+              <span className="text-[11px] font-extrabold tracking-wide uppercase text-slate-800 dark:text-slate-100">
                 {isBn ? '১. ইনভয়েস / চালান তথ্য (INVOICE INFO)' : '1. INVOICE / CHALAN INFO'}
               </span>
               <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold tracking-wider uppercase">
@@ -579,7 +579,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Invoice Number */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn ? 'ইনভয়েস / চালান নম্বর *' : 'Invoice / Chalan No. *'}
                 </label>
                 <input
@@ -588,13 +588,13 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder="INV-2026-2806"
-                  className="w-full px-3 py-2 bg-white border-2 border-emerald-500/80 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border-2 border-emerald-500/80 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Invoice Date */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn ? 'ইনভয়েস তারিখ *' : 'Invoice Date *'}
                 </label>
                 <input
@@ -602,20 +602,20 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   required
                   value={invoiceDate}
                   onChange={(e) => setInvoiceDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Product Master Dropdown + Inline + New Product toggle */}
               <div>
                 <div className="flex items-center justify-between gap-1 mb-1">
-                  <label className="font-bold text-slate-700 truncate">
+                  <label className="font-bold text-slate-700 truncate dark:text-slate-200">
                     {isBn ? 'ওষুধ / প্রোডাক্ট *' : 'Medicine / Product *'}
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowNewProductForm((v) => !v)}
-                    className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-0.5 cursor-pointer shrink-0"
+                    className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-0.5 cursor-pointer shrink-0 dark:text-emerald-300"
                   >
                     <Plus className="w-3 h-3" />
                     <span>
@@ -636,7 +636,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                     setSelectedMedicineId(e.target.value);
                     setShowNewProductForm(false);
                   }}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 >
                   {medicines.length === 0 ? (
                     <option value="">
@@ -655,13 +655,13 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
               {/* Supplier / Distributor Dropdown + Custom toggle */}
               <div>
                 <div className="flex items-center justify-between gap-1 mb-1">
-                  <label className="font-bold text-slate-700 truncate">
+                  <label className="font-bold text-slate-700 truncate dark:text-slate-200">
                     {isBn ? 'সাপ্লায়ার / ডিস্ট্রিবিউটর' : 'Supplier / Distributor'}
                   </label>
                   <button
                     type="button"
                     onClick={() => setCustomSupplierMode((v) => !v)}
-                    className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer shrink-0"
+                    className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer shrink-0 dark:text-emerald-300"
                   >
                     {customSupplierMode
                       ? isBn
@@ -679,13 +679,13 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                     value={customSupplierName}
                     onChange={(e) => setCustomSupplierName(e.target.value)}
                     placeholder={isBn ? 'যেমন: গ্যাকো ফার্মাসিউটিক্যালস লি.' : 'e.g., Gaco Pharmaceuticals Ltd.'}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 ) : (
                   <select
                     value={selectedSupplierId}
                     onChange={(e) => setSelectedSupplierId(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     {suppliers.length === 0 && (
                       <option value="">{isBn ? 'সাপ্লায়ার নির্বাচন করুন' : 'Select Supplier'}</option>
@@ -702,10 +702,10 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
 
             {/* Inline Quick Product Master Registration Sub-Panel */}
             {showNewProductForm && (
-              <div className="mt-2 p-3 bg-white rounded-xl border border-emerald-300 shadow-2xs space-y-2.5">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-[11px] font-extrabold text-emerald-800 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="mt-2 p-3 bg-white rounded-xl border border-emerald-300 shadow-2xs space-y-2.5 dark:bg-[#111827] dark:border-emerald-800/70">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
+                  <span className="text-[11px] font-extrabold text-emerald-800 flex items-center gap-1.5 dark:text-emerald-300">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>
                       {isBn ? 'নতুন প্রোডাক্ট মাস্টার নিবন্ধন' : 'Register New Product Master'}
                     </span>
@@ -714,7 +714,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                     <button
                       type="button"
                       onClick={() => setShowNewProductForm(false)}
-                      className="text-[11px] text-slate-500 hover:text-slate-800 cursor-pointer"
+                      className="text-[11px] text-slate-500 hover:text-slate-800 cursor-pointer dark:text-slate-400 dark:hover:text-white"
                     >
                       {isBn ? 'বন্ধ' : 'Close'}
                     </button>
@@ -723,7 +723,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="sm:col-span-2">
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'বাণিজ্যিক / প্রোডাক্ট নাম *' : 'Commercial / Product Name *'}
                     </label>
                     <input
@@ -732,12 +732,12 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                       value={newProd.name}
                       onChange={(e) => setNewProd({ ...newProd, name: e.target.value })}
                       placeholder="e.g., Amoxicillin + Clavulanate 625mg"
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'জেনেরিক / রাসায়নিক নাম *' : 'Generic / Chemical Name *'}
                     </label>
                     <input
@@ -746,12 +746,12 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                       value={newProd.genericName}
                       onChange={(e) => setNewProd({ ...newProd, genericName: e.target.value })}
                       placeholder="e.g., Amoxicillin & Clavulanate"
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'প্রস্তুতকারক / কোম্পানি' : 'Manufacturer / Company'}
                     </label>
                     <input
@@ -759,12 +759,12 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                       value={newProd.manufacturer}
                       onChange={(e) => setNewProd({ ...newProd, manufacturer: e.target.value })}
                       placeholder="e.g., Square Pharmaceuticals PLC"
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'থেরাপিউটিক ক্যাটাগরি' : 'Therapeutic Category'}
                     </label>
                     <select
@@ -772,7 +772,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                       onChange={(e) =>
                         setNewProd({ ...newProd, category: e.target.value as MedicineCategory })
                       }
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     >
                       <option value="Antibiotics">{isBn ? 'অ্যান্টিবায়োটিক' : 'Antibiotics'}</option>
                       <option value="Analgesics & Antipyretics">
@@ -793,13 +793,13 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'ডোজের ধরন' : 'Dosage Form'}
                     </label>
                     <select
                       value={newProd.dosageForm}
                       onChange={(e) => setNewProd({ ...newProd, dosageForm: e.target.value })}
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     >
                       <option value="TABLET">{isBn ? 'ট্যাবলেট' : 'Tablet'}</option>
                       <option value="CAPSULE">{isBn ? 'ক্যাপসুল' : 'Capsule'}</option>
@@ -813,7 +813,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'শক্তি / স্ট্রেন্থ' : 'Strength Specification'}
                     </label>
                     <input
@@ -821,12 +821,12 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                       value={newProd.strength}
                       onChange={(e) => setNewProd({ ...newProd, strength: e.target.value })}
                       placeholder="500mg"
-                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                      className="w-full mt-0.5 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'ইউনিট ও র‍্যাক অবস্থান' : 'Unit & Rack Location'}
                     </label>
                     <div className="flex gap-1.5 mt-0.5">
@@ -838,7 +838,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                             unitOfMeasure: e.target.value as Medicine['unitOfMeasure'],
                           })
                         }
-                        className="px-2 py-1.5 border border-slate-300 rounded-lg text-xs bg-white"
+                        className="px-2 py-1.5 border border-slate-300 rounded-lg text-xs bg-white dark:border-slate-700 dark:bg-[#111827] text-slate-900 dark:text-slate-100"
                       >
                         <option value="Strip">{isBn ? 'স্ট্রিপ' : 'Strip'}</option>
                         <option value="Box">{isBn ? 'বক্স' : 'Box'}</option>
@@ -852,7 +852,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                         value={newProd.rackLocation}
                         onChange={(e) => setNewProd({ ...newProd, rackLocation: e.target.value })}
                         placeholder="Rack A-01"
-                        className="flex-1 min-w-0 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                        className="flex-1 min-w-0 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                   </div>
@@ -860,7 +860,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   {/* Master Prices inside Quick Product Creator */}
                   <div className="sm:col-span-2 grid grid-cols-3 gap-2 pt-1">
                     <div>
-                      <label className="font-bold text-slate-700 text-[11px]">
+                      <label className="font-bold text-slate-700 text-[11px] dark:text-slate-200">
                         {isBn ? 'মাস্টার ক্রয়মূল্য (৳)' : 'Master Cost (৳)'}
                       </label>
                       <input
@@ -871,11 +871,11 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                         onChange={(e) =>
                           setNewProd({ ...newProd, purchasePrice: parseFloat(e.target.value) || 0 })
                         }
-                        className="w-full mt-0.5 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                        className="w-full mt-0.5 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label className="font-bold text-slate-700 text-[11px]">
+                      <label className="font-bold text-slate-700 text-[11px] dark:text-slate-200">
                         {isBn ? 'মাস্টার এমআরপি (৳)' : 'Master MRP (৳)'}
                       </label>
                       <input
@@ -886,11 +886,11 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                         onChange={(e) =>
                           setNewProd({ ...newProd, mrp: parseFloat(e.target.value) || 0 })
                         }
-                        className="w-full mt-0.5 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                        className="w-full mt-0.5 px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label className="font-bold text-emerald-700 text-[11px]">
+                      <label className="font-bold text-emerald-700 text-[11px] dark:text-emerald-300">
                         {isBn ? 'মাস্টার বিক্রয়মূল্য (৳)' : 'Master Selling (৳)'}
                       </label>
                       <input
@@ -901,7 +901,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                         onChange={(e) =>
                           setNewProd({ ...newProd, sellingPrice: parseFloat(e.target.value) || 0 })
                         }
-                        className="w-full mt-0.5 px-2 py-1.5 border border-emerald-300 bg-emerald-50/40 rounded-lg text-xs font-mono font-bold text-emerald-900"
+                        className="w-full mt-0.5 px-2 py-1.5 border border-emerald-300 bg-emerald-50/40 rounded-lg text-xs font-mono font-bold text-emerald-900 dark:border-emerald-800/70 dark:bg-emerald-950/40 dark:text-emerald-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -909,7 +909,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   {/* Barcode Input */}
                   <div className="sm:col-span-2 flex items-center gap-2 pt-1">
                     <div className="relative flex-1">
-                      <Barcode className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-600" />
+                      <Barcode className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-emerald-400" />
                       <input
                         type="text"
                         value={newProd.barcode}
@@ -919,7 +919,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                             ? 'বারকোড স্ক্যান করুন অথবা লিখুন...'
                             : 'Scan barcode or enter EAN-13 / GTIN...'
                         }
-                        className="w-full pl-8 pr-2.5 py-1.5 border border-emerald-300 rounded-lg text-xs font-mono"
+                        className="w-full pl-8 pr-2.5 py-1.5 border border-emerald-300 rounded-lg text-xs font-mono dark:border-emerald-800/70 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <button
@@ -928,7 +928,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                         const rnd = Math.floor(1000000000 + Math.random() * 9000000000).toString();
                         setNewProd({ ...newProd, barcode: `890${rnd.slice(0, 10)}` });
                       }}
-                      className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                      className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-800/70"
                     >
                       <Sparkles className="w-3 h-3" />
                       <span>{isBn ? 'অটো' : 'Auto'}</span>
@@ -936,14 +936,14 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   </div>
 
                   <div className="sm:col-span-2 flex items-center justify-between pt-1">
-                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-700">
+                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-700 dark:text-slate-200">
                       <input
                         type="checkbox"
                         checked={newProd.requiresPrescription}
                         onChange={(e) =>
                           setNewProd({ ...newProd, requiresPrescription: e.target.checked })
                         }
-                        className="rounded text-emerald-600 focus:ring-emerald-500"
+                        className="rounded text-emerald-600 focus:ring-emerald-500 dark:text-emerald-400"
                       />
                       <span>
                         {isBn
@@ -965,12 +965,12 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
           </div>
 
           {/* CARD 2: 2. BATCH, DATES & QUANTITY */}
-          <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 space-y-3 shadow-2xs">
+          <div className="bg-white border border-slate-200 rounded-xl p-3.5 sm:p-4 space-y-3 shadow-2xs dark:bg-[#111827] dark:border-slate-800">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-extrabold tracking-wide uppercase text-slate-800">
+              <span className="text-[11px] font-extrabold tracking-wide uppercase text-slate-800 dark:text-slate-100">
                 {isBn ? '২. ব্যাচ, মেয়াদ ও প্রাপ্ত পরিমাণ' : '2. BATCH, DATES & QUANTITY'}
               </span>
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase">
+              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase dark:text-slate-400">
                 {isBn ? `র‍্যাক: ${activeRack}` : `RACK: ${activeRack}`}
               </span>
             </div>
@@ -978,7 +978,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Batch Number */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn ? 'ব্যাচ নম্বর *' : 'Batch Number *'}
                 </label>
                 <input
@@ -987,13 +987,13 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   value={batchNumber}
                   onChange={(e) => setBatchNumber(e.target.value)}
                   placeholder="BAT-4807"
-                  className="w-full px-3 py-2 bg-slate-50/70 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                  className="w-full px-3 py-2 bg-slate-50/70 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:bg-slate-900/70 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Initial Received Quantity */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn
                     ? `প্রাপ্ত প্রাথমিক পরিমাণ (${activeUnitLabel}) *`
                     : `Initial Received Quantity (${activeUnitLabel}) *`}
@@ -1004,26 +1004,26 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   min="1"
                   value={initialQuantity}
                   onChange={(e) => setInitialQuantity(parseInt(e.target.value, 10) || 0)}
-                  className="w-full px-3 py-2 bg-white border-2 border-emerald-500/80 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border-2 border-emerald-500/80 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Manufacturing Date */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn ? 'উৎপাদন তারিখ' : 'Manufacturing Date'}
                 </label>
                 <input
                   type="date"
                   value={manufacturingDate}
                   onChange={(e) => setManufacturingDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Expiry Date */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-slate-700 mb-1 dark:text-slate-200">
                   {isBn ? 'মেয়াদ উত্তীর্ণের তারিখ *' : 'Expiry Date *'}
                 </label>
                 <input
@@ -1031,27 +1031,27 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   required
                   value={expiryDate}
                   onChange={(e) => setExpiryDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-emerald-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
           </div>
 
           {/* CARD 3: UNIT PRICING (AUTO-FETCHED FROM PRODUCT MASTER) */}
-          <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-3.5 sm:p-4 space-y-3">
+          <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-3.5 sm:p-4 space-y-3 dark:bg-slate-900/70 dark:border-slate-800">
             <div className="flex items-start gap-2">
               {overridePrices ? (
-                <Unlock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <Unlock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 dark:text-amber-400" />
               ) : (
-                <Lock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                <Lock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5 dark:text-slate-400" />
               )}
               <div className="min-w-0">
-                <div className="font-bold text-slate-800 text-xs">
+                <div className="font-bold text-slate-800 text-xs dark:text-slate-100">
                   {isBn
                     ? 'ইউনিট মূল্য (প্রোডাক্ট মাস্টার থেকে সংগৃহীত)'
                     : 'Unit Pricing (Auto-Fetched from Product Master)'}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5 dark:text-slate-400">
                   {isBn
                     ? 'প্রোডাক্ট মাস্টার থেকে স্বয়ংক্রিয়ভাবে সংগৃহীত — প্রতি ব্যাচে বারবার ম্যানুয়ালি টাইপ করার প্রয়োজন নেই'
                     : 'Auto-fetched from Product Master — no need to re-type manually on every batch'}
@@ -1059,14 +1059,14 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
               </div>
             </div>
 
-            <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition select-none">
+            <label className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition select-none dark:bg-[#111827] dark:border-slate-700 dark:hover:bg-slate-800/60">
               <input
                 type="checkbox"
                 checked={overridePrices}
                 onChange={(e) => setOverridePrices(e.target.checked)}
-                className="rounded text-emerald-600 focus:ring-emerald-500"
+                className="rounded text-emerald-600 focus:ring-emerald-500 dark:text-emerald-400"
               />
-              <span className="font-bold text-slate-700 text-[11px]">
+              <span className="font-bold text-slate-700 text-[11px] dark:text-slate-200">
                 {isBn ? 'মূল্য পরিবর্তন / ওভাররাইড' : 'Edit Prices / Override'}
               </span>
             </label>
@@ -1075,7 +1075,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
               {/* Cost Price */}
               <div>
                 <div className="flex items-center justify-between text-[11px] mb-1">
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">
                     {isBn ? 'ক্রয়মূল্য (৳)' : 'Cost Price (৳)'}
                   </span>
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
@@ -1083,7 +1083,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs dark:text-slate-400">
                     ৳
                   </span>
                   <input
@@ -1105,7 +1105,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
               {/* MRP */}
               <div>
                 <div className="flex items-center justify-between text-[11px] mb-1">
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">
                     {isBn ? 'এমআরপি (৳)' : 'MRP (৳)'}
                   </span>
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
@@ -1113,7 +1113,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs dark:text-slate-400">
                     ৳
                   </span>
                   <input
@@ -1135,15 +1135,15 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
               {/* Selling Price */}
               <div>
                 <div className="flex items-center justify-between text-[11px] mb-1">
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">
                     {isBn ? 'বিক্রয়মূল্য (৳)' : 'Selling Price (৳)'}
                   </span>
-                  <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-wider">
+                  <span className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-wider dark:text-emerald-400">
                     {overridePrices ? (isBn ? 'ম্যানুয়াল' : 'EDIT') : isBn ? 'মাস্টার' : 'MASTER'}
                   </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-700 font-bold text-xs">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-700 font-bold text-xs dark:text-emerald-300">
                     ৳
                   </span>
                   <input
@@ -1165,17 +1165,17 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
           </div>
 
           {/* FOOTER */}
-          <div className="pt-2 border-t border-slate-200 space-y-2.5">
-            <div className="text-xs text-slate-600 font-semibold">
+          <div className="pt-2 border-t border-slate-200 space-y-2.5 dark:border-slate-800">
+            <div className="text-xs text-slate-600 font-semibold dark:text-slate-300">
               {isBn ? 'মোট ইনওয়ার্ড ভ্যালু: ' : 'Total Inward Value: '}
-              <span className="font-mono font-extrabold text-slate-900">৳{formattedTotalValue}</span>
+              <span className="font-mono font-extrabold text-slate-900 dark:text-white">৳{formattedTotalValue}</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-2 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-xs cursor-pointer transition"
+                className="px-3.5 py-2 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-xs cursor-pointer transition dark:border-slate-700 dark:bg-[#111827] dark:hover:bg-slate-800 dark:text-slate-200"
               >
                 {isBn ? 'বাতিল করুন' : 'Cancel'}
               </button>
@@ -1185,7 +1185,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => handleSubmit(true)}
-                  className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-lg font-bold text-xs cursor-pointer transition disabled:opacity-50"
+                  className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-lg font-bold text-xs cursor-pointer transition disabled:opacity-50 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 dark:border-indigo-800/70 dark:text-indigo-300"
                 >
                   {isBn ? '+ সংরক্ষণ ও পরবর্তী ব্যাচ' : '+ Save & Next Batch'}
                 </button>

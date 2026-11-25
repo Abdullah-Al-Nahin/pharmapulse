@@ -441,14 +441,14 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
       {/* ========================================================================= */}
       {/* 2. SIMULATION & FILTER CONTROLS BAR                                       */}
       {/* ========================================================================= */}
-      <div id="suggester-controls-card" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div id="suggester-controls-card" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4 dark:bg-[#111827] dark:border-slate-800">
         {/* Left: Coverage & Buffer Days */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Safety Target:</span>
+            <SlidersHorizontal className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider dark:text-slate-200">Safety Target:</span>
           </div>
-          <div className="flex items-center bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg text-xs font-semibold dark:bg-slate-800">
             {[
               { days: 15, label: '15d Lean' },
               { days: 30, label: '30d Standard' },
@@ -473,12 +473,12 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
           {/* Supplier Dropdown */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-slate-500 font-medium">Distributor:</span>
+            <span className="text-xs text-slate-500 font-medium dark:text-slate-400">Distributor:</span>
             <select
               id="select-supplier-filter"
               value={selectedSupplierId}
               onChange={e => setSelectedSupplierId(e.target.value)}
-              className="text-xs font-medium border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="text-xs font-medium border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-800 dark:bg-[#111827] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             >
               <option value="all">All Distributors ({suppliers.length})</option>
               {suppliers.map(s => (
@@ -493,7 +493,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
         {/* Right: Search & Urgency Filters */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Urgency Filter */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-lg text-xs font-medium">
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg text-xs font-medium dark:bg-slate-800">
             <button
               id="filter-urgency-all"
               type="button"
@@ -541,18 +541,18 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
               placeholder="Search medicine or generic..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-800 dark:bg-[#111827] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           {/* Include all toggle */}
-          <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer select-none">
+          <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer select-none dark:text-slate-300">
             <input
               id="checkbox-include-all"
               type="checkbox"
               checked={includeAllMedicines}
               onChange={e => setIncludeAllMedicines(e.target.checked)}
-              className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer dark:text-emerald-400"
             />
             <span>Include healthy stock</span>
           </label>
@@ -563,12 +563,12 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
       {/* 3. SUPPLIER GROUPS & ITEMIZED RECOMMENDATIONS                             */}
       {/* ========================================================================= */}
       {processedGroups.length === 0 ? (
-        <div id="no-suggestions-box" className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+        <div id="no-suggestions-box" className="bg-white rounded-xl border border-slate-200 p-12 text-center dark:bg-[#111827] dark:border-slate-800">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 dark:bg-emerald-950/40 dark:text-emerald-400">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h3 className="text-base font-bold text-slate-900">Inventory Well-Balanced</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Inventory Well-Balanced</h3>
+          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto dark:text-slate-400">
             No medicines currently meet the threshold for replenishment under the current safety buffer ({targetBufferDays} days) and urgency filter.
           </p>
           <div className="mt-4 flex items-center justify-center gap-3">
@@ -581,7 +581,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                 setSearchQuery('');
                 setIncludeAllMedicines(true);
               }}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200"
             >
               Review All Inventory SKUs
             </button>
@@ -596,49 +596,49 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
               <div
                 key={group.supplier.id}
                 id={`supplier-group-${group.supplier.id}`}
-                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all"
+                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all dark:bg-[#111827] dark:border-slate-800"
               >
                 {/* Supplier Header Banner */}
-                <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200">
+                <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-50 via-white to-slate-50 border-b border-slate-200 dark:border-slate-800">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     {/* Supplier info */}
                     <div className="flex items-start gap-3.5">
-                      <div className="w-11 h-11 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
+                      <div className="w-11 h-11 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">
                         <Building2 className="w-6 h-6" />
                       </div>
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-base font-bold text-slate-900">
+                          <h2 className="text-base font-bold text-slate-900 dark:text-white">
                             {group.supplier.name}
                           </h2>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800">
                             {group.paymentTerms}
                           </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/70">
                             ~{group.leadTimeDays}d Lead Time
                           </span>
                           {group.outOfStockCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70">
                               <ShieldAlert className="w-3 h-3" />
                               {group.outOfStockCount} Out of Stock
                             </span>
                           )}
                         </div>
-                        <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-slate-500 mt-1">
-                          <span>License: <strong className="text-slate-700 font-mono">{group.supplier.drugLicenseNumber}</strong></span>
+                        <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-slate-500 mt-1 dark:text-slate-400">
+                          <span>License: <strong className="text-slate-700 font-mono dark:text-slate-200">{group.supplier.drugLicenseNumber}</strong></span>
                           <span>•</span>
-                          <span>Phone: <strong className="text-slate-700">{group.supplier.phone}</strong></span>
+                          <span>Phone: <strong className="text-slate-700 dark:text-slate-200">{group.supplier.phone}</strong></span>
                           <span>•</span>
-                          <span>Payable Balance: <strong className="text-rose-600 font-mono">{fmt(group.balancePayable)}</strong></span>
+                          <span>Payable Balance: <strong className="text-rose-600 font-mono dark:text-rose-400">{fmt(group.balancePayable)}</strong></span>
                         </div>
                       </div>
                     </div>
 
                     {/* Quick Financial Summary & Group Action Buttons */}
                     <div className="flex flex-wrap items-center gap-3">
-                      <div className="text-right px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
-                        <div className="text-[11px] text-slate-500">Selected Order Total</div>
-                        <div className="text-base font-bold font-mono text-emerald-700">
+                      <div className="text-right px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">Selected Order Total</div>
+                        <div className="text-base font-bold font-mono text-emerald-700 dark:text-emerald-300">
                           {fmt(group.totalEstimatedAmount)}
                         </div>
                         <div className="text-[10px] text-slate-400">
@@ -653,7 +653,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                           type="button"
                           onClick={() => handleOpenPrintModal(group)}
                           title="Print requisition sheet"
-                          className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 cursor-pointer"
+                          className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 cursor-pointer dark:border-slate-800 dark:bg-[#111827] dark:hover:bg-slate-800/60 dark:text-slate-300 dark:hover:text-white"
                         >
                           <Printer className="w-4 h-4" />
                         </button>
@@ -673,7 +673,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                           id={`btn-toggle-collapse-${group.supplier.id}`}
                           type="button"
                           onClick={() => toggleSupplierCollapse(group.supplier.id)}
-                          className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 cursor-pointer"
+                          className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 cursor-pointer dark:border-slate-800 dark:bg-[#111827] dark:hover:bg-slate-800/60 dark:text-slate-300 dark:hover:text-white"
                         >
                           {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                         </button>
@@ -683,12 +683,12 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
                   {/* Supplier Sub-Header: Select all toggle & MOV progress */}
                   {!isCollapsed && (
-                    <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs dark:border-slate-800">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleToggleSupplierAll(group.supplier.id, true)}
-                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer dark:text-indigo-400"
                         >
                           Select All ({group.items.length})
                         </button>
@@ -696,7 +696,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleSupplierAll(group.supplier.id, false)}
-                          className="text-xs font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
+                          className="text-xs font-medium text-slate-500 hover:text-slate-800 cursor-pointer dark:text-slate-400 dark:hover:text-white"
                         >
                           Deselect All
                         </button>
@@ -704,19 +704,19 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
                       {/* Minimum Order Value indicator */}
                       <div className="flex items-center gap-2 text-[11px]">
-                        <span className="text-slate-500">Free Freight Target ({fmt(group.minOrderValueTarget)}):</span>
-                        <div className="w-24 bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <span className="text-slate-500 dark:text-slate-400">Free Freight Target ({fmt(group.minOrderValueTarget)}):</span>
+                        <div className="w-24 bg-slate-200 h-2 rounded-full overflow-hidden dark:bg-slate-700">
                           <div
                             className={`h-full ${group.meetsMinOrderValue ? 'bg-emerald-500' : 'bg-amber-500'}`}
                             style={{ width: `${Math.min(100, (group.totalEstimatedAmount / group.minOrderValueTarget) * 100)}%` }}
                           />
                         </div>
                         {group.meetsMinOrderValue ? (
-                          <span className="text-emerald-700 font-bold flex items-center gap-0.5">
+                          <span className="text-emerald-700 font-bold flex items-center gap-0.5 dark:text-emerald-300">
                             <Check className="w-3 h-3" /> Target Met
                           </span>
                         ) : (
-                          <span className="text-amber-700 font-bold">
+                          <span className="text-amber-700 font-bold dark:text-amber-300">
                             {fmt(Math.max(0, group.minOrderValueTarget - group.totalEstimatedAmount))} short
                           </span>
                         )}
@@ -728,8 +728,8 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                 {/* Line Items Table */}
                 {!isCollapsed && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-slate-700">
-                      <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200">
+                    <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                      <thead className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200 dark:bg-slate-900/70 dark:text-slate-400 dark:border-slate-800">
                         <tr>
                           <th className="px-3 py-3 w-10 text-center">
                             <span className="sr-only">Select</span>
@@ -744,7 +744,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                           <th className="px-3 py-3 text-right">Line Total</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {group.items.map(item => {
                           const isOos = item.riskLevel === 'out_of_stock';
                           const isCrit = item.riskLevel === 'critical';
@@ -764,16 +764,16 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                                   type="checkbox"
                                   checked={item.isSelected}
                                   onChange={() => handleToggleItemSelect(item.medicineId, item.isSelected)}
-                                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer dark:text-emerald-400"
                                 />
                               </td>
 
                               {/* Medicine Details */}
                               <td className="px-3 py-3 max-w-[220px]">
-                                <div className="font-bold text-slate-900 leading-tight">
+                                <div className="font-bold text-slate-900 leading-tight dark:text-white">
                                   {item.medicineName}
                                 </div>
-                                <div className="text-[11px] text-slate-500 mt-0.5 truncate">
+                                <div className="text-[11px] text-slate-500 mt-0.5 truncate dark:text-slate-400">
                                   {item.genericName} • {item.dosageForm} ({item.strength})
                                 </div>
                                 <div className="text-[10px] text-slate-400 font-mono mt-0.5">
@@ -793,7 +793,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                                     / {item.reorderLevel} min
                                   </span>
                                 </div>
-                                <div className="w-20 bg-slate-100 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                                <div className="w-20 bg-slate-100 h-1.5 rounded-full mt-1.5 overflow-hidden dark:bg-slate-800">
                                   <div
                                     className={`h-full ${
                                       isOos ? 'bg-rose-500' : isCrit ? 'bg-orange-500' : 'bg-amber-400'
@@ -804,7 +804,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                                   />
                                 </div>
                                 {item.deficit > 0 && (
-                                  <div className="text-[10px] font-bold text-rose-600 mt-0.5">
+                                  <div className="text-[10px] font-bold text-rose-600 mt-0.5 dark:text-rose-400">
                                     -{item.deficit} {item.unitOfMeasure} deficit
                                   </div>
                                 )}
@@ -812,10 +812,10 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
                               {/* Consumption Velocity (ADC) */}
                               <td className="px-3 py-3">
-                                <div className="text-slate-900 font-semibold font-mono">
+                                <div className="text-slate-900 font-semibold font-mono dark:text-white">
                                   {item.avgDailyConsumption} / day
                                 </div>
-                                <div className="text-[10px] text-slate-500">
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">
                                   {item.salesLast30Days} sold last 30d
                                 </div>
                               </td>
@@ -823,22 +823,22 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                               {/* Stockout Risk Badge */}
                               <td className="px-3 py-3">
                                 {isOos ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 animate-pulse">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 animate-pulse dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70">
                                     <ShieldAlert className="w-3 h-3" />
                                     <span>Stockout (0d)</span>
                                   </span>
                                 ) : isCrit ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800/70">
                                     <Clock className="w-3 h-3" />
                                     <span>{item.daysOfStockRemaining}d left (Critical)</span>
                                   </span>
                                 ) : isReorder ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/70">
                                     <AlertTriangle className="w-3 h-3" />
                                     <span>{item.daysOfStockRemaining}d left (Reorder)</span>
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/70">
                                     <span>{item.daysOfStockRemaining}d left (Safe)</span>
                                   </span>
                                 )}
@@ -846,19 +846,19 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
                               {/* Pack Size */}
                               <td className="px-3 py-3 text-center">
-                                <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-slate-700 font-mono text-[11px]">
+                                <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-slate-700 font-mono text-[11px] dark:bg-slate-800 dark:text-slate-200">
                                   {item.packSize} {item.unitOfMeasure}/pack
                                 </span>
                               </td>
 
                               {/* Suggested Order Stepper */}
                               <td className="px-3 py-3 text-center">
-                                <div className="inline-flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden shadow-2xs">
+                                <div className="inline-flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden shadow-2xs dark:border-slate-800 dark:bg-[#111827]">
                                   <button
                                     id={`btn-pack-minus-${item.medicineId}`}
                                     type="button"
                                     onClick={() => handleAdjustPacks(item.medicineId, item.adjustedPacks, -1)}
-                                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-600 transition cursor-pointer"
+                                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-600 transition cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300"
                                   >
                                     <Minus className="w-3 h-3" />
                                   </button>
@@ -867,25 +867,25 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                                     type="text"
                                     value={item.adjustedPacks}
                                     onChange={e => handleDirectPackInput(item.medicineId, e.target.value)}
-                                    className="w-12 text-center font-bold font-mono text-xs py-1 text-slate-900 focus:outline-none bg-white"
+                                    className="w-12 text-center font-bold font-mono text-xs py-1 text-slate-900 focus:outline-none bg-white dark:text-white dark:bg-[#111827] placeholder:text-slate-400 dark:placeholder:text-slate-500"
                                   />
                                   <button
                                     id={`btn-pack-plus-${item.medicineId}`}
                                     type="button"
                                     onClick={() => handleAdjustPacks(item.medicineId, item.adjustedPacks, 1)}
-                                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-600 transition cursor-pointer"
+                                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-600 transition cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300"
                                   >
                                     <Plus className="w-3 h-3" />
                                   </button>
                                 </div>
-                                <div className="text-[10px] text-slate-500 font-mono mt-1">
+                                <div className="text-[10px] text-slate-500 font-mono mt-1 dark:text-slate-400">
                                   = {item.adjustedQuantity} {item.unitOfMeasure}
                                 </div>
                               </td>
 
                               {/* Unit Cost */}
                               <td className="px-3 py-3 text-right font-mono">
-                                <div className="font-semibold text-slate-900">
+                                <div className="font-semibold text-slate-900 dark:text-white">
                                   {fmt(item.unitPurchasePrice)}
                                 </div>
                                 <div className="text-[10px] text-slate-400">
@@ -895,7 +895,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
 
                               {/* Line Total */}
                               <td className="px-3 py-3 text-right font-mono">
-                                <div className="font-bold text-slate-900 text-sm">
+                                <div className="font-bold text-slate-900 text-sm dark:text-white">
                                   {fmt(item.estimatedTotal)}
                                 </div>
                                 <div className="text-[10px] text-slate-400">
@@ -920,44 +920,44 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
       {/* ========================================================================= */}
       {isBulkConfirmOpen && (
         <div id="modal-bulk-confirm" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 dark:bg-emerald-950/60 dark:text-emerald-300">
                 <ShoppingCart className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   Confirm Bulk Purchase Order Generation
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                   The automated suggester will dispatch separate purchase orders per distributor.
                 </p>
               </div>
             </div>
 
             <div className="mt-5 space-y-3">
-              <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider dark:text-slate-200">
                 Orders to be Created:
               </div>
-              <div className="max-h-52 overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100">
+              <div className="max-h-52 overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100 dark:divide-slate-800">
                 {processedGroups.filter(g => g.selectedItemsCount > 0).map(g => (
                   <div key={g.supplier.id} className="pt-2 first:pt-0 flex items-center justify-between text-xs">
                     <div>
-                      <div className="font-bold text-slate-900">{g.supplier.name}</div>
-                      <div className="text-slate-500 text-[11px]">
+                      <div className="font-bold text-slate-900 dark:text-white">{g.supplier.name}</div>
+                      <div className="text-slate-500 text-[11px] dark:text-slate-400">
                         {g.selectedItemsCount} items ({g.totalSuggestedPacks} packs) • {g.paymentTerms}
                       </div>
                     </div>
-                    <div className="font-bold font-mono text-emerald-700">
+                    <div className="font-bold font-mono text-emerald-700 dark:text-emerald-300">
                       {fmt(g.totalEstimatedAmount)}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300">
                 <span className="font-bold">Total Requisition Outlay:</span>
-                <span className="font-bold font-mono text-base text-emerald-800">
+                <span className="font-bold font-mono text-base text-emerald-800 dark:text-emerald-300">
                   {fmt(overallMetrics.totalSelectedAmount)}
                 </span>
               </div>
@@ -968,7 +968,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                 id="btn-cancel-bulk-modal"
                 type="button"
                 onClick={() => setIsBulkConfirmOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>
@@ -990,29 +990,29 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
       {/* ========================================================================= */}
       {successModalData && (
         <div id="modal-success-generation" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-center">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-center dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 dark:bg-emerald-950/60 dark:text-emerald-400">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
               Purchase Order(s) Successfully Created!
             </h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">
               Automated requisitions have been logged into the procurement register and supplier liability balances.
             </p>
 
-            <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-1.5">
+            <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-1.5 dark:bg-slate-900 dark:border-slate-800">
               <div className="flex justify-between">
-                <span className="text-slate-500">Orders Generated:</span>
-                <strong className="text-slate-800">{successModalData.poList.length} Purchase Order(s)</strong>
+                <span className="text-slate-500 dark:text-slate-400">Orders Generated:</span>
+                <strong className="text-slate-800 dark:text-slate-100">{successModalData.poList.length} Purchase Order(s)</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Total Outlay:</span>
-                <strong className="text-emerald-700 font-mono">{fmt(successModalData.totalAmount)}</strong>
+                <span className="text-slate-500 dark:text-slate-400">Total Outlay:</span>
+                <strong className="text-emerald-700 font-mono dark:text-emerald-300">{fmt(successModalData.totalAmount)}</strong>
               </div>
-              <div className="pt-2 border-t border-slate-200">
-                <span className="text-slate-500 text-[11px] block">Distributor(s):</span>
-                <div className="font-medium text-slate-700 text-[11px] truncate">
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 text-[11px] block dark:text-slate-400">Distributor(s):</span>
+                <div className="font-medium text-slate-700 text-[11px] truncate dark:text-slate-200">
                   {successModalData.supplierNames.join(', ')}
                 </div>
               </div>
@@ -1023,7 +1023,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                 id="btn-close-success-modal"
                 type="button"
                 onClick={() => setSuccessModalData(null)}
-                className="w-full sm:w-1/2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"
+                className="w-full sm:w-1/2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer dark:text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 Stay in Suggester
               </button>
@@ -1051,12 +1051,12 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
       {/* ========================================================================= */}
       {isPrintModalOpen && printGroup && (
         <div id="modal-print-requisition" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             {/* Modal Actions */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6 print:hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6 print:hidden dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-emerald-600" />
-                <span className="text-sm font-bold text-slate-900">Printable Purchase Requisition</span>
+                <Printer className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm font-bold text-slate-900 dark:text-white">Printable Purchase Requisition</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -1072,7 +1072,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                   id="btn-close-print-modal"
                   type="button"
                   onClick={() => setIsPrintModalOpen(false)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer dark:border-slate-800 dark:hover:bg-slate-800/60 dark:text-slate-200"
                 >
                   Close
                 </button>
@@ -1080,94 +1080,94 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
             </div>
 
             {/* Formal Requisition Document Sheet */}
-            <div className="border border-slate-300 rounded-xl p-6 sm:p-8 text-slate-900 space-y-6 print:border-none print:p-0">
+            <div className="border border-slate-300 rounded-xl p-6 sm:p-8 text-slate-900 space-y-6 print:border-none print:p-0 dark:border-slate-700 dark:text-white">
               {/* Hospital Letterhead */}
-              <div className="flex items-start justify-between border-b border-slate-300 pb-4">
+              <div className="flex items-start justify-between border-b border-slate-300 pb-4 dark:border-slate-700">
                 <div>
                   <h1 className="text-lg font-bold text-slate-950 uppercase tracking-tight">
                     Madina Eye Hospital Ltd. & Pharmacy Depot
                   </h1>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Department of Pharmaceutical Procurement & Inventory Control
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-slate-500 mt-0.5 dark:text-slate-400">
                     Dhaka, Bangladesh • Contact: +880 2-8891000 • Email: pharmacy@madinaeye.org
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded inline-block">
+                  <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded inline-block dark:text-emerald-300 dark:bg-emerald-950/40">
                     Automated Purchase Requisition
                   </div>
-                  <div className="text-xs text-slate-500 mt-1 font-mono">
+                  <div className="text-xs text-slate-500 mt-1 font-mono dark:text-slate-400">
                     Date: {new Date().toLocaleDateString('en-GB')}
                   </div>
-                  <div className="text-xs text-slate-500 font-mono">
+                  <div className="text-xs text-slate-500 font-mono dark:text-slate-400">
                     Ref: REQ-{Date.now().toString().slice(-6)}
                   </div>
                 </div>
               </div>
 
               {/* Supplier Details */}
-              <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                 <div>
-                  <span className="text-slate-500 font-medium block">Distributor / Vendor:</span>
-                  <strong className="text-sm text-slate-900 font-bold block mt-0.5">
+                  <span className="text-slate-500 font-medium block dark:text-slate-400">Distributor / Vendor:</span>
+                  <strong className="text-sm text-slate-900 font-bold block mt-0.5 dark:text-white">
                     {printGroup.supplier.name}
                   </strong>
-                  <span className="text-slate-600 block mt-0.5">{printGroup.supplier.address}</span>
-                  <span className="text-slate-600 block">Phone: {printGroup.supplier.phone}</span>
+                  <span className="text-slate-600 block mt-0.5 dark:text-slate-300">{printGroup.supplier.address}</span>
+                  <span className="text-slate-600 block dark:text-slate-300">Phone: {printGroup.supplier.phone}</span>
                 </div>
                 <div className="space-y-1">
                   <div>
-                    <span className="text-slate-500">DGDA Drug License: </span>
+                    <span className="text-slate-500 dark:text-slate-400">DGDA Drug License: </span>
                     <strong className="font-mono">{printGroup.supplier.drugLicenseNumber}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500">Tax TIN: </span>
+                    <span className="text-slate-500 dark:text-slate-400">Tax TIN: </span>
                     <strong className="font-mono">{printGroup.supplier.taxId}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500">Payment Terms: </span>
+                    <span className="text-slate-500 dark:text-slate-400">Payment Terms: </span>
                     <strong>{printGroup.paymentTerms}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500">Expected Delivery: </span>
+                    <span className="text-slate-500 dark:text-slate-400">Expected Delivery: </span>
                     <strong>Within {printGroup.leadTimeDays} Business Days</strong>
                   </div>
                 </div>
               </div>
 
               {/* Itemized Requisition Table */}
-              <table className="w-full text-left text-xs border border-slate-300">
-                <thead className="bg-slate-100 text-[11px] font-bold text-slate-700 uppercase border-b border-slate-300">
+              <table className="w-full text-left text-xs border border-slate-300 dark:border-slate-700">
+                <thead className="bg-slate-100 text-[11px] font-bold text-slate-700 uppercase border-b border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700">
                   <tr>
-                    <th className="p-2 border-r border-slate-300 w-8 text-center">#</th>
-                    <th className="p-2 border-r border-slate-300">Medicine & Specification</th>
-                    <th className="p-2 border-r border-slate-300 text-center">Pack Size</th>
-                    <th className="p-2 border-r border-slate-300 text-center">Reorder Packs</th>
-                    <th className="p-2 border-r border-slate-300 text-center">Total Units</th>
-                    <th className="p-2 border-r border-slate-300 text-right">Unit Price</th>
+                    <th className="p-2 border-r border-slate-300 w-8 text-center dark:border-slate-700">#</th>
+                    <th className="p-2 border-r border-slate-300 dark:border-slate-700">Medicine & Specification</th>
+                    <th className="p-2 border-r border-slate-300 text-center dark:border-slate-700">Pack Size</th>
+                    <th className="p-2 border-r border-slate-300 text-center dark:border-slate-700">Reorder Packs</th>
+                    <th className="p-2 border-r border-slate-300 text-center dark:border-slate-700">Total Units</th>
+                    <th className="p-2 border-r border-slate-300 text-right dark:border-slate-700">Unit Price</th>
                     <th className="p-2 text-right">Line Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {printGroup.items.filter(it => it.isSelected).map((it, idx) => (
                     <tr key={it.medicineId} className="even:bg-slate-50/50">
-                      <td className="p-2 border-r border-slate-300 text-center font-mono">{idx + 1}</td>
-                      <td className="p-2 border-r border-slate-300">
-                        <div className="font-bold text-slate-900">{it.medicineName}</div>
-                        <div className="text-[10px] text-slate-500">{it.genericName} • {it.dosageForm}</div>
+                      <td className="p-2 border-r border-slate-300 text-center font-mono dark:border-slate-700">{idx + 1}</td>
+                      <td className="p-2 border-r border-slate-300 dark:border-slate-700">
+                        <div className="font-bold text-slate-900 dark:text-white">{it.medicineName}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">{it.genericName} • {it.dosageForm}</div>
                       </td>
-                      <td className="p-2 border-r border-slate-300 text-center font-mono">
+                      <td className="p-2 border-r border-slate-300 text-center font-mono dark:border-slate-700">
                         {it.packSize} {it.unitOfMeasure}
                       </td>
-                      <td className="p-2 border-r border-slate-300 text-center font-bold font-mono">
+                      <td className="p-2 border-r border-slate-300 text-center font-bold font-mono dark:border-slate-700">
                         {it.adjustedPacks}
                       </td>
-                      <td className="p-2 border-r border-slate-300 text-center font-mono">
+                      <td className="p-2 border-r border-slate-300 text-center font-mono dark:border-slate-700">
                         {it.adjustedQuantity} {it.unitOfMeasure}
                       </td>
-                      <td className="p-2 border-r border-slate-300 text-right font-mono">
+                      <td className="p-2 border-r border-slate-300 text-right font-mono dark:border-slate-700">
                         {fmt(it.unitPurchasePrice)}
                       </td>
                       <td className="p-2 text-right font-bold font-mono">
@@ -1176,7 +1176,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-bold">
+                <tfoot className="border-t-2 border-slate-300 bg-slate-50 font-bold dark:border-slate-700 dark:bg-slate-900">
                   <tr>
                     <td colSpan={5} className="p-2 text-right">Subtotal:</td>
                     <td colSpan={2} className="p-2 text-right font-mono">{fmt(printGroup.totalEstimatedSubtotal)}</td>
@@ -1185,7 +1185,7 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
                     <td colSpan={5} className="p-2 text-right">Estimated Tax (VAT):</td>
                     <td colSpan={2} className="p-2 text-right font-mono">{fmt(printGroup.totalEstimatedTax)}</td>
                   </tr>
-                  <tr className="text-sm bg-emerald-50 text-emerald-950">
+                  <tr className="text-sm bg-emerald-50 text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-300">
                     <td colSpan={5} className="p-2.5 text-right font-bold">Estimated Grand Total:</td>
                     <td colSpan={2} className="p-2.5 text-right font-bold font-mono text-base">{fmt(printGroup.totalEstimatedAmount)}</td>
                   </tr>
@@ -1195,16 +1195,16 @@ export const PurchaseOrderSuggester: React.FC<PurchaseOrderSuggesterProps> = ({
               {/* Signatures */}
               <div className="pt-10 grid grid-cols-3 gap-8 text-center text-xs">
                 <div className="border-t border-slate-400 pt-2">
-                  <div className="font-semibold text-slate-800">Prepared By</div>
-                  <div className="text-[10px] text-slate-500">Store Pharmacist</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">Prepared By</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Store Pharmacist</div>
                 </div>
                 <div className="border-t border-slate-400 pt-2">
-                  <div className="font-semibold text-slate-800">Verified By</div>
-                  <div className="text-[10px] text-slate-500">Procurement Manager</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">Verified By</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Procurement Manager</div>
                 </div>
                 <div className="border-t border-slate-400 pt-2">
-                  <div className="font-semibold text-slate-800">Approved By</div>
-                  <div className="text-[10px] text-slate-500">Medical Superintendent</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">Approved By</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">Medical Superintendent</div>
                 </div>
               </div>
             </div>

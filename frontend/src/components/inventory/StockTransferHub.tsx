@@ -131,19 +131,19 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
   return (
     <div className="space-y-4">
       {/* Header & Sub-Nav */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <ArrowRightLeft className="w-4 h-4 text-emerald-600" />
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+            <ArrowRightLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Stock Transfer & Branch-to-Branch Logistics Hub</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
             Inter-branch replenishment, departmental ward transfers, and cold-chain transport tracking.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+          <div className="flex bg-slate-100 p-1 rounded-lg text-xs font-semibold dark:bg-slate-800">
             <button
               onClick={() => setActiveSubTab('all')}
               className={`px-3 py-1.5 rounded-md cursor-pointer transition-all ${
@@ -182,15 +182,15 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
 
       {/* New Transfer Creator View */}
       {activeSubTab === 'new_transfer' && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h4 className="text-sm font-bold text-slate-900">Initiate New Stock Transfer Order</h4>
-              <p className="text-xs text-slate-500">Allocate batches and specify shipping route</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">Initiate New Stock Transfer Order</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Allocate batches and specify shipping route</p>
             </div>
             <button 
               onClick={() => setActiveSubTab('all')} 
-              className="text-xs font-bold text-slate-500 hover:text-slate-800"
+              className="text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
             >
               Cancel
             </button>
@@ -199,11 +199,11 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
           <form onSubmit={handleSubmitTransfer} className="space-y-4 text-xs">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label className="font-bold text-slate-700">Transfer Type</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Transfer Type</label>
                 <select
                   value={transferType}
                   onChange={(e) => setTransferType(e.target.value as any)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 >
                   <option value="branch_to_branch">Branch-to-Branch Transfer (External)</option>
                   <option value="department_transfer">Department / Ward Transfer (Internal)</option>
@@ -212,11 +212,11 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Origin Facility / Counter</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Origin Facility / Counter</label>
                 <select
                   value={fromBranch}
                   onChange={(e) => setFromBranch(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 >
                   <option value="Head Office (Central Depot)">Head Office (Central Depot)</option>
                   <option value="Dhanmondi Main Branch">Dhanmondi Main Branch</option>
@@ -227,11 +227,11 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Destination Facility / Ward</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Destination Facility / Ward</label>
                 <select
                   value={toBranch}
                   onChange={(e) => setToBranch(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold text-emerald-800"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold text-emerald-800 dark:border-slate-700 dark:text-emerald-300 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 >
                   <option value="Dhanmondi Main Branch">Dhanmondi Main Branch</option>
                   <option value="Mirpur Model Branch">Mirpur Model Branch</option>
@@ -243,49 +243,49 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
             </div>
 
             {/* Cold Chain Toggle */}
-            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark:bg-sky-950/40 dark:border-sky-800/70">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isColdChain}
                   onChange={(e) => setIsColdChain(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500"
+                  className="rounded text-sky-600 focus:ring-sky-500 dark:text-sky-400"
                 />
                 <div>
-                  <span className="font-bold text-sky-950 flex items-center gap-1.5">
-                    <Snowflake className="w-3.5 h-3.5 text-sky-600" />
+                  <span className="font-bold text-sky-950 flex items-center gap-1.5 dark:text-sky-300">
+                    <Snowflake className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     Maintain Cold Chain (2°C - 8°C Monitored Transport)
                   </span>
-                  <p className="text-[11px] text-sky-700">Required for Insulins, Prostaglandin Eye Drops, and Biologics.</p>
+                  <p className="text-[11px] text-sky-700 dark:text-sky-300">Required for Insulins, Prostaglandin Eye Drops, and Biologics.</p>
                 </div>
               </label>
 
               {isColdChain && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-sky-900">Transport Logger:</span>
+                  <span className="text-[11px] font-bold text-sky-900 dark:text-sky-300">Transport Logger:</span>
                   <input
                     type="text"
                     value={transitTemp}
                     onChange={(e) => setTransitTemp(e.target.value)}
-                    className="px-2.5 py-1 bg-white border border-sky-300 rounded text-xs font-semibold text-sky-900"
+                    className="px-2.5 py-1 bg-white border border-sky-300 rounded text-xs font-semibold text-sky-900 dark:bg-[#111827] dark:border-sky-800/70 dark:text-sky-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               )}
             </div>
 
             {/* Item Allocation Builder */}
-            <div className="border border-slate-200 rounded-xl p-3.5 bg-slate-50/50 space-y-3">
-              <h5 className="font-bold text-slate-800 uppercase tracking-wide text-[11px]">
+            <div className="border border-slate-200 rounded-xl p-3.5 bg-slate-50/50 space-y-3 dark:border-slate-800 dark:bg-slate-900/70">
+              <h5 className="font-bold text-slate-800 uppercase tracking-wide text-[11px] dark:text-slate-100">
                 Allocate Medicines & Batches to Transfer
               </h5>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-end">
                 <div className="sm:col-span-2">
-                  <label className="text-[11px] font-bold text-slate-600">Product</label>
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Product</label>
                   <select
                     value={selectedMedId}
                     onChange={(e) => setSelectedMedId(e.target.value)}
-                    className="w-full mt-0.5 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-0.5 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   >
                     {medicines.map(m => (
                       <option key={m.id} value={m.id}>
@@ -296,11 +296,11 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-slate-600">Available Batch</label>
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Available Batch</label>
                   <select
                     value={selectedBatchId}
                     onChange={(e) => setSelectedBatchId(e.target.value)}
-                    className="w-full mt-0.5 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full mt-0.5 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   >
                     {availableBatchesForMed.map(b => (
                       <option key={b.id} value={b.id}>
@@ -311,14 +311,14 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-slate-600">Quantity</label>
+                  <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Quantity</label>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <input
                       type="number"
                       min="1"
                       value={transferQty}
                       onChange={(e) => setTransferQty(Number(e.target.value) || 1)}
-                      className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold"
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                     <button
                       type="button"
@@ -333,10 +333,10 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
 
               {/* Items List */}
               {transferItems.length > 0 && (
-                <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white mt-3">
+                <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white mt-3 dark:border-slate-800 dark:bg-[#111827]">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-200 text-slate-500 font-semibold bg-slate-50">
+                      <tr className="border-b border-slate-200 text-slate-500 font-semibold bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:bg-slate-900">
                         <th className="p-2">Item</th>
                         <th className="p-2">Batch #</th>
                         <th className="p-2">Expiry</th>
@@ -346,20 +346,20 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                         <th className="p-2 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {transferItems.map(item => (
                         <tr key={item.id}>
-                          <td className="p-2 font-bold text-slate-900">{item.medicineName}</td>
+                          <td className="p-2 font-bold text-slate-900 dark:text-white">{item.medicineName}</td>
                           <td className="p-2 font-mono">{item.batchNumber}</td>
                           <td className="p-2">{item.expiryDate}</td>
-                          <td className="p-2 text-slate-500">{item.fromRackLocation}</td>
-                          <td className="p-2 text-right font-extrabold text-emerald-800">{item.quantity}</td>
+                          <td className="p-2 text-slate-500 dark:text-slate-400">{item.fromRackLocation}</td>
+                          <td className="p-2 text-right font-extrabold text-emerald-800 dark:text-emerald-300">{item.quantity}</td>
                           <td className="p-2 text-right font-medium">৳{item.totalCost.toFixed(2)}</td>
                           <td className="p-2 text-center">
                             <button
                               type="button"
                               onClick={() => handleRemoveItem(item.id)}
-                              className="text-rose-600 hover:text-rose-800 font-bold"
+                              className="text-rose-600 hover:text-rose-800 font-bold dark:text-rose-400"
                             >
                               ✕
                             </button>
@@ -374,33 +374,33 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="font-bold text-slate-700">Requisitioned By (Pharmacist / Doctor)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Requisitioned By (Pharmacist / Doctor)</label>
                 <input
                   type="text"
                   required
                   value={requestedBy}
                   onChange={(e) => setRequestedBy(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Dispatch Notes / Gate Pass Instructions</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Dispatch Notes / Gate Pass Instructions</label>
                 <input
                   type="text"
                   placeholder="e.g. Deliver before 2:00 PM for OT shift"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-slate-200">
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setActiveSubTab('all')}
-                className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer"
+                className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer dark:border-slate-700"
               >
                 Cancel
               </button>
@@ -418,7 +418,7 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
       {/* Transfer Orders List */}
       <div className="space-y-3">
         {filteredTransfers.length === 0 ? (
-          <div className="bg-white p-12 text-center rounded-xl border border-slate-200 text-slate-500">
+          <div className="bg-white p-12 text-center rounded-xl border border-slate-200 text-slate-500 dark:bg-[#111827] dark:border-slate-800 dark:text-slate-400">
             <Truck className="w-10 h-10 mx-auto text-slate-300 mb-2" />
             <p className="font-semibold text-sm">No transfer records found</p>
           </div>
@@ -430,18 +430,18 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
             return (
               <div 
                 key={trf.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#111827] dark:border-slate-800"
               >
                 <div className="flex-1 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 dark:text-white dark:bg-slate-800 dark:border-slate-800">
                       {trf.transferNumber}
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500">
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                       Challan: {trf.challanNumber}
                     </span>
                     {trf.isColdChain && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 px-1.5 py-0.5 rounded">
+                      <span className="flex items-center gap-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 px-1.5 py-0.5 rounded dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/70">
                         <Snowflake className="w-3 h-3 text-sky-500" />
                         Cold Chain {trf.transitTemperature && `(${trf.transitTemperature})`}
                       </span>
@@ -457,22 +457,22 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+                  <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold dark:text-slate-200">
                     <span>{trf.fromBranchName}</span>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-emerald-800">{trf.toBranchName}</span>
+                    <span className="text-emerald-800 dark:text-emerald-300">{trf.toBranchName}</span>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                    <span>Total: <strong className="text-slate-800">{trf.totalUnits} units</strong></span>
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                    <span>Total: <strong className="text-slate-800 dark:text-slate-100">{trf.totalUnits} units</strong></span>
                     <span>•</span>
-                    <span>Value: <strong className="text-slate-800">৳{trf.totalValue.toFixed(2)}</strong></span>
+                    <span>Value: <strong className="text-slate-800 dark:text-slate-100">৳{trf.totalValue.toFixed(2)}</strong></span>
                     <span>•</span>
                     <span>Requested by: {trf.requestedBy}</span>
                     {trf.receivedBy && (
                       <>
                         <span>•</span>
-                        <span className="text-emerald-700 font-medium">Received by: {trf.receivedBy}</span>
+                        <span className="text-emerald-700 font-medium dark:text-emerald-300">Received by: {trf.receivedBy}</span>
                       </>
                     )}
                   </div>
@@ -481,7 +481,7 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => setSelectedTransferForView(trf)}
-                    className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer"
+                    className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>View Challan</span>
@@ -516,7 +516,7 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
       {/* Challan View Modal */}
       {selectedTransferForView && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold">Inter-Branch Transfer Challan / Gate Pass</h3>
@@ -526,24 +526,24 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
             </div>
 
             <div className="p-5 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase font-bold">Origin (Sender)</span>
-                  <p className="font-bold text-slate-900">{selectedTransferForView.fromBranchName}</p>
-                  <p className="text-[11px] text-slate-500">Requested: {new Date(selectedTransferForView.requestedAt).toLocaleString()}</p>
+                  <p className="font-bold text-slate-900 dark:text-white">{selectedTransferForView.fromBranchName}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Requested: {new Date(selectedTransferForView.requestedAt).toLocaleString()}</p>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase font-bold">Destination (Recipient)</span>
-                  <p className="font-bold text-emerald-800">{selectedTransferForView.toBranchName}</p>
-                  <p className="text-[11px] text-slate-500">Challan: {selectedTransferForView.challanNumber}</p>
+                  <p className="font-bold text-emerald-800 dark:text-emerald-300">{selectedTransferForView.toBranchName}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Challan: {selectedTransferForView.challanNumber}</p>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <span className="font-bold text-slate-800">Transferred Items Breakdown:</span>
-                <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <span className="font-bold text-slate-800 dark:text-slate-100">Transferred Items Breakdown:</span>
+                <div className="border border-slate-200 rounded-lg overflow-hidden dark:border-slate-800">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800">
                       <tr>
                         <th className="p-2">Item</th>
                         <th className="p-2">Batch #</th>
@@ -552,10 +552,10 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                         <th className="p-2 text-right">Value</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {selectedTransferForView.items.map(item => (
                         <tr key={item.id}>
-                          <td className="p-2 font-bold text-slate-900">{item.medicineName}</td>
+                          <td className="p-2 font-bold text-slate-900 dark:text-white">{item.medicineName}</td>
                           <td className="p-2 font-mono">{item.batchNumber}</td>
                           <td className="p-2">{item.expiryDate}</td>
                           <td className="p-2 text-right font-extrabold">{item.quantity}</td>
@@ -567,10 +567,10 @@ export const StockTransferHub: React.FC<StockTransferHubProps> = ({
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-3 border-t border-slate-200 text-xs text-slate-500">
+              <div className="flex justify-between items-center pt-3 border-t border-slate-200 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <div>
-                  <span>Total Units: <strong className="text-slate-900">{selectedTransferForView.totalUnits}</strong></span>
-                  <span className="ml-3">Total Value: <strong className="text-slate-900">৳{selectedTransferForView.totalValue.toFixed(2)}</strong></span>
+                  <span>Total Units: <strong className="text-slate-900 dark:text-white">{selectedTransferForView.totalUnits}</strong></span>
+                  <span className="ml-3">Total Value: <strong className="text-slate-900 dark:text-white">৳{selectedTransferForView.totalValue.toFixed(2)}</strong></span>
                 </div>
                 <button
                   type="button"

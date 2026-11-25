@@ -140,7 +140,7 @@ export const MaskedProfit: React.FC<MaskedProfitProps> = ({
   if (!canViewProfits) {
     return (
       <span
-        className="inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 border border-slate-200 select-none"
+        className="inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 border border-slate-200 select-none dark:bg-slate-800 dark:border-slate-800"
         title="Profit analytics restricted to Admin / Management"
       >
         <Lock className="w-2.5 h-2.5 text-slate-400" />
@@ -180,21 +180,21 @@ export const AccessDeniedCard: React.FC<AccessDeniedCardProps> = ({
   const { user } = usePermission();
 
   return (
-    <div className="max-w-xl mx-auto my-12 p-6 bg-white rounded-2xl border border-slate-200 shadow-xl text-center space-y-4">
-      <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+    <div className="max-w-xl mx-auto my-12 p-6 bg-white rounded-2xl border border-slate-200 shadow-xl text-center space-y-4 dark:bg-[#111827] dark:border-slate-800">
+      <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-400">
         <ShieldAlert className="w-7 h-7" />
       </div>
 
       <div className="space-y-1">
-        <h2 className="text-lg font-bold text-slate-900">Access Restricted</h2>
-        <p className="text-xs text-slate-500">
-          Your current role (<strong className="text-slate-800 uppercase">{user.roleName}</strong>) does not have authorization to view the <strong>{moduleTitle}</strong> module.
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Access Restricted</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Your current role (<strong className="text-slate-800 uppercase dark:text-slate-100">{user.roleName}</strong>) does not have authorization to view the <strong>{moduleTitle}</strong> module.
         </p>
       </div>
 
-      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-1 font-mono">
-        <div className="text-slate-500">Required Permission:</div>
-        <div className="text-rose-600 font-bold">{requiredPermission}</div>
+      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-1 font-mono dark:bg-slate-900 dark:border-slate-800">
+        <div className="text-slate-500 dark:text-slate-400">Required Permission:</div>
+        <div className="text-rose-600 font-bold dark:text-rose-400">{requiredPermission}</div>
       </div>
 
       {onSwitchToAdmin && (

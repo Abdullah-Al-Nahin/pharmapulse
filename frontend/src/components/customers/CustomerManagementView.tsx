@@ -185,30 +185,30 @@ export const CustomerManagementView: React.FC = () => {
   const getTypeBadge = (type: CustomerType) => {
     switch (type) {
       case 'wholesale':
-        return <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Wholesale</span>;
+        return <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-amber-950/60 dark:text-amber-300">Wholesale</span>;
       case 'corporate':
-        return <span className="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Corporate</span>;
+        return <span className="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-sky-950/60 dark:text-sky-300">Corporate</span>;
       case 'institution':
-        return <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Institution</span>;
+        return <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-indigo-950/60 dark:text-indigo-300">Institution</span>;
       case 'regular':
-        return <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Regular</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-emerald-950/60 dark:text-emerald-300">Regular</span>;
       default:
-        return <span className="bg-slate-100 text-slate-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Retail</span>;
+        return <span className="bg-slate-100 text-slate-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-slate-800 dark:text-slate-100">Retail</span>;
     }
   };
 
   const getTierBadge = (tier: PricingTier) => {
     switch (tier) {
       case 'wholesale':
-        return <span className="bg-purple-100 text-purple-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-purple-200">Wholesale Tier</span>;
+        return <span className="bg-purple-100 text-purple-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/70">Wholesale Tier</span>;
       case 'dealer':
-        return <span className="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Corporate / Dealer</span>;
+        return <span className="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800/70">Corporate / Dealer</span>;
       case 'institution':
-        return <span className="bg-blue-100 text-blue-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-200">Hospital Tier</span>;
+        return <span className="bg-blue-100 text-blue-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70">Hospital Tier</span>;
       case 'mrp':
-        return <span className="bg-slate-100 text-slate-700 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">MRP Tier</span>;
+        return <span className="bg-slate-100 text-slate-700 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800">MRP Tier</span>;
       default:
-        return <span className="bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Retail Tier</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">Retail Tier</span>;
     }
   };
 
@@ -217,11 +217,11 @@ export const CustomerManagementView: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-emerald-600" />
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2 dark:text-white">
+            <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             <span>Customer Management & Receivables Ledger</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">
             Multi-Tier Pricing (Retail, Wholesale, Corporate, Hospital), Credit Limits & Due Collections, and Loyalty Points Program
           </p>
         </div>
@@ -239,94 +239,94 @@ export const CustomerManagementView: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Receivables Due */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium dark:text-slate-400">
             <span>Outstanding Receivables</span>
-            <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600">
+            <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
               <DollarSign className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black font-mono text-rose-600">
+            <span className="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
               ${totalReceivablesDue.toFixed(2)}
             </span>
-            <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
+            <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded dark:text-rose-400 dark:bg-rose-950/40">
               {customersWithDueCount} Due Accounts
             </span>
           </div>
           <div className="text-[11px] text-slate-400">
-            Total credit limit allocated: <strong className="text-slate-600 font-mono">${totalCreditLimitAllocated.toFixed(2)}</strong>
+            Total credit limit allocated: <strong className="text-slate-600 font-mono dark:text-slate-300">${totalCreditLimitAllocated.toFixed(2)}</strong>
           </div>
         </div>
 
         {/* Customer Directory Count */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium dark:text-slate-400">
             <span>Active Customers</span>
-            <span className="p-1.5 rounded-lg bg-slate-100 text-slate-700">
+            <span className="p-1.5 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
               <Users className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-black font-mono text-slate-900">
+          <div className="text-2xl font-black font-mono text-slate-900 dark:text-white">
             {customers.length} <span className="text-sm font-normal text-slate-400">Profiles</span>
           </div>
           <div className="text-[11px] text-slate-400 flex items-center gap-2">
-            <span>Wholesale: <strong className="text-slate-700">{customers.filter(c => c.customerType === 'wholesale').length}</strong></span>
+            <span>Wholesale: <strong className="text-slate-700 dark:text-slate-200">{customers.filter(c => c.customerType === 'wholesale').length}</strong></span>
             <span>•</span>
-            <span>Corporate: <strong className="text-slate-700">{customers.filter(c => c.customerType === 'corporate').length}</strong></span>
+            <span>Corporate: <strong className="text-slate-700 dark:text-slate-200">{customers.filter(c => c.customerType === 'corporate').length}</strong></span>
             <span>•</span>
-            <span>Hospital: <strong className="text-slate-700">{customers.filter(c => c.customerType === 'institution').length}</strong></span>
+            <span>Hospital: <strong className="text-slate-700 dark:text-slate-200">{customers.filter(c => c.customerType === 'institution').length}</strong></span>
           </div>
         </div>
 
         {/* Total Loyalty Points */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium dark:text-slate-400">
             <span>Active Loyalty Points</span>
-            <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+            <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
               <Award className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black font-mono text-indigo-600">
+            <span className="text-2xl font-black font-mono text-indigo-600 dark:text-indigo-400">
               {totalActiveLoyaltyPoints}
             </span>
-            <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">
+            <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded dark:text-indigo-300 dark:bg-indigo-950/40">
               Pts Circulating
             </span>
           </div>
           <div className="text-[11px] text-slate-400">
-            Cash discount liability: <strong className="text-emerald-700 font-mono font-bold">${totalLoyaltyValue.toFixed(2)}</strong>
+            Cash discount liability: <strong className="text-emerald-700 font-mono font-bold dark:text-emerald-300">${totalLoyaltyValue.toFixed(2)}</strong>
           </div>
         </div>
 
         {/* Dynamic Pricing Engine Rules */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium dark:text-slate-400">
             <span>Tier Pricing Rules</span>
-            <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+            <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <Tag className="w-4 h-4" />
             </span>
           </div>
           <div className="space-y-1 text-[11px]">
             <div className="flex justify-between">
-              <span className="text-slate-600">Wholesale:</span>
-              <span className="font-bold text-purple-700 font-mono">18% off MRP / Trade</span>
+              <span className="text-slate-600 dark:text-slate-300">Wholesale:</span>
+              <span className="font-bold text-purple-700 font-mono dark:text-purple-300">18% off MRP / Trade</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Corporate:</span>
-              <span className="font-bold text-indigo-700 font-mono">22% off MRP / Dealer</span>
+              <span className="text-slate-600 dark:text-slate-300">Corporate:</span>
+              <span className="font-bold text-indigo-700 font-mono dark:text-indigo-300">22% off MRP / Dealer</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Institution:</span>
-              <span className="font-bold text-blue-700 font-mono">25% off MRP / Hospital</span>
+              <span className="text-slate-600 dark:text-slate-300">Institution:</span>
+              <span className="font-bold text-blue-700 font-mono dark:text-blue-300">25% off MRP / Hospital</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div className="relative flex-1 min-w-[260px]">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -341,7 +341,7 @@ export const CustomerManagementView: React.FC = () => {
                 document.getElementById('customer-row-0')?.focus();
               }
             }}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:bg-white dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
@@ -351,7 +351,7 @@ export const CustomerManagementView: React.FC = () => {
             id="filter-customer-type"
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           >
             <option value="all">All Customer Types</option>
             <option value="retail">Retail (OTC)</option>
@@ -366,7 +366,7 @@ export const CustomerManagementView: React.FC = () => {
             id="filter-pricing-tier"
             value={selectedTier}
             onChange={(e) => setSelectedTier(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           >
             <option value="all">All Pricing Tiers</option>
             <option value="retail">Retail Tier</option>
@@ -386,18 +386,18 @@ export const CustomerManagementView: React.FC = () => {
                 : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5 text-rose-600" />
+            <DollarSign className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
             <span>Has Due Balance ({customersWithDueCount})</span>
           </button>
         </div>
       </div>
 
       {/* Customer Directory Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs dark:bg-[#111827] dark:border-slate-800">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800">
                 <th className="py-3 px-4">Customer Details</th>
                 <th className="py-3 px-4">Type & Category</th>
                 <th className="py-3 px-4">Pricing Tier</th>
@@ -407,7 +407,7 @@ export const CustomerManagementView: React.FC = () => {
                 <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-400">
@@ -450,17 +450,17 @@ export const CustomerManagementView: React.FC = () => {
                           setModalInitialTab(cust.outstandingBalance > 0 ? 'payment' : 'ledger');
                         }
                       }}
-                      className="hover:bg-slate-50/70 transition focus:outline-none focus:bg-emerald-50/50"
+                      className="hover:bg-slate-50/70 transition focus:outline-none focus:bg-emerald-50/50 dark:hover:bg-slate-800/60"
                     >
                       {/* Customer Details */}
                       <td className="py-3 px-4">
-                        <div className="font-bold text-slate-900 text-sm">{cust.name}</div>
-                        <div className="text-slate-500 text-[11px] flex items-center gap-2 mt-0.5">
+                        <div className="font-bold text-slate-900 text-sm dark:text-white">{cust.name}</div>
+                        <div className="text-slate-500 text-[11px] flex items-center gap-2 mt-0.5 dark:text-slate-400">
                           <span className="font-mono">{cust.phone}</span>
                           {cust.email && <span>• {cust.email}</span>}
                         </div>
                         {cust.institutionName && (
-                          <div className="text-[11px] text-indigo-700 font-medium mt-0.5">
+                          <div className="text-[11px] text-indigo-700 font-medium mt-0.5 dark:text-indigo-300">
                             {cust.institutionName} {cust.contactPerson && `(Attn: ${cust.contactPerson})`}
                           </div>
                         )}
@@ -482,7 +482,7 @@ export const CustomerManagementView: React.FC = () => {
                           ${(cust.outstandingBalance ?? 0).toFixed(2)}
                         </span>
                         {isOverCredit && (
-                          <span className="block text-[10px] text-rose-600 font-bold">
+                          <span className="block text-[10px] text-rose-600 font-bold dark:text-rose-400">
                             Exceeds Limit!
                           </span>
                         )}
@@ -490,12 +490,12 @@ export const CustomerManagementView: React.FC = () => {
 
                       {/* Credit Limit & Bar */}
                       <td className="py-3 px-4 text-right font-mono whitespace-nowrap">
-                        <span className="font-bold text-slate-800">
+                        <span className="font-bold text-slate-800 dark:text-slate-100">
                           ${(cust.creditLimit ?? 0).toFixed(2)}
                         </span>
                         {cust.creditLimit > 0 && (
                           <div className="w-24 ml-auto mt-1 flex items-center gap-1.5">
-                            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden dark:bg-slate-700">
                               <div
                                 className={`h-full rounded-full ${
                                   creditPercent >= 90 ? 'bg-rose-500' : creditPercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -510,10 +510,10 @@ export const CustomerManagementView: React.FC = () => {
 
                       {/* Loyalty Points */}
                       <td className="py-3 px-4 text-right font-mono whitespace-nowrap">
-                        <span className="font-bold text-indigo-700">
+                        <span className="font-bold text-indigo-700 dark:text-indigo-300">
                           {cust.loyaltyPoints} <span className="text-[10px] font-normal text-slate-400">Pts</span>
                         </span>
-                        <div className="text-[10px] text-emerald-600">
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400">
                           ≈ ${(cust.loyaltyPoints * loyaltyConfig.redemptionRatePerPoint).toFixed(2)}
                         </div>
                       </td>
@@ -539,7 +539,7 @@ export const CustomerManagementView: React.FC = () => {
                               setSelectedCustomerForModal(cust);
                               setModalInitialTab('loyalty');
                             }}
-                            className="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded cursor-pointer transition"
+                            className="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded cursor-pointer transition dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 dark:text-indigo-300 dark:border-indigo-800/70"
                             title="Loyalty Rewards History"
                           >
                             <Award className="w-3.5 h-3.5" />
@@ -572,7 +572,7 @@ export const CustomerManagementView: React.FC = () => {
       {/* New Customer Creation Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="p-5 bg-slate-900 text-white flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <UserPlus className="w-5 h-5 text-emerald-400" />
@@ -588,44 +588,44 @@ export const CustomerManagementView: React.FC = () => {
 
             <form onSubmit={handleCreateCustomer} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
               {formError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs font-semibold text-rose-700">
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs font-semibold text-rose-700 dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
                   {formError}
                 </div>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Customer / Entity Name *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Customer / Entity Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. John Doe, Metro Clinic"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Phone Number *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. +1 (555) 000-0000"
                     value={formPhone}
                     onChange={(e) => setFormPhone(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Customer Type *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Customer Type *</label>
                   <select
                     value={formType}
                     onChange={(e) => handleTypeChange(e.target.value as CustomerType)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="regular">Regular Patient</option>
                     <option value="retail">Retail (Standard OTC)</option>
@@ -636,11 +636,11 @@ export const CustomerManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Dynamic Pricing Tier *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Dynamic Pricing Tier *</label>
                   <select
                     value={formTier}
                     onChange={(e) => setFormTier(e.target.value as PricingTier)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="retail">Retail Tier (Standard POS)</option>
                     <option value="wholesale">Wholesale Tier (18% off MRP)</option>
@@ -653,7 +653,7 @@ export const CustomerManagementView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Credit Limit ($)</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Credit Limit ($)</label>
                   <input
                     type="number"
                     step="50"
@@ -661,7 +661,7 @@ export const CustomerManagementView: React.FC = () => {
                     placeholder="0.00"
                     value={formCreditLimit}
                     onChange={(e) => setFormCreditLimit(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
                     Maximum receivables credit ceiling allowed for this account
@@ -669,68 +669,68 @@ export const CustomerManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Tax ID / Trade License</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Tax ID / Trade License</label>
                   <input
                     type="text"
                     placeholder="e.g. VAT-99120, BIN-4421"
                     value={formTaxId}
                     onChange={(e) => setFormTaxId(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Email (Optional)</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Email (Optional)</label>
                   <input
                     type="email"
                     placeholder="name@example.com"
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Contact Person / Officer</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Contact Person / Officer</label>
                   <input
                     type="text"
                     placeholder="e.g. Dr. Marcus Vance"
                     value={formContactPerson}
                     onChange={(e) => setFormContactPerson(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Physical Delivery / Billing Address</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Physical Delivery / Billing Address</label>
                 <input
                   type="text"
                   placeholder="Street address, Suite, City"
                   value={formAddress}
                   onChange={(e) => setFormAddress(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Operational Notes / Terms</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1 dark:text-slate-200">Operational Notes / Terms</label>
                 <textarea
                   rows={2}
                   placeholder="e.g. Net 30 days settlement terms, weekly billing"
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition"
+                  className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition dark:bg-[#111827] dark:border-slate-700 dark:hover:bg-slate-800/60 dark:text-slate-200"
                 >
                   Cancel
                 </button>

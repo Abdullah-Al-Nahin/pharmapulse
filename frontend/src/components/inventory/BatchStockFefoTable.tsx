@@ -148,7 +148,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
   return (
     <div className="space-y-4">
       {/* Search & Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -163,17 +163,17 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                 document.getElementById('inv-card-0')?.focus();
               }
             }}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-          <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
+          <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs dark:bg-slate-900 dark:border-slate-700">
+            <Filter className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-transparent text-slate-800 font-medium focus:outline-none text-xs"
+              className="bg-transparent text-slate-800 font-medium focus:outline-none text-xs dark:text-slate-100"
             >
               <option value="All">All Categories</option>
               <option value="Ophthalmic & ENT">Ophthalmic & ENT</option>
@@ -185,7 +185,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
             </select>
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg dark:bg-slate-800">
             {(['all', 'low_stock', 'near_expiry', 'cold_chain'] as const).map(tab => (
               <button
                 key={tab}
@@ -204,17 +204,17 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1 text-xs text-slate-500 border-l border-slate-200 pl-2">
+          <div className="flex items-center gap-1 text-xs text-slate-500 border-l border-slate-200 pl-2 dark:text-slate-400 dark:border-slate-800">
             <button
               onClick={expandAll}
-              className="px-2 py-1 hover:bg-slate-100 rounded text-slate-600 font-medium"
+              className="px-2 py-1 hover:bg-slate-100 rounded text-slate-600 font-medium dark:hover:bg-slate-800 dark:text-slate-300"
             >
               Expand All
             </button>
             <span>•</span>
             <button
               onClick={collapseAll}
-              className="px-2 py-1 hover:bg-slate-100 rounded text-slate-600 font-medium"
+              className="px-2 py-1 hover:bg-slate-100 rounded text-slate-600 font-medium dark:hover:bg-slate-800 dark:text-slate-300"
             >
               Collapse
             </button>
@@ -223,10 +223,10 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
       </div>
 
       {/* FEFO Algorithm Banner Note */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-start gap-3">
-        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-        <div className="text-xs text-emerald-950">
-          <span className="font-bold text-emerald-900">FEFO (First Expiry, First Out) Automated Picking Active: </span>
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-start gap-3 dark:bg-emerald-950/40 dark:border-emerald-800/70">
+        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 dark:text-emerald-400" />
+        <div className="text-xs text-emerald-950 dark:text-emerald-300">
+          <span className="font-bold text-emerald-900 dark:text-emerald-300">FEFO (First Expiry, First Out) Automated Picking Active: </span>
           The system automatically sequences batches by earliest expiry date. Dispensation in the POS counter and Inpatient Wards automatically deducts from <span className="font-bold underline decoration-emerald-500">FEFO Priority #1</span> batches first, eliminating shelf expiry losses and preserving sterile drug efficacy.
         </div>
       </div>
@@ -234,7 +234,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
       {/* Medicine & Batch Listing Cards */}
       <div className="space-y-3">
         {filteredData.length === 0 ? (
-          <div className="bg-white p-12 text-center rounded-xl border border-slate-200 text-slate-500">
+          <div className="bg-white p-12 text-center rounded-xl border border-slate-200 text-slate-500 dark:bg-[#111827] dark:border-slate-800 dark:text-slate-400">
             <Layers className="w-10 h-10 mx-auto text-slate-300 mb-2" />
             <p className="font-semibold text-sm">No pharmaceutical products matching your filter criteria</p>
             <p className="text-xs text-slate-400 mt-1">Try changing the search keyword, category, or stock filter above.</p>
@@ -267,66 +267,66 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                     toggleExpand(medicine.id);
                   }
                 }}
-                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               >
                 {/* Medicine Header Row */}
-                <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-50/50">
+                <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-900/70">
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900">{medicine.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">{medicine.name}</h3>
                       {medicine.brandName && (
-                        <span className="text-[10px] font-semibold bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded border border-slate-300">
+                        <span className="text-[10px] font-semibold bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded border border-slate-300 dark:text-slate-200 dark:border-slate-700">
                           Brand: {medicine.brandName}
                         </span>
                       )}
-                      <span className="text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">
                         {medicine.category}
                       </span>
                       {medicine.requiresPrescription && (
-                        <span className="text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/70">
                           Rx
                         </span>
                       )}
                       {isColdChain && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 px-1.5 py-0.5 rounded">
+                        <span className="flex items-center gap-1 text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 px-1.5 py-0.5 rounded dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/70">
                           <Snowflake className="w-3 h-3 text-sky-500" />
                           2°C - 8°C Cold Chain
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-500 italic">
-                      Formula: <strong className="text-slate-700 font-medium">{medicine.genericName}</strong> • {medicine.dosageForm} ({medicine.strength})
+                    <p className="text-xs text-slate-500 italic dark:text-slate-400">
+                      Formula: <strong className="text-slate-700 font-medium dark:text-slate-200">{medicine.genericName}</strong> • {medicine.dosageForm} ({medicine.strength})
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-0.5">
-                      <span className="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-slate-200">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                        Rack/Bin: <strong className="text-slate-800 font-bold">{medicine.rackLocation}</strong>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-0.5 dark:text-slate-400">
+                      <span className="flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-slate-200 dark:bg-[#111827] dark:border-slate-800">
+                        <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        Rack/Bin: <strong className="text-slate-800 font-bold dark:text-slate-100">{medicine.rackLocation}</strong>
                       </span>
-                      <span>Mfr: <strong className="text-slate-700">{medicine.manufacturer}</strong></span>
-                      <span>Pack: <strong className="text-slate-700">{medicine.packSize} / {medicine.unitOfMeasure}</strong></span>
-                      <span>Reorder Lvl: <strong className="text-slate-700">{medicine.reorderLevel}</strong></span>
+                      <span>Mfr: <strong className="text-slate-700 dark:text-slate-200">{medicine.manufacturer}</strong></span>
+                      <span>Pack: <strong className="text-slate-700 dark:text-slate-200">{medicine.packSize} / {medicine.unitOfMeasure}</strong></span>
+                      <span>Reorder Lvl: <strong className="text-slate-700 dark:text-slate-200">{medicine.reorderLevel}</strong></span>
                     </div>
                   </div>
 
                   {/* Stock Counts Metric Box */}
                   <div className="flex items-center gap-4 shrink-0 flex-wrap lg:flex-nowrap justify-between lg:justify-end">
-                    <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-2xs text-xs">
+                    <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-2xs text-xs dark:bg-[#111827] dark:border-slate-800">
                       <div>
                         <span className="text-[10px] text-slate-400 block uppercase font-bold">Physical Stock</span>
-                        <span className="text-sm font-extrabold text-slate-900">{totalPhysicalStock}</span>
+                        <span className="text-sm font-extrabold text-slate-900 dark:text-white">{totalPhysicalStock}</span>
                       </div>
-                      <div className="w-px h-6 bg-slate-200" />
+                      <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
                       <div>
-                        <span className="text-[10px] text-amber-600 block uppercase font-bold flex items-center gap-0.5">
+                        <span className="text-[10px] text-amber-600 block uppercase font-bold flex items-center gap-0.5 dark:text-amber-400">
                           <Lock className="w-2.5 h-2.5" /> Reserved
                         </span>
-                        <span className="text-sm font-bold text-amber-700">{reservedCount}</span>
+                        <span className="text-sm font-bold text-amber-700 dark:text-amber-300">{reservedCount}</span>
                       </div>
-                      <div className="w-px h-6 bg-slate-200" />
+                      <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
                       <div>
-                        <span className="text-[10px] text-emerald-600 block uppercase font-bold">Avail for POS</span>
+                        <span className="text-[10px] text-emerald-600 block uppercase font-bold dark:text-emerald-400">Avail for POS</span>
                         <span className={`text-base font-black ${
                           isLowStock ? 'text-amber-600 flex items-center gap-1' : 'text-emerald-700'
                         }`}>
@@ -348,7 +348,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
 
                       <button
                         onClick={() => toggleExpand(medicine.id)}
-                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 cursor-pointer"
+                        className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300"
                         title={isExpanded ? 'Collapse batches' : 'View batch breakdown'}
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -359,16 +359,16 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
 
                 {/* Batch-wise Expanded Table with FEFO Sequence */}
                 {isExpanded && (
-                  <div className="p-4 border-t border-slate-200 bg-white space-y-2">
+                  <div className="p-4 border-t border-slate-200 bg-white space-y-2 dark:border-slate-800 dark:bg-[#111827]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-emerald-600" />
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                        <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide dark:text-slate-100">
                           Batch Inventory Matrix ({medBatches.length} Batches Tracked)
                         </h4>
                       </div>
-                      <span className="text-[11px] text-slate-500">
-                        Ranked by <strong className="text-emerald-700 font-bold">FEFO Auto-Picking Algorithm</strong>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Ranked by <strong className="text-emerald-700 font-bold dark:text-emerald-300">FEFO Auto-Picking Algorithm</strong>
                       </span>
                     </div>
 
@@ -378,7 +378,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
                           <thead>
-                            <tr className="border-b border-slate-200 text-slate-500 font-semibold text-[11px]">
+                            <tr className="border-b border-slate-200 text-slate-500 font-semibold text-[11px] dark:border-slate-800 dark:text-slate-400">
                               <th className="py-2">FEFO Priority</th>
                               <th className="py-2">Batch #</th>
                               <th className="py-2">Rack / Shelf / Bin</th>
@@ -392,7 +392,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                               <th className="py-2 text-right">Actions</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100">
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {medBatches.map((batch, index) => {
                               const isQuarantined = quarantinedBatchNumbers.includes(batch.batchNumber) || batch.status === 'quarantined';
                               const isExpired = batch.expiryDate <= todayStr || batch.status === 'expired';
@@ -406,9 +406,9 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                               let fefoBadge = null;
 
                               if (isExpired) {
-                                fefoBadge = <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded">EXPIRED</span>;
+                                fefoBadge = <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-rose-950/60 dark:text-rose-300">EXPIRED</span>;
                               } else if (isQuarantined) {
-                                fefoBadge = <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">QUARANTINE</span>;
+                                fefoBadge = <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-purple-950/60 dark:text-purple-300">QUARANTINE</span>;
                               } else if (index === 0 && isFefoEligible) {
                                 fefoBadge = (
                                   <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-xs flex items-center gap-1 w-max">
@@ -416,9 +416,9 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                                   </span>
                                 );
                               } else if (index === 1 && isFefoEligible) {
-                                fefoBadge = <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">#2 SEQUENCE</span>;
+                                fefoBadge = <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-emerald-950/60 dark:text-emerald-300">#2 SEQUENCE</span>;
                               } else if (isFefoEligible) {
-                                fefoBadge = <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded">#{index + 1} RESERVE</span>;
+                                fefoBadge = <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-200">#{index + 1} RESERVE</span>;
                               } else {
                                 fefoBadge = <span className="text-slate-400 text-[10px]">DEPLETED</span>;
                               }
@@ -431,47 +431,47 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                                   }`}
                                 >
                                   <td className="py-2.5">{fefoBadge}</td>
-                                  <td className="py-2.5 font-mono font-bold text-slate-900">
+                                  <td className="py-2.5 font-mono font-bold text-slate-900 dark:text-white">
                                     <div className="flex items-center gap-1.5">
                                       <span>{batch.batchNumber}</span>
                                       {isBonusBatch && (
-                                        <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1 py-0.5 rounded flex items-center gap-0.5" title="Trade Bonus Stock">
+                                        <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1 py-0.5 rounded flex items-center gap-0.5 dark:bg-amber-950/60 dark:text-amber-300" title="Trade Bonus Stock">
                                           <Tag className="w-2.5 h-2.5" /> Bonus
                                         </span>
                                       )}
                                     </div>
                                     {batch.invoiceNumber && (
-                                      <div className="text-[10px] font-sans font-semibold text-emerald-700 mt-0.5">
+                                      <div className="text-[10px] font-sans font-semibold text-emerald-700 mt-0.5 dark:text-emerald-300">
                                         Inv: {batch.invoiceNumber}
                                       </div>
                                     )}
                                   </td>
                                   <td className="py-2.5">
-                                    <span className="text-slate-700 font-medium flex items-center gap-1">
+                                    <span className="text-slate-700 font-medium flex items-center gap-1 dark:text-slate-200">
                                       <MapPin className="w-3 h-3 text-slate-400" />
                                       {batch.rackLocation || medicine.rackLocation}
                                     </span>
                                   </td>
-                                  <td className="py-2.5 font-medium text-slate-800">{batch.expiryDate}</td>
+                                  <td className="py-2.5 font-medium text-slate-800 dark:text-slate-100">{batch.expiryDate}</td>
                                   <td className="py-2.5">
                                     {isExpired ? (
-                                      <span className="text-rose-600 font-bold">{Math.abs(daysLeft)}d expired</span>
+                                      <span className="text-rose-600 font-bold dark:text-rose-400">{Math.abs(daysLeft)}d expired</span>
                                     ) : daysLeft <= 30 ? (
-                                      <span className="text-rose-600 font-bold flex items-center gap-1">
+                                      <span className="text-rose-600 font-bold flex items-center gap-1 dark:text-rose-400">
                                         <AlertTriangle className="w-3 h-3" /> {daysLeft}d left (CRITICAL)
                                       </span>
                                     ) : daysLeft <= 90 ? (
-                                      <span className="text-amber-600 font-semibold">{daysLeft}d left (Near)</span>
+                                      <span className="text-amber-600 font-semibold dark:text-amber-400">{daysLeft}d left (Near)</span>
                                     ) : (
-                                      <span className="text-emerald-700 font-medium">{daysLeft} days</span>
+                                      <span className="text-emerald-700 font-medium dark:text-emerald-300">{daysLeft} days</span>
                                     )}
                                   </td>
-                                  <td className="py-2.5 text-slate-600">
+                                  <td className="py-2.5 text-slate-600 dark:text-slate-300">
                                     <MaskedCost value={batch.purchasePrice} />
                                   </td>
-                                  <td className="py-2.5 text-slate-500">৳{Number(batch.mrp ?? batch.sellingPrice ?? (batch as any).unitSellingPrice ?? 0).toFixed(2)}</td>
-                                  <td className="py-2.5 font-bold text-slate-900">৳{Number(batch.sellingPrice ?? (batch as any).unitSellingPrice ?? 0).toFixed(2)}</td>
-                                  <td className="py-2.5 text-right font-extrabold text-slate-900">
+                                  <td className="py-2.5 text-slate-500 dark:text-slate-400">৳{Number(batch.mrp ?? batch.sellingPrice ?? (batch as any).unitSellingPrice ?? 0).toFixed(2)}</td>
+                                  <td className="py-2.5 font-bold text-slate-900 dark:text-white">৳{Number(batch.sellingPrice ?? (batch as any).unitSellingPrice ?? 0).toFixed(2)}</td>
+                                  <td className="py-2.5 text-right font-extrabold text-slate-900 dark:text-white">
                                     {batch.currentStock} {medicine.unitOfMeasure}s
                                   </td>
                                   <td className="py-2.5 text-center">
@@ -492,7 +492,7 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                                       {onDeductBatch && batch.currentStock > 0 && (
                                         <button
                                           onClick={() => onDeductBatch(medicine, batch)}
-                                          className="p-1 hover:bg-rose-100 rounded text-rose-600 cursor-pointer font-bold text-xs"
+                                          className="p-1 hover:bg-rose-100 rounded text-rose-600 cursor-pointer font-bold text-xs dark:hover:bg-rose-900/60 dark:text-rose-400"
                                           title="Deduct or Write-off"
                                         >
                                           Deduct
@@ -500,28 +500,28 @@ export const BatchStockFefoTable: React.FC<BatchStockFefoTableProps> = ({
                                       )}
                                       <button
                                         onClick={() => onRelocateBatch(medicine, batch)}
-                                        className="p-1 hover:bg-slate-200 rounded text-slate-600 cursor-pointer"
+                                        className="p-1 hover:bg-slate-200 rounded text-slate-600 cursor-pointer dark:hover:bg-slate-700 dark:text-slate-300"
                                         title="Change Shelf/Bin Location"
                                       >
                                         <MapPin className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => onTransferBatch(medicine, batch)}
-                                        className="p-1 hover:bg-slate-200 rounded text-blue-600 cursor-pointer"
+                                        className="p-1 hover:bg-slate-200 rounded text-blue-600 cursor-pointer dark:hover:bg-slate-700 dark:text-blue-400"
                                         title="Inter-Branch / Ward Transfer"
                                       >
                                         <ArrowRightLeft className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => onReserveBatch(medicine, batch)}
-                                        className="p-1 hover:bg-slate-200 rounded text-amber-600 cursor-pointer"
+                                        className="p-1 hover:bg-slate-200 rounded text-amber-600 cursor-pointer dark:hover:bg-slate-700 dark:text-amber-400"
                                         title="Reserve for Surgery / OT"
                                       >
                                         <Lock className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => onQuarantineBatch(medicine, batch)}
-                                        className="p-1 hover:bg-slate-200 rounded text-purple-600 cursor-pointer"
+                                        className="p-1 hover:bg-slate-200 rounded text-purple-600 cursor-pointer dark:hover:bg-slate-700 dark:text-purple-400"
                                         title="Quarantine this batch"
                                       >
                                         <ShieldAlert className="w-3.5 h-3.5" />

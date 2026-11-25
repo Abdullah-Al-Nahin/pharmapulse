@@ -207,7 +207,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
   return (
     <div className="space-y-4">
       {/* Sub-Header / Navigation Tabs */}
-      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           <button
             onClick={() => setActiveTab('eoq_minmax')}
@@ -259,7 +259,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+          <span className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800">
             Automated Hospital Inventory Intel
           </span>
         </div>
@@ -319,7 +319,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                       step="50"
                       value={orderingCostS}
                       onChange={(e) => setOrderingCostS(Number(e.target.value))}
-                      className="w-full accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                      className="w-full accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                     <span className="text-[10px] text-slate-400">PO admin & transport</span>
                   </div>
@@ -335,7 +335,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                       step="1"
                       value={holdingCostPercentH}
                       onChange={(e) => setHoldingCostPercentH(Number(e.target.value))}
-                      className="w-full accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                      className="w-full accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                     <span className="text-[10px] text-slate-400">Cold-chain, rent & capital</span>
                   </div>
@@ -386,53 +386,53 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
             </div>
 
             {/* Inventory Holding vs Reorder Policy Card */}
-            <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between dark:bg-[#111827] dark:border-slate-800">
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Hospital Min/Max Buffer Guidelines</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 dark:text-slate-400">Hospital Min/Max Buffer Guidelines</h4>
                 <div className="space-y-3">
-                  <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-xs">
-                    <div className="font-bold text-amber-900 flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-xs dark:bg-amber-950/40 dark:border-amber-800/70">
+                    <div className="font-bold text-amber-900 flex items-center gap-1.5 dark:text-amber-300">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       <span>Reorder Point (ROP)</span>
                     </div>
-                    <p className="text-[11px] text-amber-800 mt-1">
+                    <p className="text-[11px] text-amber-800 mt-1 dark:text-amber-300">
                       Calculated as: <em>(Daily Demand × Lead Time) + Safety Stock</em>. When shelf inventory breaches this threshold, auto-draft purchase request.
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-sky-50 rounded-lg border border-sky-200 text-xs">
-                    <div className="font-bold text-sky-900 flex items-center gap-1.5">
-                      <ShieldAlert className="w-3.5 h-3.5 text-sky-600" />
+                  <div className="p-2.5 bg-sky-50 rounded-lg border border-sky-200 text-xs dark:bg-sky-950/40 dark:border-sky-800/70">
+                    <div className="font-bold text-sky-900 flex items-center gap-1.5 dark:text-sky-300">
+                      <ShieldAlert className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                       <span>Safety Stock Floor (Min Stock)</span>
                     </div>
-                    <p className="text-[11px] text-sky-800 mt-1">
+                    <p className="text-[11px] text-sky-800 mt-1 dark:text-sky-300">
                       Reserved buffer for supplier delivery delays or sudden hospital epidemic surges. Stock should never drop below this value.
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-purple-50 rounded-lg border border-purple-200 text-xs">
-                    <div className="font-bold text-purple-900 flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-purple-600" />
+                  <div className="p-2.5 bg-purple-50 rounded-lg border border-purple-200 text-xs dark:bg-purple-950/40 dark:border-purple-800/70">
+                    <div className="font-bold text-purple-900 flex items-center gap-1.5 dark:text-purple-300">
+                      <Layers className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                       <span>Max Stock Ceiling</span>
                     </div>
-                    <p className="text-[11px] text-purple-800 mt-1">
+                    <p className="text-[11px] text-purple-800 mt-1 dark:text-purple-300">
                       Calculated as: <em>Safety Stock + EOQ</em>. Prevents over-ordering which leads to expiry risk, fridge overcrowding, and trapped capital.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <span>Lead Time: <strong>{leadTimeDays} days</strong> (Incepta/Square)</span>
-                <span className="text-emerald-700 font-bold">Dynamic FEFO Synced</span>
+                <span className="text-emerald-700 font-bold dark:text-emerald-300">Dynamic FEFO Synced</span>
               </div>
             </div>
           </div>
 
           {/* Master Min/Max & Reorder Level Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
             {/* Table Search and Filters */}
-            <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+            <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
               <div className="relative flex-1 w-full sm:max-w-md">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -440,7 +440,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                   placeholder="Filter by drug name, generic formula or category..."
                   value={eoqSearch}
                   onChange={(e) => setEoqSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -474,8 +474,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+              <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                   <tr>
                     <th className="px-3.5 py-2.5">Medicine & Formula</th>
                     <th className="px-3.5 py-2.5 text-center">Current Stock</th>
@@ -486,7 +486,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     <th className="px-3.5 py-2.5 text-right">Quick Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {medicineEoqList.map(item => {
                     const maxBoundary = Math.max(item.eoq.maxStock, item.currentStock, 100);
                     const currentPercent = Math.min(100, Math.round((item.currentStock / maxBoundary) * 100));
@@ -494,10 +494,10 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     const minPercent = Math.min(100, Math.round((item.eoq.minStock / maxBoundary) * 100));
 
                     return (
-                      <tr key={item.medicine.id} className="hover:bg-slate-50/80 transition-colors">
+                      <tr key={item.medicine.id} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
                         <td className="px-3.5 py-3">
-                          <div className="font-bold text-slate-900">{item.medicine.name}</div>
-                          <div className="text-[11px] text-slate-500">{item.medicine.genericName} • {item.medicine.category}</div>
+                          <div className="font-bold text-slate-900 dark:text-white">{item.medicine.name}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">{item.medicine.genericName} • {item.medicine.category}</div>
                         </td>
 
                         <td className="px-3.5 py-3 text-center">
@@ -515,7 +515,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
 
                         <td className="px-3.5 py-3 min-w-[200px]">
                           {/* Visual Min / ROP / Max indicator bar */}
-                          <div className="relative w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
+                          <div className="relative w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200 dark:bg-slate-800 dark:border-slate-800">
                             {/* Current Stock Bar */}
                             <div 
                               className={`h-full transition-all duration-300 ${
@@ -539,19 +539,19 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
 
                           <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
                             <span>Min: {item.eoq.minStock}</span>
-                            <span className="text-amber-700 font-semibold">ROP: {item.eoq.reorderPoint}</span>
+                            <span className="text-amber-700 font-semibold dark:text-amber-300">ROP: {item.eoq.reorderPoint}</span>
                             <span>Max: {item.eoq.maxStock}</span>
                           </div>
                         </td>
 
                         <td className="px-3.5 py-3 text-center">
-                          <span className="font-mono font-bold text-slate-800">{item.eoq.eoqUnits}</span>
+                          <span className="font-mono font-bold text-slate-800 dark:text-slate-100">{item.eoq.eoqUnits}</span>
                           <span className="text-[10px] text-slate-400 block">units/order</span>
                         </td>
 
                         <td className="px-3.5 py-3 text-center">
                           {item.suggestedPO > 0 ? (
-                            <span className="font-mono font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <span className="font-mono font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 dark:text-amber-300 dark:bg-amber-950/40 dark:border-amber-800/70">
                               +{item.suggestedPO}
                             </span>
                           ) : (
@@ -561,22 +561,22 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
 
                         <td className="px-3.5 py-3 text-center">
                           {item.statusBadge === 'critical' && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70">
                               <AlertTriangle className="w-3 h-3" /> Critical Stock
                             </span>
                           )}
                           {item.statusBadge === 'reorder' && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
                               <Clock className="w-3 h-3" /> Reorder Point
                             </span>
                           )}
                           {item.statusBadge === 'healthy' && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">
                               <CheckCircle2 className="w-3 h-3" /> Optimal
                             </span>
                           )}
                           {item.statusBadge === 'overstocked' && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/70">
                               <Layers className="w-3 h-3" /> Overstocked
                             </span>
                           )}
@@ -591,7 +591,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                                 alert(`Purchase Order draft initiated for ${item.medicine.name} - Quantity: ${item.suggestedPO > 0 ? item.suggestedPO : item.eoq.eoqUnits} units.`);
                               }
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-md font-semibold text-xs transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-md font-semibold text-xs transition-colors cursor-pointer dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-800/70"
                           >
                             <ShoppingBag className="w-3.5 h-3.5" />
                             <span>Draft PO</span>
@@ -614,39 +614,39 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
         <div className="space-y-4">
           {/* Notification Banner if action succeeded */}
           {liquidationSuccessMsg && (
-            <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2 dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>{liquidationSuccessMsg}</span>
             </div>
           )}
 
           {/* FSN KPI Metrics Row */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="flex items-center justify-between text-xs text-slate-500 font-semibold dark:text-slate-400">
                 <span>Fast Moving (F)</span>
-                <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold">F</span>
+                <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold dark:bg-emerald-950/60 dark:text-emerald-300">F</span>
               </div>
-              <div className="text-2xl font-black text-emerald-700 mt-2">{fsnStats.fast} <span className="text-xs font-normal text-slate-500">lines</span></div>
+              <div className="text-2xl font-black text-emerald-700 mt-2 dark:text-emerald-300">{fsnStats.fast} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">lines</span></div>
               <p className="text-[11px] text-slate-400 mt-1">High turnover & daily velocity &gt; 10 units</p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="flex items-center justify-between text-xs text-slate-500 font-semibold dark:text-slate-400">
                 <span>Slow Moving (S)</span>
-                <span className="p-1.5 bg-amber-100 text-amber-700 rounded-lg font-bold">S</span>
+                <span className="p-1.5 bg-amber-100 text-amber-700 rounded-lg font-bold dark:bg-amber-950/60 dark:text-amber-300">S</span>
               </div>
-              <div className="text-2xl font-black text-amber-700 mt-2">{fsnStats.slow} <span className="text-xs font-normal text-slate-500">lines</span></div>
+              <div className="text-2xl font-black text-amber-700 mt-2 dark:text-amber-300">{fsnStats.slow} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">lines</span></div>
               <p className="text-[11px] text-slate-400 mt-1">Moderate consumption; adjust order frequency</p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-xs">
-              <div className="flex items-center justify-between text-xs text-rose-600 font-bold">
+            <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-xs dark:bg-[#111827] dark:border-rose-800/70">
+              <div className="flex items-center justify-between text-xs text-rose-600 font-bold dark:text-rose-400">
                 <span>Non-Moving / Dead (N)</span>
-                <span className="p-1.5 bg-rose-100 text-rose-700 rounded-lg font-bold">N</span>
+                <span className="p-1.5 bg-rose-100 text-rose-700 rounded-lg font-bold dark:bg-rose-950/60 dark:text-rose-300">N</span>
               </div>
-              <div className="text-2xl font-black text-rose-700 mt-2">{fsnStats.dead} <span className="text-xs font-normal text-slate-500">drugs</span></div>
-              <p className="text-[11px] text-rose-600 mt-1">No sales in &gt;90 days; immediate action needed</p>
+              <div className="text-2xl font-black text-rose-700 mt-2 dark:text-rose-300">{fsnStats.dead} <span className="text-xs font-normal text-slate-500 dark:text-slate-400">drugs</span></div>
+              <p className="text-[11px] text-rose-600 mt-1 dark:text-rose-400">No sales in &gt;90 days; immediate action needed</p>
             </div>
 
             <div className="bg-gradient-to-br from-rose-900 to-rose-800 p-4 rounded-xl text-white shadow-xs">
@@ -662,8 +662,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
           </div>
 
           {/* FSN Filtering & Search Toolbar */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
+            <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
               <div className="relative flex-1 w-full sm:max-w-md">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -671,7 +671,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                   placeholder="Search by drug name or generic formula..."
                   value={fsnSearch}
                   onChange={(e) => setFsnSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -705,8 +705,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
 
             {/* FSN Data Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+              <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                   <tr>
                     <th className="px-3.5 py-2.5">FSN Class</th>
                     <th className="px-3.5 py-2.5">Medicine & Category</th>
@@ -718,34 +718,34 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     <th className="px-3.5 py-2.5 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredFsnItems.map(item => (
-                    <tr key={item.medicineId} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={item.medicineId} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
                       <td className="px-3.5 py-3">
                         {item.fsnCategory === 'F' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">
                             Fast (F)
                           </span>
                         )}
                         {item.fsnCategory === 'S' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
                             Slow (S)
                           </span>
                         )}
                         {item.fsnCategory === 'N' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 animate-pulse dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70">
                             <AlertTriangle className="w-3 h-3" /> Dead (N)
                           </span>
                         )}
                       </td>
 
                       <td className="px-3.5 py-3">
-                        <div className="font-bold text-slate-900">{item.medicineName}</div>
-                        <div className="text-[11px] text-slate-500">{item.genericName} • {item.category}</div>
+                        <div className="font-bold text-slate-900 dark:text-white">{item.medicineName}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">{item.genericName} • {item.category}</div>
                       </td>
 
                       <td className="px-3.5 py-3 text-center">
-                        <span className="font-mono font-bold text-slate-800">{item.currentStock}</span>
+                        <span className="font-mono font-bold text-slate-800 dark:text-slate-100">{item.currentStock}</span>
                         <span className="text-[10px] text-slate-400 block">{item.unitOfMeasure}</span>
                       </td>
 
@@ -762,11 +762,11 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                         </span>
                       </td>
 
-                      <td className="px-3.5 py-3 text-right font-mono font-bold text-slate-800">
+                      <td className="px-3.5 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-100">
                         <MaskedCost amount={item.totalStockValue} />
                       </td>
 
-                      <td className="px-3.5 py-3 text-[11px] text-slate-600 max-w-xs">
+                      <td className="px-3.5 py-3 text-[11px] text-slate-600 max-w-xs dark:text-slate-300">
                         {item.liquidationAction || 'Maintain regular order cycle with automatic FEFO picking.'}
                       </td>
 
@@ -774,7 +774,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                         {item.isDeadStock ? (
                           <button
                             onClick={() => setLiquidationModalItem(item)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-md font-semibold text-xs transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-md font-semibold text-xs transition-colors cursor-pointer dark:bg-rose-950/40 dark:hover:bg-rose-900/60 dark:text-rose-300 dark:border-rose-800/70"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                             <span>Liquidate</span>
@@ -812,7 +812,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700">{b.bracket}</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{b.bracket}</span>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
                       b.riskLevel === 'low' 
                         ? 'bg-emerald-100 text-emerald-800' 
@@ -826,17 +826,17 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     </span>
                   </div>
 
-                  <div className="mt-2 text-xl font-black text-slate-900">
+                  <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
                     <MaskedCost amount={b.totalValuation} />
                   </div>
 
-                  <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                  <div className="mt-1 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>{b.totalQuantity} units</span>
                     <span className="font-semibold">{b.percentageOfInventory}% of total</span>
                   </div>
 
                   {/* Micro Progress Bar */}
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden dark:bg-slate-800">
                     <div 
                       className={`h-full ${
                         b.riskLevel === 'low' 
@@ -856,19 +856,19 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
           </div>
 
           {/* Aging Batches Drill-Down */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
+            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
               <div>
-                <h4 className="text-xs font-bold text-slate-800">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
                   Aging Batches Drill-Down {selectedAgingBracket !== 'all' ? `— [${selectedAgingBracket}]` : '— All Age Brackets'}
                 </h4>
-                <p className="text-[11px] text-slate-500">Calculated from manufacturing & stock arrival receipt timestamp</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Calculated from manufacturing & stock arrival receipt timestamp</p>
               </div>
 
               {selectedAgingBracket !== 'all' && (
                 <button
                   onClick={() => setSelectedAgingBracket('all')}
-                  className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold cursor-pointer"
+                  className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold cursor-pointer dark:text-emerald-400"
                 >
                   Clear Bracket Filter
                 </button>
@@ -876,8 +876,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+              <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                   <tr>
                     <th className="px-3.5 py-2.5">Batch Number</th>
                     <th className="px-3.5 py-2.5">Medicine Name</th>
@@ -889,12 +889,12 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     <th className="px-3.5 py-2.5 text-right">Batch Valuation</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {agingBatches.map(b => (
-                    <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-3.5 py-3 font-mono font-bold text-slate-900">{b.batchNumber}</td>
-                      <td className="px-3.5 py-3 font-semibold text-slate-800">{b.medicineName}</td>
-                      <td className="px-3.5 py-3 text-center font-mono text-slate-500">{b.manufacturingDate}</td>
+                    <tr key={b.id} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
+                      <td className="px-3.5 py-3 font-mono font-bold text-slate-900 dark:text-white">{b.batchNumber}</td>
+                      <td className="px-3.5 py-3 font-semibold text-slate-800 dark:text-slate-100">{b.medicineName}</td>
+                      <td className="px-3.5 py-3 text-center font-mono text-slate-500 dark:text-slate-400">{b.manufacturingDate}</td>
                       <td className="px-3.5 py-3 text-center">
                         <span className={`px-2 py-0.5 rounded font-mono font-bold text-xs ${
                           b.ageDays > 180 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'
@@ -902,14 +902,14 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                           {b.ageDays} days
                         </span>
                       </td>
-                      <td className="px-3.5 py-3 text-center font-mono text-slate-500">{b.expiryDate}</td>
+                      <td className="px-3.5 py-3 text-center font-mono text-slate-500 dark:text-slate-400">{b.expiryDate}</td>
                       <td className="px-3.5 py-3 text-center font-mono">
                         <span className={`font-semibold ${b.daysToExpiry <= 60 ? 'text-rose-600 font-bold' : 'text-slate-600'}`}>
                           {b.daysToExpiry} days
                         </span>
                       </td>
-                      <td className="px-3.5 py-3 text-center font-mono font-bold text-slate-800">{b.currentStock}</td>
-                      <td className="px-3.5 py-3 text-right font-mono font-bold text-slate-800">
+                      <td className="px-3.5 py-3 text-center font-mono font-bold text-slate-800 dark:text-slate-100">{b.currentStock}</td>
+                      <td className="px-3.5 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-100">
                         <MaskedCost amount={b.value} />
                       </td>
                     </tr>
@@ -927,20 +927,20 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
       {activeTab === 'stock_valuation' && (
         <div className="space-y-4">
           {printSuccessMsg && (
-            <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2 dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>{printSuccessMsg}</span>
             </div>
           )}
 
           {/* Comparative Valuation Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="text-xs text-slate-500 font-semibold flex items-center justify-between">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="text-xs text-slate-500 font-semibold flex items-center justify-between dark:text-slate-400">
                 <span>Weighted Average Cost (WAC)</span>
-                <span className="text-[10px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded font-bold">Standard</span>
+                <span className="text-[10px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded font-bold dark:bg-sky-950/60 dark:text-sky-300">Standard</span>
               </div>
-              <div className="text-2xl font-black text-sky-700 mt-2">
+              <div className="text-2xl font-black text-sky-700 mt-2 dark:text-sky-300">
                 <MaskedCost amount={valuationData.weightedAverageValuation} />
               </div>
               <div className="text-[11px] text-slate-400 mt-1">
@@ -948,12 +948,12 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="text-xs text-slate-500 font-semibold flex items-center justify-between">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="text-xs text-slate-500 font-semibold flex items-center justify-between dark:text-slate-400">
                 <span>FIFO Replacement Valuation</span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Latest Batches</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold dark:bg-emerald-950/60 dark:text-emerald-300">Latest Batches</span>
               </div>
-              <div className="text-2xl font-black text-emerald-700 mt-2">
+              <div className="text-2xl font-black text-emerald-700 mt-2 dark:text-emerald-300">
                 <MaskedCost amount={valuationData.fifoValuation} />
               </div>
               <div className="text-[11px] text-slate-400 mt-1">
@@ -961,8 +961,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="text-xs text-slate-500 font-semibold">Valuation Variance</div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="text-xs text-slate-500 font-semibold dark:text-slate-400">Valuation Variance</div>
               <div className={`text-2xl font-black mt-2 ${valuationData.varianceAmount >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {valuationData.varianceAmount >= 0 ? '+' : ''}৳{valuationData.varianceAmount.toLocaleString()}
               </div>
@@ -971,9 +971,9 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-              <div className="text-xs text-slate-500 font-semibold">Total Retail Value (MRP)</div>
-              <div className="text-2xl font-black text-purple-700 mt-2">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
+              <div className="text-xs text-slate-500 font-semibold dark:text-slate-400">Total Retail Value (MRP)</div>
+              <div className="text-2xl font-black text-purple-700 mt-2 dark:text-purple-300">
                 <MaskedCost amount={valuationData.retailValueMRP} />
               </div>
               <div className="text-[11px] text-slate-400 mt-1 font-mono">
@@ -983,14 +983,14 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
           </div>
 
           {/* Audit Note & Valuation Statement Generator */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 dark:bg-slate-900 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <span className="p-2 bg-slate-200 text-slate-700 rounded-lg">
+              <span className="p-2 bg-slate-200 text-slate-700 rounded-lg dark:bg-slate-700 dark:text-slate-200">
                 <FileText className="w-5 h-5" />
               </span>
               <div>
-                <h4 className="text-xs font-bold text-slate-900">Hospital Pharmacy Stock Audit Valuation Ledger</h4>
-                <p className="text-[11px] text-slate-500">
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white">Hospital Pharmacy Stock Audit Valuation Ledger</h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Complies with Bangladesh DGDA & IAS 2 Inventory Standards. Dual FIFO & Weighted Average tracking.
                 </p>
               </div>
@@ -1009,8 +1009,8 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
           </div>
 
           {/* Detailed Valuation Table per Drug */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
+            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
               <div className="relative flex-1 max-w-sm">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -1018,17 +1018,17 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                   placeholder="Search valuation ledger..."
                   value={valuationSearch}
                   onChange={(e) => setValuationSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-slate-500 font-mono dark:text-slate-400">
                 Date: {valuationData.valuationDate}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+              <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                   <tr>
                     <th className="px-3.5 py-2.5">Medicine Name</th>
                     <th className="px-3.5 py-2.5 text-center">Units in Stock</th>
@@ -1039,7 +1039,7 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                     <th className="px-3.5 py-2.5 text-right">Variance</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {medicines
                     .filter(m => m.name.toLowerCase().includes(valuationSearch.toLowerCase()) || m.genericName.toLowerCase().includes(valuationSearch.toLowerCase()))
                     .map(m => {
@@ -1057,34 +1057,34 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
                       const variance = fifoVal - wacVal;
 
                       return (
-                        <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={m.id} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
                           <td className="px-3.5 py-3">
-                            <div className="font-bold text-slate-900">{m.name}</div>
-                            <div className="text-[11px] text-slate-500">{m.genericName} • {medBatches.length} batch(es)</div>
+                            <div className="font-bold text-slate-900 dark:text-white">{m.name}</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400">{m.genericName} • {medBatches.length} batch(es)</div>
                           </td>
 
-                          <td className="px-3.5 py-3 text-center font-mono font-bold text-slate-800">
+                          <td className="px-3.5 py-3 text-center font-mono font-bold text-slate-800 dark:text-slate-100">
                             {totalQty} {m.unitOfMeasure}
                           </td>
 
-                          <td className="px-3.5 py-3 text-right font-mono text-slate-600">
+                          <td className="px-3.5 py-3 text-right font-mono text-slate-600 dark:text-slate-300">
                             ৳{wacUnit.toFixed(2)}
                           </td>
 
-                          <td className="px-3.5 py-3 text-right font-mono text-slate-600">
+                          <td className="px-3.5 py-3 text-right font-mono text-slate-600 dark:text-slate-300">
                             ৳{fifoUnit.toFixed(2)}
                           </td>
 
-                          <td className="px-3.5 py-3 text-right font-mono font-bold text-sky-700">
+                          <td className="px-3.5 py-3 text-right font-mono font-bold text-sky-700 dark:text-sky-300">
                             <MaskedCost amount={Math.round(wacVal)} />
                           </td>
 
-                          <td className="px-3.5 py-3 text-right font-mono font-bold text-emerald-700">
+                          <td className="px-3.5 py-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-300">
                             <MaskedCost amount={Math.round(fifoVal)} />
                           </td>
 
                           <td className="px-3.5 py-3 text-right font-mono font-semibold">
-                            <span className={variance >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
+                            <span className={variance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                               {variance >= 0 ? '+' : ''}৳{Math.round(variance)}
                             </span>
                           </td>
@@ -1103,83 +1103,83 @@ export const InventoryAnalyticsEoqView: React.FC<InventoryAnalyticsEoqViewProps>
       {/* ========================================================================= */}
       {liquidationModalItem && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-5 border border-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-5 border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <span className="p-2 bg-rose-100 text-rose-700 rounded-lg">
+                <span className="p-2 bg-rose-100 text-rose-700 rounded-lg dark:bg-rose-950/60 dark:text-rose-300">
                   <RotateCcw className="w-5 h-5" />
                 </span>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Dead Stock Liquidation Protocol</h3>
-                  <p className="text-xs text-slate-500">Formulate immediate recovery strategy for non-moving medicine</p>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Dead Stock Liquidation Protocol</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Formulate immediate recovery strategy for non-moving medicine</p>
                 </div>
               </div>
               <button
                 onClick={() => setLiquidationModalItem(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer dark:hover:text-slate-200"
               >
                 ✕
               </button>
             </div>
 
             <div className="py-4 space-y-3 text-xs">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
-                <div className="font-bold text-slate-900 text-sm">{liquidationModalItem.medicineName}</div>
-                <div className="text-slate-500">{liquidationModalItem.genericName} ({liquidationModalItem.category})</div>
-                <div className="flex justify-between pt-2 text-slate-700 font-mono">
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1 dark:bg-slate-900 dark:border-slate-800">
+                <div className="font-bold text-slate-900 text-sm dark:text-white">{liquidationModalItem.medicineName}</div>
+                <div className="text-slate-500 dark:text-slate-400">{liquidationModalItem.genericName} ({liquidationModalItem.category})</div>
+                <div className="flex justify-between pt-2 text-slate-700 font-mono dark:text-slate-200">
                   <span>Current Locked Stock: <strong>{liquidationModalItem.currentStock} units</strong></span>
-                  <span>Locked Capital: <strong className="text-rose-600">৳{liquidationModalItem.totalStockValue}</strong></span>
+                  <span>Locked Capital: <strong className="text-rose-600 dark:text-rose-400">৳{liquidationModalItem.totalStockValue}</strong></span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="font-bold text-slate-700 block">Select Liquidation Channel:</label>
+                <label className="font-bold text-slate-700 block dark:text-slate-200">Select Liquidation Channel:</label>
                 
                 <button
                   onClick={() => handleExecuteLiquidation('Vendor Debit Note Return')}
-                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition-all cursor-pointer"
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition-all cursor-pointer dark:border-slate-800"
                 >
-                  <div className="font-bold text-slate-900 flex items-center justify-between">
+                  <div className="font-bold text-slate-900 flex items-center justify-between dark:text-white">
                     <span>1. Vendor Return Claim (Beximco / Square / Incepta)</span>
-                    <span className="text-emerald-600 font-mono">100% Credit Note</span>
+                    <span className="text-emerald-600 font-mono dark:text-emerald-400">100% Credit Note</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[11px] text-slate-500 mt-1 dark:text-slate-400">
                     Return near-expiry/zero-velocity stock back to authorized manufacturer depot for replacement credit.
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleExecuteLiquidation('OPD Clearance Markdown 25%')}
-                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition-all cursor-pointer"
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition-all cursor-pointer dark:border-slate-800"
                 >
-                  <div className="font-bold text-slate-900 flex items-center justify-between">
+                  <div className="font-bold text-slate-900 flex items-center justify-between dark:text-white">
                     <span>2. Outpatient Counter Clearance (25% Discount)</span>
-                    <span className="text-amber-700 font-mono">Rapid OTC Sell-off</span>
+                    <span className="text-amber-700 font-mono dark:text-amber-300">Rapid OTC Sell-off</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[11px] text-slate-500 mt-1 dark:text-slate-400">
                     Apply promotional bundle discount at POS counter to stimulate immediate customer purchase.
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleExecuteLiquidation('Internal Ward / OT Bulk Reallocation')}
-                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-sky-500 hover:bg-sky-50/50 transition-all cursor-pointer"
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-sky-500 hover:bg-sky-50/50 transition-all cursor-pointer dark:border-slate-800"
                 >
-                  <div className="font-bold text-slate-900 flex items-center justify-between">
+                  <div className="font-bold text-slate-900 flex items-center justify-between dark:text-white">
                     <span>3. Inpatient Ward / OT Emergency Reallocation</span>
-                    <span className="text-sky-700 font-mono">Internal Transfer</span>
+                    <span className="text-sky-700 font-mono dark:text-sky-300">Internal Transfer</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[11px] text-slate-500 mt-1 dark:text-slate-400">
                     Transfer stock to high-volume hospital inpatient ward or surgery theatre crash cart.
                   </p>
                 </button>
               </div>
             </div>
 
-            <div className="flex justify-end pt-3 border-t border-slate-200">
+            <div className="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-800">
               <button
                 onClick={() => setLiquidationModalItem(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200"
               >
                 Cancel
               </button>

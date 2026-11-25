@@ -285,7 +285,7 @@ export const RoleManagementView: React.FC = () => {
   if (!isSuperAdmin && currentUser?.roleCode !== 'super_admin') {
     return (
       <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-red-900/50 m-6 max-w-lg mx-auto shadow-lg text-slate-800 dark:text-slate-200">
-        <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center mx-auto mb-3">
+        <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center mx-auto mb-3 dark:text-red-400">
           <AlertTriangle className="w-6 h-6" />
         </div>
         <h3 className="text-lg font-bold text-slate-900 dark:text-white">Access Restricted</h3>
@@ -297,7 +297,7 @@ export const RoleManagementView: React.FC = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-slate-800">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-slate-800 dark:text-slate-100">
       {/* Top Banner / Breadcrumb */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800">
         <div className="flex items-center gap-3.5">
@@ -362,16 +362,16 @@ export const RoleManagementView: React.FC = () => {
           }`}
         >
           {feedbackMsg.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 dark:text-emerald-400" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 dark:text-rose-400" />
           )}
           <span>{feedbackMsg.text}</span>
         </div>
       )}
 
       {/* Main Section Navigation Switcher */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveMainTab('roles')}
@@ -400,15 +400,15 @@ export const RoleManagementView: React.FC = () => {
 
         {/* Live Preview Persona Indicator */}
         <div className="hidden sm:flex items-center gap-2 text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-          <span className="text-slate-500 font-medium">Active Test Persona:</span>
-          <strong className="text-purple-700 font-bold">{currentUser.name}</strong>
-          <span className="text-[10px] font-mono bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-bold">
+          <span className="text-slate-500 font-medium dark:text-slate-400">Active Test Persona:</span>
+          <strong className="text-purple-700 font-bold dark:text-purple-300">{currentUser.name}</strong>
+          <span className="text-[10px] font-mono bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-bold dark:bg-purple-950/60 dark:text-purple-300">
             {currentUser.roleName}
           </span>
           {currentUser.roleCode !== 'super_admin' && (
             <button
               onClick={() => switchUser(allUsers[0].id)}
-              className="ml-2 text-[10px] font-bold text-sky-600 hover:text-sky-800 underline cursor-pointer"
+              className="ml-2 text-[10px] font-bold text-sky-600 hover:text-sky-800 underline cursor-pointer dark:text-sky-400"
             >
               Reset to Admin
             </button>
@@ -422,13 +422,13 @@ export const RoleManagementView: React.FC = () => {
       {activeMainTab === 'roles' && (
         <div className="space-y-6">
           {/* Role Selector Carousel / Grid */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 dark:bg-[#111827] dark:border-slate-800">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wide">
-                <ShieldCheck className="w-4 h-4 text-purple-600" />
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wide dark:text-slate-200">
+                <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 <span>Select Role to Configure Permissions:</span>
               </div>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Click any role to edit its access. Checkboxes below update the role immediately.
               </span>
             </div>
@@ -453,20 +453,20 @@ export const RoleManagementView: React.FC = () => {
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs text-slate-900 leading-tight">
+                        <span className="font-bold text-xs text-slate-900 leading-tight dark:text-white">
                           {role.name}
                         </span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-purple-600 shrink-0 dark:text-purple-400" />}
                       </div>
-                      <span className="text-[10px] text-slate-500 block mt-0.5">
+                      <span className="text-[10px] text-slate-500 block mt-0.5 dark:text-slate-400">
                         {role.permissions.includes('*') ? 'All (*)' : `${grantedCount} perms`}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[9px] text-slate-500 mt-1 pt-1 border-t border-slate-200/60">
+                    <div className="flex items-center justify-between text-[9px] text-slate-500 mt-1 pt-1 border-t border-slate-200/60 dark:text-slate-400">
                       <span>Disc: {role.maxDiscountPercent}%</span>
                       {isCurrentPersona ? (
-                        <span className="text-purple-700 font-extrabold uppercase">Live</span>
+                        <span className="text-purple-700 font-extrabold uppercase dark:text-purple-300">Live</span>
                       ) : (
                         <button
                           type="button"
@@ -474,7 +474,7 @@ export const RoleManagementView: React.FC = () => {
                             e.stopPropagation();
                             switchRole(role.code);
                           }}
-                          className="text-[9px] text-sky-600 hover:text-sky-800 font-bold underline"
+                          className="text-[9px] text-sky-600 hover:text-sky-800 font-bold underline dark:text-sky-400"
                           title="Switch active session persona to this role"
                         >
                           Test
@@ -490,11 +490,11 @@ export const RoleManagementView: React.FC = () => {
           {/* Role Detail Header & Guardrails Inspection */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left: Role Profile & Guardrail Config */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5 dark:bg-[#111827] dark:border-slate-800">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-slate-900">{currentRoleDetails.name}</h3>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">{currentRoleDetails.name}</h3>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                         currentRoleDetails.isSystem
@@ -505,7 +505,7 @@ export const RoleManagementView: React.FC = () => {
                       {currentRoleDetails.isSystem ? 'System Role' : 'Custom Role'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{currentRoleDetails.description}</p>
+                  <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">{currentRoleDetails.description}</p>
                 </div>
 
                 {!currentRoleDetails.isSystem && (
@@ -516,7 +516,7 @@ export const RoleManagementView: React.FC = () => {
                         setSelectedRole(allRoles[0]);
                       }
                     }}
-                    className="text-rose-500 hover:text-rose-700 p-1.5 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
+                    className="text-rose-500 hover:text-rose-700 p-1.5 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors dark:hover:bg-rose-950/50"
                     title="Delete Custom Role"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -525,28 +525,28 @@ export const RoleManagementView: React.FC = () => {
               </div>
 
               {/* Dynamic Role Inheritance Status Box */}
-              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs space-y-1">
-                <div className="flex items-center gap-1.5 font-bold text-purple-900 text-[11px]">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs space-y-1 dark:bg-purple-950/40 dark:border-purple-800/70">
+                <div className="flex items-center gap-1.5 font-bold text-purple-900 text-[11px] dark:text-purple-300">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   <span>Dynamic Role Inheritance Active</span>
                 </div>
-                <p className="text-[11px] text-purple-800 leading-snug">
+                <p className="text-[11px] text-purple-800 leading-snug dark:text-purple-300">
                   Any permission checked below immediately updates the role. All employees assigned this role ({allUsers.filter((u) => u.roleCode === currentRoleDetails.code).length} staff) and their sidebar navigation will refresh in real time.
                 </p>
               </div>
 
               {/* Security Guardrails Panel */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
-                <div className="font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 text-[11px]">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs dark:bg-slate-900 dark:border-slate-800">
+                <div className="font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 text-[11px] dark:text-slate-200">
                   <Lock className="w-3.5 h-3.5 text-amber-500" />
                   <span>Enforced Security Guardrails</span>
                 </div>
 
                 {/* Guardrail 1: Max Manual Discount */}
                 <div className="space-y-1">
-                  <div className="flex justify-between items-center text-slate-700">
+                  <div className="flex justify-between items-center text-slate-700 dark:text-slate-200">
                     <span>Max Manual Discount Limit:</span>
-                    <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300">
+                    <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300 dark:text-white dark:bg-[#111827] dark:border-slate-700">
                       {currentRoleDetails.maxDiscountPercent}%
                     </span>
                   </div>
@@ -558,19 +558,19 @@ export const RoleManagementView: React.FC = () => {
                       step="1"
                       value={currentRoleDetails.maxDiscountPercent}
                       onChange={(e) => handleUpdateDiscountThreshold(currentRoleDetails, Number(e.target.value))}
-                      className="w-full accent-purple-600 cursor-pointer"
+                      className="w-full accent-purple-600 cursor-pointer bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
                     Discounts exceeding this threshold require Manager Override Authorization.
                   </p>
                 </div>
 
                 {/* Guardrail 2: Purchase Cost Visibility */}
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between dark:border-slate-800">
                   <div className="flex items-center gap-2">
                     {currentRoleDetails.canViewPurchaseCosts ? (
-                      <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                      <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <EyeOff className="w-3.5 h-3.5 text-rose-500" />
                     )}
@@ -593,10 +593,10 @@ export const RoleManagementView: React.FC = () => {
                 </div>
 
                 {/* Guardrail 3: Profit Margins Visibility */}
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between dark:border-slate-800">
                   <div className="flex items-center gap-2">
                     {currentRoleDetails.canViewProfitMargins ? (
-                      <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                      <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <EyeOff className="w-3.5 h-3.5 text-rose-500" />
                     )}
@@ -619,10 +619,10 @@ export const RoleManagementView: React.FC = () => {
                 </div>
 
                 {/* Guardrail 4: Accounting Books Access */}
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between dark:border-slate-800">
                   <div className="flex items-center gap-2">
                     {currentRoleDetails.canViewAccounting ? (
-                      <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                      <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <EyeOff className="w-3.5 h-3.5 text-rose-500" />
                     )}
@@ -646,13 +646,13 @@ export const RoleManagementView: React.FC = () => {
               </div>
 
               {/* Total Active Count */}
-              <div className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+              <div className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800">
                 <span>
                   <strong>Granted Privileges:</strong>{' '}
                   {currentRoleDetails.permissions.includes('*') ? (
-                    <span className="font-bold text-purple-600">Full Root Wildcard (*)</span>
+                    <span className="font-bold text-purple-600 dark:text-purple-400">Full Root Wildcard (*)</span>
                   ) : (
-                    <span className="font-bold text-slate-900">
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {currentRoleDetails.permissions.length} of {ALL_PERMISSIONS.length}
                     </span>
                   )}
@@ -667,16 +667,16 @@ export const RoleManagementView: React.FC = () => {
             </div>
 
             {/* Right 2 cols: Granular Permissions Matrix with Real Functional Checkboxes */}
-            <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-100">
+            <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 dark:bg-[#111827] dark:border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                  <h3 className="text-sm font-black text-slate-900 flex items-center gap-2 dark:text-white">
                     <span>Granular Permissions for:</span>
-                    <span className="px-2 py-0.5 rounded-lg bg-purple-100 text-purple-800 font-bold">
+                    <span className="px-2 py-0.5 rounded-lg bg-purple-100 text-purple-800 font-bold dark:bg-purple-950/60 dark:text-purple-300">
                       {currentRoleDetails.name}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Click checkboxes to grant or revoke specific actions. Changes take effect dynamically.
                   </p>
                 </div>
@@ -688,7 +688,7 @@ export const RoleManagementView: React.FC = () => {
                         updateRole(currentRoleDetails.id, { permissions: ALL_PERMISSIONS });
                         triggerToast('success', `Granted ALL permissions to ${currentRoleDetails.name}`);
                       }}
-                      className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold cursor-pointer transition-colors"
+                      className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold cursor-pointer transition-colors dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-800/70"
                     >
                       Grant All
                     </button>
@@ -697,7 +697,7 @@ export const RoleManagementView: React.FC = () => {
                         updateRole(currentRoleDetails.id, { permissions: [] });
                         triggerToast('success', `Revoked all permissions from ${currentRoleDetails.name}`);
                       }}
-                      className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-bold cursor-pointer transition-colors"
+                      className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-bold cursor-pointer transition-colors dark:bg-rose-950/40 dark:hover:bg-rose-900/60 dark:text-rose-300 dark:border-rose-800/70"
                     >
                       Revoke All
                     </button>
@@ -706,10 +706,10 @@ export const RoleManagementView: React.FC = () => {
               </div>
 
               {currentRoleDetails.permissions.includes('*') ? (
-                <div className="p-8 text-center bg-purple-50 rounded-2xl border border-purple-200 space-y-2">
-                  <Sparkles className="w-8 h-8 text-purple-600 mx-auto" />
-                  <h4 className="font-bold text-slate-900">Root Wildcard Privilege Active (*)</h4>
-                  <p className="text-xs text-purple-800 max-w-md mx-auto">
+                <div className="p-8 text-center bg-purple-50 rounded-2xl border border-purple-200 space-y-2 dark:bg-purple-950/40 dark:border-purple-800/70">
+                  <Sparkles className="w-8 h-8 text-purple-600 mx-auto dark:text-purple-400" />
+                  <h4 className="font-bold text-slate-900 dark:text-white">Root Wildcard Privilege Active (*)</h4>
+                  <p className="text-xs text-purple-800 max-w-md mx-auto dark:text-purple-300">
                     {currentRoleDetails.name} inherits unrestricted authorization across all present and future modules without restriction.
                   </p>
                 </div>
@@ -722,17 +722,17 @@ export const RoleManagementView: React.FC = () => {
                     const allInGroupGranted = grantedCount === group.permissions.length;
 
                     return (
-                      <div key={group.module} className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                      <div key={group.module} className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs dark:border-slate-800">
                         {/* Group Header with Select/Deselect All */}
-                        <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+                        <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between dark:bg-slate-900 dark:border-slate-800">
                           <div>
-                            <span className="font-black text-xs text-slate-800 uppercase tracking-wide">
+                            <span className="font-black text-xs text-slate-800 uppercase tracking-wide dark:text-slate-100">
                               {group.name}
                             </span>
-                            <p className="text-[10px] text-slate-500">{group.description}</p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">{group.description}</p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
                               {grantedCount} / {group.permissions.length}
                             </span>
                             <button
@@ -742,7 +742,7 @@ export const RoleManagementView: React.FC = () => {
                                   ? handleRevokeGroupPermissions(currentRoleDetails, group.module)
                                   : handleGrantGroupPermissions(currentRoleDetails, group.module)
                               }
-                              className="text-[11px] font-bold text-purple-700 hover:text-purple-900 hover:underline cursor-pointer"
+                              className="text-[11px] font-bold text-purple-700 hover:text-purple-900 hover:underline cursor-pointer dark:text-purple-300"
                             >
                               {allInGroupGranted ? 'Deselect All' : 'Select All'}
                             </button>
@@ -750,7 +750,7 @@ export const RoleManagementView: React.FC = () => {
                         </div>
 
                         {/* Granular Permission Items with Real Checkboxes */}
-                        <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white">
+                        <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 bg-white dark:bg-[#111827]">
                           {group.permissions.map((perm) => {
                             const isChecked = currentRoleDetails.permissions.includes(perm.code);
                             return (
@@ -770,23 +770,23 @@ export const RoleManagementView: React.FC = () => {
                                     id={`perm-check-${perm.code}`}
                                     checked={isChecked}
                                     onChange={() => handleTogglePermission(currentRoleDetails, perm.code)}
-                                    className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-600"
+                                    className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer accent-emerald-600 dark:border-slate-700 dark:text-emerald-400"
                                   />
                                 </div>
 
                                 <div className="flex-1 space-y-0.5">
                                   <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="font-bold text-xs text-slate-900">{perm.label}</span>
+                                    <span className="font-bold text-xs text-slate-900 dark:text-white">{perm.label}</span>
                                     {perm.isSensitive && (
-                                      <span className="text-[9px] px-1 py-0.2 bg-amber-100 text-amber-800 rounded font-bold border border-amber-200">
+                                      <span className="text-[9px] px-1 py-0.2 bg-amber-100 text-amber-800 rounded font-bold border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
                                         Sensitive
                                       </span>
                                     )}
                                   </div>
-                                  <code className="text-[10px] text-slate-500 block font-mono">
+                                  <code className="text-[10px] text-slate-500 block font-mono dark:text-slate-400">
                                     {perm.code}
                                   </code>
-                                  <p className="text-[10px] text-slate-500 leading-tight">
+                                  <p className="text-[10px] text-slate-500 leading-tight dark:text-slate-400">
                                     {perm.description}
                                   </p>
                                 </div>
@@ -808,14 +808,14 @@ export const RoleManagementView: React.FC = () => {
       {/* TAB 2: STAFF & EMPLOYEE DIRECTORY (ASSIGN ROLES) */}
       {/* ======================================================== */}
       {activeMainTab === 'employees' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5 dark:bg-[#111827] dark:border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-600" />
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2 dark:text-white">
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <span>Pharmacy Staff &amp; Employee Directory</span>
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 When adding an employee, simply assign them a role. All permissions and guardrails are inherited automatically.
               </p>
             </div>
@@ -837,7 +837,7 @@ export const RoleManagementView: React.FC = () => {
           </div>
 
           {/* Search & Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs dark:bg-slate-900 dark:border-slate-800">
             <div className="flex items-center gap-2 flex-1 min-w-[240px]">
               <Search className="w-4 h-4 text-slate-400" />
               <input
@@ -845,17 +845,17 @@ export const RoleManagementView: React.FC = () => {
                 placeholder="Search staff by name, Employee ID, or phone..."
                 value={employeeSearch}
                 onChange={(e) => setEmployeeSearch(e.target.value)}
-                className="bg-transparent border-none outline-none w-full text-xs text-slate-800 placeholder-slate-400"
+                className="bg-transparent border-none outline-none w-full text-xs text-slate-800 placeholder-slate-400 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             <div className="flex items-center gap-2">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
-              <span className="font-semibold text-slate-600">Filter Role:</span>
+              <span className="font-semibold text-slate-600 dark:text-slate-300">Filter Role:</span>
               <select
                 value={employeeRoleFilter}
                 onChange={(e) => setEmployeeRoleFilter(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer"
+                className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer dark:bg-[#111827] dark:border-slate-700 text-slate-900 dark:text-slate-100"
               >
                 <option value="all">All Roles ({allUsers.length})</option>
                 {allRoles.map((r) => (
@@ -868,9 +868,9 @@ export const RoleManagementView: React.FC = () => {
           </div>
 
           {/* Employees Table */}
-          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+          <div className="overflow-x-auto border border-slate-200 rounded-xl dark:border-slate-800">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10px]">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-extrabold text-[10px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="py-3 px-4">Employee</th>
                   <th className="py-3 px-4">Branch Location</th>
@@ -880,7 +880,7 @@ export const RoleManagementView: React.FC = () => {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredEmployees.map((emp) => {
                   const empRole = allRoles.find((r) => r.code === emp.roleCode) || allRoles[0];
                   const isCurrent = currentUser.id === emp.id;
@@ -889,24 +889,24 @@ export const RoleManagementView: React.FC = () => {
                     : empRole.permissions.length;
 
                   return (
-                    <tr key={emp.id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={emp.id} className="hover:bg-slate-50/70 transition-colors dark:hover:bg-slate-800/60">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-black flex items-center justify-center shrink-0 border border-purple-200">
+                          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-black flex items-center justify-center shrink-0 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/70">
                             {emp.name.charAt(0)}
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-slate-900">{emp.name}</span>
+                              <span className="font-bold text-slate-900 dark:text-white">{emp.name}</span>
                               {isCurrent && (
-                                <span className="text-[9px] px-1.5 py-0.2 bg-purple-100 text-purple-800 font-bold rounded">
+                                <span className="text-[9px] px-1.5 py-0.2 bg-purple-100 text-purple-800 font-bold rounded dark:bg-purple-950/60 dark:text-purple-300">
                                   Current
                                 </span>
                               )}
                             </div>
-                            <div className="text-[10px] text-slate-500 flex items-center gap-2 mt-0.5">
-                              <span className="flex items-center gap-1 font-mono font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-                                <BadgeCheck className="w-3 h-3 text-purple-600" />
+                            <div className="text-[10px] text-slate-500 flex items-center gap-2 mt-0.5 dark:text-slate-400">
+                              <span className="flex items-center gap-1 font-mono font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-800">
+                                <BadgeCheck className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                                 <span>ID: {emp.employeeId || emp.email.split('@')[0]}</span>
                               </span>
                               {emp.phone && (
@@ -921,7 +921,7 @@ export const RoleManagementView: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1.5 text-slate-700">
+                        <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-200">
                           <Building2 className="w-3.5 h-3.5 text-slate-400" />
                           <span>{emp.branchName}</span>
                         </div>
@@ -938,7 +938,7 @@ export const RoleManagementView: React.FC = () => {
                               `Role updated to '${allRoles.find((r) => r.code === e.target.value)?.name}' for ${emp.name}`
                             );
                           }}
-                          className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 cursor-pointer shadow-2xs hover:border-purple-500"
+                          className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 cursor-pointer shadow-2xs hover:border-purple-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100"
                         >
                           {allRoles.map((r) => (
                             <option key={r.id} value={r.code}>
@@ -949,16 +949,16 @@ export const RoleManagementView: React.FC = () => {
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <span className="font-semibold text-slate-700">
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">
                           {empRole.permissions.includes('*') ? (
-                            <span className="text-purple-600 font-bold">Root All (*)</span>
+                            <span className="text-purple-600 font-bold dark:text-purple-400">Root All (*)</span>
                           ) : (
                             `${grantedCount} / ${ALL_PERMISSIONS.length} Privileges`
                           )}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-800 dark:text-slate-100">
                         {empRole.maxDiscountPercent}%
                       </td>
 
@@ -973,10 +973,10 @@ export const RoleManagementView: React.FC = () => {
                                 setConfirmResetPassword('');
                                 setShowResetPasswordModal(true);
                               }}
-                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors flex items-center gap-1 cursor-pointer"
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors flex items-center gap-1 cursor-pointer dark:bg-amber-950/40 dark:hover:bg-amber-900/60 dark:text-amber-300 dark:border-amber-800/70"
                               title="Reset/Change password for this employee"
                             >
-                              <KeyRound className="w-3 h-3 text-amber-600" />
+                              <KeyRound className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                               <span>Change Pass</span>
                             </button>
                           )}
@@ -1004,7 +1004,7 @@ export const RoleManagementView: React.FC = () => {
                                   triggerToast('success', `Removed ${emp.name}`);
                                 }
                               }}
-                              className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer"
+                              className="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer dark:hover:bg-rose-950/50"
                               title="Delete Employee"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1026,7 +1026,7 @@ export const RoleManagementView: React.FC = () => {
       {/* ======================================================== */}
       {showAddEmployeeModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserCheck className="w-5 h-5 text-purple-400" />
@@ -1042,32 +1042,32 @@ export const RoleManagementView: React.FC = () => {
 
             <form onSubmit={handleAddEmployeeSubmit} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Full Employee Name *</label>
+                <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Full Employee Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Tanvir Ahmed, BPharm"
                   value={newEmpName}
                   onChange={(e) => setNewEmpName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Employee ID (Login ID) *</label>
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Employee ID (Login ID) *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. EMP-101 or CSH-01"
                     value={newEmpEmployeeId}
                     onChange={(e) => setNewEmpEmployeeId(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">
                     Login Password *
                   </label>
                   <input
@@ -1076,34 +1076,34 @@ export const RoleManagementView: React.FC = () => {
                     placeholder="Enter employee password..."
                     value={newEmpPassword}
                     onChange={(e) => setNewEmpPassword(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
+                <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Phone Number</label>
                 <input
                   type="text"
                   placeholder="+880 1711-000000"
                   value={newEmpPhone}
                   onChange={(e) => setNewEmpPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               {/* Crucial Requirement: Assign Role */}
-              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1.5">
-                <label className="font-bold text-purple-900 block text-xs">
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl space-y-1.5 dark:bg-purple-950/40 dark:border-purple-800/70">
+                <label className="font-bold text-purple-900 block text-xs dark:text-purple-300">
                   Assign System / Custom Role *
                 </label>
-                <p className="text-[10px] text-purple-700">
+                <p className="text-[10px] text-purple-700 dark:text-purple-300">
                   The employee will automatically inherit all permissions, discount limits, and financial visibility defined for this role.
                 </p>
                 <select
                   value={newEmpRole}
                   onChange={(e) => setNewEmpRole(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 shadow-2xs cursor-pointer"
+                  className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900 shadow-2xs cursor-pointer dark:bg-[#111827] dark:border-purple-800/70 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 >
                   {allRoles.map((r) => (
                     <option key={r.id} value={r.code}>
@@ -1115,11 +1115,11 @@ export const RoleManagementView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Assigned Branch (Facility Tag)</label>
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Assigned Branch (Facility Tag)</label>
                   <select
                     value={newEmpBranch}
                     onChange={(e) => setNewEmpBranch(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   >
                     {availableBranches.length === 0 ? (
                       <option value="main">Main Branch (Default)</option>
@@ -1134,22 +1134,22 @@ export const RoleManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Reg / License No.</label>
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Reg / License No.</label>
                   <input
                     type="text"
                     placeholder="e.g. RPH-99120"
                     value={newEmpLicense}
                     onChange={(e) => setNewEmpLicense(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddEmployeeModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -1170,7 +1170,7 @@ export const RoleManagementView: React.FC = () => {
       {/* ======================================================== */}
       {showResetPasswordModal && changePasswordTarget && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
@@ -1190,23 +1190,23 @@ export const RoleManagementView: React.FC = () => {
             </div>
 
             <form onSubmit={handlePasswordResetSubmit} className="p-5 space-y-4 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="flex items-center justify-between text-slate-800 font-bold">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 dark:bg-slate-900 dark:border-slate-800">
+                <div className="flex items-center justify-between text-slate-800 font-bold dark:text-slate-100">
                   <span>{changePasswordTarget.name}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-bold">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-bold dark:bg-purple-950/60 dark:text-purple-300">
                     {changePasswordTarget.roleName}
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-500 flex items-center gap-2">
+                <div className="text-[11px] text-slate-500 flex items-center gap-2 dark:text-slate-400">
                   <span>Employee ID:</span>
-                  <span className="font-mono font-bold text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                  <span className="font-mono font-bold text-slate-700 bg-white px-1.5 py-0.5 rounded border border-slate-200 dark:text-slate-200 dark:bg-[#111827] dark:border-slate-800">
                     {changePasswordTarget.employeeId || changePasswordTarget.email.split('@')[0]}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
+                <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">
                   New Security Password *
                 </label>
                 <input
@@ -1215,12 +1215,12 @@ export const RoleManagementView: React.FC = () => {
                   placeholder="Enter new password (e.g. 1800 or custom)..."
                   value={newResetPassword}
                   onChange={(e) => setNewResetPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
+                <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">
                   Confirm New Password *
                 </label>
                 <input
@@ -1229,15 +1229,15 @@ export const RoleManagementView: React.FC = () => {
                   placeholder="Re-enter new password to verify..."
                   value={confirmResetPassword}
                   onChange={(e) => setConfirmResetPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowResetPasswordModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -1259,7 +1259,7 @@ export const RoleManagementView: React.FC = () => {
       {/* ======================================================== */}
       {showCreateRoleModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh] dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
@@ -1275,12 +1275,12 @@ export const RoleManagementView: React.FC = () => {
 
             <form onSubmit={handleCreateRoleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
               {/* Clone Preset */}
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
-                <label className="font-bold text-slate-700">Clone Base Permissions From Existing Role:</label>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 dark:bg-slate-900 dark:border-slate-800">
+                <label className="font-bold text-slate-700 dark:text-slate-200">Clone Base Permissions From Existing Role:</label>
                 <select
                   value={baseCloneRole}
                   onChange={(e) => handleCloneFromBase(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold cursor-pointer"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold cursor-pointer dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 >
                   {allRoles.map((r) => (
                     <option key={r.id} value={r.code}>
@@ -1293,7 +1293,7 @@ export const RoleManagementView: React.FC = () => {
               {/* Role Name & Code */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Role Display Name *</label>
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Role Display Name *</label>
                   <input
                     type="text"
                     required
@@ -1305,44 +1305,44 @@ export const RoleManagementView: React.FC = () => {
                         setNewRoleCode(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_'));
                       }
                     }}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Unique Role Code *</label>
+                  <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Unique Role Code *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. senior_dispensary_tech"
                     value={newRoleCode}
                     onChange={(e) => setNewRoleCode(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Description</label>
+                <label className="font-bold text-slate-700 block mb-1 dark:text-slate-200">Description</label>
                 <input
                   type="text"
                   placeholder="Responsibilities and authorization scope..."
                   value={newRoleDesc}
                   onChange={(e) => setNewRoleDesc(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               {/* Guardrails Configuration */}
-              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-3">
-                <span className="font-bold text-amber-900 block text-[11px] uppercase tracking-wide">
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-3 dark:bg-amber-950/40 dark:border-amber-800/70">
+                <span className="font-bold text-amber-900 block text-[11px] uppercase tracking-wide dark:text-amber-300">
                   Configure Role Security Guardrails
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-semibold text-slate-700 block mb-1">
-                      Max Manual Discount %: <strong className="text-slate-900">{newRoleDiscount}%</strong>
+                    <label className="font-semibold text-slate-700 block mb-1 dark:text-slate-200">
+                      Max Manual Discount %: <strong className="text-slate-900 dark:text-white">{newRoleDiscount}%</strong>
                     </label>
                     <input
                       type="number"
@@ -1350,12 +1350,12 @@ export const RoleManagementView: React.FC = () => {
                       max="100"
                       value={newRoleDiscount}
                       onChange={(e) => setNewRoleDiscount(Number(e.target.value))}
-                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
 
                   <div className="space-y-1.5 pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800 dark:text-slate-100">
                       <input
                         type="checkbox"
                         checked={newRoleCostView}
@@ -1365,7 +1365,7 @@ export const RoleManagementView: React.FC = () => {
                       <span>Allow Purchase Price Visibility</span>
                     </label>
 
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800 dark:text-slate-100">
                       <input
                         type="checkbox"
                         checked={newRoleProfitView}
@@ -1375,7 +1375,7 @@ export const RoleManagementView: React.FC = () => {
                       <span>Allow Profit Margin Analytics</span>
                     </label>
 
-                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800">
+                    <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-800 dark:text-slate-100">
                       <input
                         type="checkbox"
                         checked={newRoleAccountingView}
@@ -1390,14 +1390,14 @@ export const RoleManagementView: React.FC = () => {
 
               {/* Module Granular Permissions Checkboxes */}
               <div className="space-y-3">
-                <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px] block">
+                <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px] block dark:text-slate-200">
                   Select Granular Module Permissions ({newRolePermissions.length} selected)
                 </span>
 
                 {MODULE_PERMISSIONS.map((group) => (
-                  <div key={group.module} className="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2">
+                  <div key={group.module} className="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2 dark:border-slate-800 dark:bg-slate-900">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-800">{group.name}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-100">{group.name}</span>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -1405,7 +1405,7 @@ export const RoleManagementView: React.FC = () => {
                             const modPerms = group.permissions.map((p) => p.code);
                             setNewRolePermissions((prev) => Array.from(new Set([...prev, ...modPerms])));
                           }}
-                          className="text-[10px] text-purple-700 hover:underline font-bold cursor-pointer"
+                          className="text-[10px] text-purple-700 hover:underline font-bold cursor-pointer dark:text-purple-300"
                         >
                           Select All
                         </button>
@@ -1416,7 +1416,7 @@ export const RoleManagementView: React.FC = () => {
                             const modPerms = new Set(group.permissions.map((p) => p.code));
                             setNewRolePermissions((prev) => prev.filter((code) => !modPerms.has(code)));
                           }}
-                          className="text-[10px] text-slate-500 hover:underline cursor-pointer"
+                          className="text-[10px] text-slate-500 hover:underline cursor-pointer dark:text-slate-400"
                         >
                           Clear
                         </button>
@@ -1456,11 +1456,11 @@ export const RoleManagementView: React.FC = () => {
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 shrink-0">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 shrink-0 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateRoleModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-xl font-semibold cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800"
                 >
                   Cancel
                 </button>

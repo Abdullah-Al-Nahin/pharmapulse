@@ -100,16 +100,16 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
   });
 
   return (
-    <div className="p-4 md:p-6 bg-slate-100 min-h-[calc(100vh-85px)] space-y-4">
+    <div className="p-4 md:p-6 bg-slate-100 min-h-[calc(100vh-85px)] space-y-4 dark:bg-slate-800">
       
       {/* Header ribbon */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+            <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <span>Prescription Register & Dispensing Pipeline</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
             Log physician prescriptions, track Schedule H dispensing compliance, and dispense directly to POS.
           </p>
         </div>
@@ -124,7 +124,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
       </div>
 
       {/* Search & Filter */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -142,7 +142,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                 document.getElementById('rx-filter-all')?.focus();
               }
             }}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
@@ -216,14 +216,14 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                   }
                 }
               }}
-              className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:border-emerald-500 transition-all space-y-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:border-emerald-500 transition-all space-y-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             >
               <div>
                 {/* Header info */}
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-800">
+                      <span className="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-800 dark:bg-slate-800 dark:text-slate-100">
                         {rx.prescriptionNumber}
                       </span>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
@@ -233,34 +233,34 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-slate-900 mt-2 flex items-center gap-1.5">
-                      <User className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-base font-bold text-slate-900 mt-2 flex items-center gap-1.5 dark:text-white">
+                      <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span>{rx.patientName}</span>
-                      <span className="text-xs font-normal text-slate-500">
+                      <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
                         ({rx.patientAge}y, {rx.patientGender})
                       </span>
                     </h3>
-                    <p className="text-xs text-slate-500">Contact: {rx.patientPhone || 'Not provided'}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Contact: {rx.patientPhone || 'Not provided'}</p>
                   </div>
 
-                  <div className="text-right text-xs text-slate-500">
-                    <span className="block font-medium text-slate-700">{rx.date}</span>
+                  <div className="text-right text-xs text-slate-500 dark:text-slate-400">
+                    <span className="block font-medium text-slate-700 dark:text-slate-200">{rx.date}</span>
                   </div>
                 </div>
 
                 {/* Doctor & Clinic */}
-                <div className="mt-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-xs space-y-1">
-                  <div className="flex items-center gap-1.5 font-semibold text-slate-800">
-                    <Stethoscope className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="mt-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-xs space-y-1 dark:bg-slate-900">
+                  <div className="flex items-center gap-1.5 font-semibold text-slate-800 dark:text-slate-100">
+                    <Stethoscope className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>{rx.doctorName}</span>
                     <span className="text-[10px] text-slate-400 font-mono">({rx.doctorRegNumber})</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
+                  <div className="flex items-center gap-1.5 text-slate-500 text-[11px] dark:text-slate-400">
                     <Building2 className="w-3 h-3 text-slate-400" />
                     <span>{rx.clinicHospital}</span>
                   </div>
                   {rx.diagnosis && (
-                    <div className="pt-1 text-[11px] text-slate-700 font-medium">
+                    <div className="pt-1 text-[11px] text-slate-700 font-medium dark:text-slate-200">
                       Diagnosis: <span className="italic font-normal">{rx.diagnosis}</span>
                     </div>
                   )}
@@ -268,17 +268,17 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
 
                 {/* Medications List */}
                 <div className="mt-3 space-y-1.5">
-                  <div className="text-[11px] font-bold text-slate-500 uppercase">Prescribed Drugs:</div>
-                  <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">
+                  <div className="text-[11px] font-bold text-slate-500 uppercase dark:text-slate-400">Prescribed Drugs:</div>
+                  <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden dark:divide-slate-800 dark:border-slate-800">
                     {rx.medications.map((m, idx) => (
-                      <div key={idx} className="p-2 bg-white flex items-center justify-between text-xs">
+                      <div key={idx} className="p-2 bg-white flex items-center justify-between text-xs dark:bg-[#111827]">
                         <div>
-                          <span className="font-bold text-slate-800">{m.medicineName}</span>
-                          <p className="text-[10px] text-slate-500">
+                          <span className="font-bold text-slate-800 dark:text-slate-100">{m.medicineName}</span>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
                             {m.dosage} • {m.frequency} • {m.duration}
                           </p>
                         </div>
-                        <span className="font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded text-xs">
+                        <span className="font-extrabold text-slate-900 bg-slate-100 px-2 py-0.5 rounded text-xs dark:text-white dark:bg-slate-800">
                           {m.quantity} units
                         </span>
                       </div>
@@ -287,14 +287,14 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                 </div>
 
                 {rx.notes && (
-                  <p className="mt-2 text-[11px] text-slate-500 italic bg-amber-50/50 p-2 rounded border border-amber-100">
+                  <p className="mt-2 text-[11px] text-slate-500 italic bg-amber-50/50 p-2 rounded border border-amber-100 dark:text-slate-400 dark:bg-amber-950/40 dark:border-amber-800/70">
                     Note: {rx.notes}
                   </p>
                 )}
               </div>
 
               {/* Action Bar */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between dark:border-slate-800">
                 <span className="text-[11px] text-slate-400">
                   {isPending ? 'Awaiting pharmacist checkout' : 'Dispensed and invoiced'}
                 </span>
@@ -317,7 +317,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
       {/* --- ADD PRESCRIPTION MODAL --- */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold">Log New Patient Prescription</h3>
@@ -332,30 +332,30 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
               {/* Patient details */}
               <div className="grid grid-cols-3 gap-2.5">
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Patient Full Name *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Patient Full Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Md. Rafiqul Islam"
                     value={newRx.patientName}
                     onChange={(e) => setNewRx({ ...newRx, patientName: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700">Age & Gender</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Age & Gender</label>
                   <div className="flex gap-1 mt-1">
                     <input
                       type="number"
                       placeholder="Age"
                       value={newRx.patientAge}
                       onChange={(e) => setNewRx({ ...newRx, patientAge: parseInt(e.target.value) || 0 })}
-                      className="w-14 px-2 py-2 border border-slate-300 rounded-lg text-xs"
+                      className="w-14 px-2 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                     />
                     <select
                       value={newRx.patientGender}
                       onChange={(e) => setNewRx({ ...newRx, patientGender: e.target.value as any })}
-                      className="flex-1 px-1 py-2 border border-slate-300 rounded-lg text-xs"
+                      className="flex-1 px-1 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                     >
                       <option value="Male">M</option>
                       <option value="Female">F</option>
@@ -365,21 +365,21 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                 </div>
 
                 <div className="col-span-3">
-                  <label className="font-bold text-slate-700">Phone Number</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Phone Number</label>
                   <input
                     type="text"
                     placeholder="+880 1711-000000"
                     value={newRx.patientPhone}
                     onChange={(e) => setNewRx({ ...newRx, patientPhone: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               {/* Doctor Details */}
-              <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-200">
+              <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Quick Select Registered Doctor (BMDC)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Quick Select Registered Doctor (BMDC)</label>
                   <select
                     onChange={(e) => {
                       const doc = REGISTERED_DOCTORS.find(d => d.id === e.target.value);
@@ -392,7 +392,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                         });
                       }
                     }}
-                    className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800"
+                    className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="">-- Select Registered Doctor or Fill Below --</option>
                     {REGISTERED_DOCTORS.map(d => (
@@ -402,58 +402,58 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Prescribing Doctor *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Prescribing Doctor *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Prof. Dr. Mahbubur Rahman"
                     value={newRx.doctorName}
                     onChange={(e) => setNewRx({ ...newRx, doctorName: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700">BMDC Registration #</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">BMDC Registration #</label>
                   <input
                     type="text"
                     placeholder="e.g. BMDC-A-42109"
                     value={newRx.doctorRegNumber}
                     onChange={(e) => setNewRx({ ...newRx, doctorRegNumber: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Clinic / Hospital</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Clinic / Hospital</label>
                   <input
                     type="text"
                     placeholder="e.g. Madina Eye Hospital & Medical Center"
                     value={newRx.clinicHospital}
                     onChange={(e) => setNewRx({ ...newRx, clinicHospital: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Diagnosis / Indications</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Diagnosis / Indications</label>
                   <input
                     type="text"
                     placeholder="e.g. Acute Bronchitis, Essential Hypertension"
                     value={newRx.diagnosis}
                     onChange={(e) => setNewRx({ ...newRx, diagnosis: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               {/* Medications Rows */}
-              <div className="pt-2 border-t border-slate-200 space-y-2">
+              <div className="pt-2 border-t border-slate-200 space-y-2 dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px]">
+                  <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px] dark:text-slate-200">
                     Prescribed Medications
                   </span>
                   <button
                     type="button"
                     onClick={handleAddMedRow}
-                    className="text-emerald-600 font-bold hover:underline flex items-center gap-1 text-xs cursor-pointer"
+                    className="text-emerald-600 font-bold hover:underline flex items-center gap-1 text-xs cursor-pointer dark:text-emerald-400"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Item</span>
@@ -461,7 +461,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                 </div>
 
                 {rxMeds.map((med, idx) => (
-                  <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                  <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 dark:bg-slate-900 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -472,7 +472,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                           updated[idx].medicineName = e.target.value;
                           setRxMeds(updated);
                         }}
-                        className="flex-1 px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold"
+                        className="flex-1 px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       <input
                         type="number"
@@ -484,7 +484,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                           updated[idx].quantity = parseInt(e.target.value) || 1;
                           setRxMeds(updated);
                         }}
-                        className="w-16 px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-center"
+                        className="w-16 px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-center dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       {rxMeds.length > 1 && (
                         <button
@@ -507,7 +507,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                           updated[idx].dosage = e.target.value;
                           setRxMeds(updated);
                         }}
-                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px]"
+                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       <input
                         type="text"
@@ -518,7 +518,7 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                           updated[idx].frequency = e.target.value;
                           setRxMeds(updated);
                         }}
-                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px]"
+                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                       <input
                         type="text"
@@ -529,18 +529,18 @@ export const PrescriptionView: React.FC<PrescriptionViewProps> = ({ onDispenseRx
                           updated[idx].duration = e.target.value;
                           setRxMeds(updated);
                         }}
-                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px]"
+                        className="px-2 py-1 bg-white border border-slate-300 rounded text-[11px] dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800"
                 >
                   Cancel
                 </button>

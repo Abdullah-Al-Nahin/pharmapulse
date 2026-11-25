@@ -182,30 +182,30 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
   const getTierBadge = (tier: string) => {
     switch (tier) {
       case 'wholesale':
-        return <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-purple-200">Wholesale Tier</span>;
+        return <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/70">Wholesale Tier</span>;
       case 'dealer':
-        return <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-indigo-200">Corporate / Dealer</span>;
+        return <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800/70">Corporate / Dealer</span>;
       case 'institution':
-        return <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200">Hospital / Institution</span>;
+        return <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70">Hospital / Institution</span>;
       case 'mrp':
-        return <span className="bg-slate-100 text-slate-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-slate-200">MRP Tier</span>;
+        return <span className="bg-slate-100 text-slate-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800">MRP Tier</span>;
       default:
-        return <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Retail Tier</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded-full border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">Retail Tier</span>;
     }
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'wholesale':
-        return <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Wholesale</span>;
+        return <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-amber-950/60 dark:text-amber-300">Wholesale</span>;
       case 'corporate':
-        return <span className="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Corporate</span>;
+        return <span className="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-sky-950/60 dark:text-sky-300">Corporate</span>;
       case 'institution':
-        return <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Institution</span>;
+        return <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-indigo-950/60 dark:text-indigo-300">Institution</span>;
       case 'regular':
-        return <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Regular</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-emerald-950/60 dark:text-emerald-300">Regular</span>;
       default:
-        return <span className="bg-slate-100 text-slate-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase">Retail</span>;
+        return <span className="bg-slate-100 text-slate-800 text-xs font-bold px-2.5 py-0.5 rounded uppercase dark:bg-slate-800 dark:text-slate-100">Retail</span>;
     }
   };
 
@@ -213,7 +213,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
       <div 
         id="customer-due-loyalty-modal"
-        className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
       >
         {/* Modal Header */}
         <div className="p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between shrink-0">
@@ -250,15 +250,15 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
         </div>
 
         {/* Snapshot Metrics Ribbon */}
-        <div className="grid grid-cols-3 divide-x divide-slate-200 bg-slate-50 border-b border-slate-200 text-xs shrink-0">
+        <div className="grid grid-cols-3 divide-x divide-slate-200 bg-slate-50 border-b border-slate-200 text-xs shrink-0 dark:divide-slate-800 dark:bg-slate-900 dark:border-slate-800">
           <div className="p-3.5">
-            <div className="text-slate-500 font-medium">Outstanding Due Balance</div>
+            <div className="text-slate-500 font-medium dark:text-slate-400">Outstanding Due Balance</div>
             <div className="flex items-baseline gap-2 mt-0.5">
               <span className={`text-xl font-bold font-mono ${customer.outstandingBalance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {formatCurrency(customer.outstandingBalance)}
               </span>
               {customer.outstandingBalance > 0 && (
-                <span className="text-[10px] text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded font-bold">
+                <span className="text-[10px] text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded font-bold dark:bg-rose-950/40">
                   Receivable
                 </span>
               )}
@@ -266,12 +266,12 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
           </div>
 
           <div className="p-3.5">
-            <div className="text-slate-500 font-medium flex items-center justify-between">
+            <div className="text-slate-500 font-medium flex items-center justify-between dark:text-slate-400">
               <span>Credit Limit</span>
-              <span className="font-mono text-slate-700 font-bold">{formatCurrency(customer.creditLimit)}</span>
+              <span className="font-mono text-slate-700 font-bold dark:text-slate-200">{formatCurrency(customer.creditLimit)}</span>
             </div>
             <div className="mt-1.5 flex items-center gap-2">
-              <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden dark:bg-slate-700">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ${
                     creditUsagePercent >= 90 ? 'bg-rose-500' : creditUsagePercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -279,30 +279,30 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                   style={{ width: `${creditUsagePercent}%` }}
                 />
               </div>
-              <span className="text-[11px] font-mono font-bold text-slate-600 shrink-0">
+              <span className="text-[11px] font-mono font-bold text-slate-600 shrink-0 dark:text-slate-300">
                 {creditUsagePercent}%
               </span>
             </div>
           </div>
 
           <div className="p-3.5">
-            <div className="text-slate-500 font-medium flex items-center justify-between">
+            <div className="text-slate-500 font-medium flex items-center justify-between dark:text-slate-400">
               <span>Active Loyalty Points</span>
-              <span className="text-[10px] text-emerald-600 font-medium">
+              <span className="text-[10px] text-emerald-600 font-medium dark:text-emerald-400">
                 ≈ {formatCurrency(customer.loyaltyPoints * loyaltyConfig.redemptionRatePerPoint)} Value
               </span>
             </div>
             <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="text-xl font-bold font-mono text-indigo-600">
+              <span className="text-xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
                 {customer.loyaltyPoints}
               </span>
-              <span className="text-[11px] text-slate-500">Points available</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Points available</span>
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-200 bg-white px-5 shrink-0">
+        <div className="flex border-b border-slate-200 bg-white px-5 shrink-0 dark:border-slate-800 dark:bg-[#111827]">
           <button
             id="tab-collect-due-payment"
             onClick={() => { setActiveTab('payment'); setLastReceipt(null); }}
@@ -344,7 +344,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
         </div>
 
         {/* Tab Body */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/40">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/40 dark:bg-slate-900/70">
           {/* ========================================================= */}
           {/* TAB 1: COLLECT DUE PAYMENT                                 */}
           {/* ========================================================= */}
@@ -352,17 +352,17 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
             <div className="space-y-6">
               {lastReceipt ? (
                 /* Formal Payment Receipt Voucher */
-                <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-6 space-y-5">
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div className="flex items-center gap-2.5 text-emerald-600">
+                <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-6 space-y-5 dark:bg-[#111827] dark:border-emerald-800/70">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
                       <CheckCircle2 className="w-6 h-6" />
                       <div>
-                        <h3 className="font-bold text-slate-900 text-base">Payment Recorded Successfully</h3>
-                        <p className="text-xs text-slate-500">Official Customer Due Collection Voucher</p>
+                        <h3 className="font-bold text-slate-900 text-base dark:text-white">Payment Recorded Successfully</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Official Customer Due Collection Voucher</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-3 py-1 rounded-md border border-slate-200">
+                      <span className="font-mono text-xs font-bold bg-slate-100 text-slate-800 px-3 py-1 rounded-md border border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-800">
                         {lastReceipt.receiptNumber}
                       </span>
                       <div className="text-[11px] text-slate-400 mt-1">
@@ -372,28 +372,28 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                   </div>
 
                   {/* Receipt Details Box */}
-                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono dark:bg-slate-900 dark:border-slate-800">
                     <div>
-                      <span className="text-slate-500 block">Amount Collected</span>
-                      <span className="text-base font-bold text-emerald-700">{formatCurrency(lastReceipt.amountPaid)}</span>
+                      <span className="text-slate-500 block dark:text-slate-400">Amount Collected</span>
+                      <span className="text-base font-bold text-emerald-700 dark:text-emerald-300">{formatCurrency(lastReceipt.amountPaid)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Previous Balance</span>
-                      <span className="text-slate-700 font-bold">{formatCurrency(lastReceipt.previousBalance)}</span>
+                      <span className="text-slate-500 block dark:text-slate-400">Previous Balance</span>
+                      <span className="text-slate-700 font-bold dark:text-slate-200">{formatCurrency(lastReceipt.previousBalance)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Remaining Due</span>
+                      <span className="text-slate-500 block dark:text-slate-400">Remaining Due</span>
                       <span className={`text-base font-bold ${lastReceipt.remainingBalance > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                         {formatCurrency(lastReceipt.remainingBalance)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block">Payment Mode</span>
-                      <span className="text-slate-800 font-semibold uppercase">{lastReceipt.paymentMethod.replace('_', ' ')}</span>
+                      <span className="text-slate-500 block dark:text-slate-400">Payment Mode</span>
+                      <span className="text-slate-800 font-semibold uppercase dark:text-slate-100">{lastReceipt.paymentMethod.replace('_', ' ')}</span>
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-600 space-y-1">
+                  <div className="text-xs text-slate-600 space-y-1 dark:text-slate-300">
                     <p><strong>Customer:</strong> {lastReceipt.customerName} ({lastReceipt.customerPhone})</p>
                     <p><strong>Collector:</strong> {lastReceipt.collectedBy}</p>
                     {lastReceipt.transactionReference && (
@@ -404,7 +404,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                     )}
                   </div>
 
-                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <button
                       id="print-due-receipt-btn"
                       onClick={handlePrintReceipt}
@@ -415,7 +415,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                     </button>
                     <button
                       onClick={() => setLastReceipt(null)}
-                      className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition"
+                      className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition dark:bg-[#111827] dark:border-slate-700 dark:hover:bg-slate-800/60 dark:text-slate-200"
                     >
                       Record Another Payment
                     </button>
@@ -425,20 +425,20 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                 /* Payment Input Form */
                 <form onSubmit={handleProcessDuePayment} className="space-y-5">
                   {customer.outstandingBalance <= 0 ? (
-                    <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-200 text-center space-y-2">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-                      <h3 className="text-sm font-bold text-emerald-900">Zero Outstanding Balance</h3>
-                      <p className="text-xs text-emerald-700 max-w-md mx-auto">
+                    <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-200 text-center space-y-2 dark:bg-emerald-950/40 dark:border-emerald-800/70">
+                      <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto dark:text-emerald-400" />
+                      <h3 className="text-sm font-bold text-emerald-900 dark:text-emerald-300">Zero Outstanding Balance</h3>
+                      <p className="text-xs text-emerald-700 max-w-md mx-auto dark:text-emerald-300">
                         This customer currently has no pending receivables. All historical invoices are fully settled.
                       </p>
                     </div>
                   ) : (
                     <>
                       {/* Balance & Quick Actions */}
-                      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+                      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-4 dark:bg-[#111827] dark:border-slate-800">
                         <div>
-                          <span className="text-xs font-semibold text-slate-500 block">Total Due To Settle</span>
-                          <span className="text-2xl font-black font-mono text-rose-600">
+                          <span className="text-xs font-semibold text-slate-500 block dark:text-slate-400">Total Due To Settle</span>
+                          <span className="text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
                             {formatCurrency(customer.outstandingBalance)}
                           </span>
                         </div>
@@ -448,21 +448,21 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                           <button
                             type="button"
                             onClick={() => handleQuickAmount(1.0)}
-                            className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded text-xs font-bold cursor-pointer transition"
+                            className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded text-xs font-bold cursor-pointer transition dark:bg-rose-950/40 dark:hover:bg-rose-900/60 dark:text-rose-300 dark:border-rose-800/70"
                           >
                             Full Due (100%)
                           </button>
                           <button
                             type="button"
                             onClick={() => handleQuickAmount(0.5)}
-                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded text-xs font-bold cursor-pointer transition"
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded text-xs font-bold cursor-pointer transition dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-800"
                           >
                             50% Due
                           </button>
                           <button
                             type="button"
                             onClick={() => handleQuickAmount(0.25)}
-                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded text-xs font-bold cursor-pointer transition"
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded text-xs font-bold cursor-pointer transition dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-800"
                           >
                             25% Due
                           </button>
@@ -470,8 +470,8 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                       </div>
 
                       {paymentError && (
-                        <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs font-semibold text-rose-700 flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+                        <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs font-semibold text-rose-700 flex items-center gap-2 dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                           <span>{paymentError}</span>
                         </div>
                       )}
@@ -479,7 +479,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                       {/* Payment Inputs */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5 dark:text-slate-200">
                             Payment Amount (৳) *
                           </label>
                           <div className="relative">
@@ -496,13 +496,13 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                                 setPaymentAmount(e.target.value);
                                 setPaymentError('');
                               }}
-                              className="w-full pl-8 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-base font-bold font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full pl-8 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-base font-bold font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             />
                           </div>
                           {parseFloat(paymentAmount) > 0 && parseFloat(paymentAmount) <= customer.outstandingBalance && (
-                            <p className="text-[11px] text-slate-500 mt-1">
+                            <p className="text-[11px] text-slate-500 mt-1 dark:text-slate-400">
                               Remaining balance will be:{' '}
-                              <strong className="text-slate-800 font-mono">
+                              <strong className="text-slate-800 font-mono dark:text-slate-100">
                                 {formatCurrency(customer.outstandingBalance - parseFloat(paymentAmount))}
                               </strong>
                             </p>
@@ -510,13 +510,13 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                         </div>
 
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5 dark:text-slate-200">
                             Payment Method *
                           </label>
                           <select
                             value={paymentMethod}
                             onChange={(e) => setPaymentMethod(e.target.value as any)}
-                            className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           >
                             <option value="cash">Cash Tender</option>
                             <option value="bank_transfer">Bank Wire Transfer / EFT</option>
@@ -529,7 +529,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5 dark:text-slate-200">
                             Transaction Reference / Cheque No
                           </label>
                           <input
@@ -537,12 +537,12 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                             placeholder="e.g. Cheque #77491, ACH-88192, TRX-9923"
                             value={trxReference}
                             onChange={(e) => setTrxReference(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5 dark:text-slate-200">
                             Receipt Notes / Remarks
                           </label>
                           <input
@@ -550,16 +550,16 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                             placeholder="e.g. Partial settlement for August supply"
                             value={paymentNotes}
                             onChange={(e) => setPaymentNotes(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           />
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
                         <button
                           type="button"
                           onClick={onClose}
-                          className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition"
+                          className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold cursor-pointer transition dark:bg-[#111827] dark:border-slate-700 dark:hover:bg-slate-800/60 dark:text-slate-200"
                         >
                           Cancel
                         </button>
@@ -585,22 +585,22 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
           {/* ========================================================= */}
           {activeTab === 'ledger' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-slate-500">
+              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                 <span>Displaying chronological receivables accounting journal</span>
-                <span className="font-mono font-bold text-slate-700">{ledgerEntries.length} ledger movements</span>
+                <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{ledgerEntries.length} ledger movements</span>
               </div>
 
               {ledgerEntries.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
+                <div className="p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200 dark:bg-[#111827] dark:border-slate-800">
                   <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
                   <p className="text-xs">No ledger transactions recorded yet for this customer.</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs dark:bg-[#111827] dark:border-slate-800">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                        <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800">
                           <th className="py-2.5 px-3">Date & Time</th>
                           <th className="py-2.5 px-3">Type</th>
                           <th className="py-2.5 px-3">Reference</th>
@@ -610,50 +610,50 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                           <th className="py-2.5 px-3 text-right">Running Balance</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                      <tbody className="divide-y divide-slate-100 font-mono text-[11px] dark:divide-slate-800">
                         {ledgerEntries.map((entry) => (
-                          <tr key={entry.id} className="hover:bg-slate-50/70 transition">
-                            <td className="py-2.5 px-3 whitespace-nowrap text-slate-700">
+                          <tr key={entry.id} className="hover:bg-slate-50/70 transition dark:hover:bg-slate-800/60">
+                            <td className="py-2.5 px-3 whitespace-nowrap text-slate-700 dark:text-slate-200">
                               {entry.date} <span className="text-slate-400 text-[10px]">{entry.timestamp}</span>
                             </td>
                             <td className="py-2.5 px-3 whitespace-nowrap font-sans">
                               {entry.type === 'INVOICE_DUE' && (
-                                <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded text-[10px] font-bold border border-rose-200">
+                                <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded text-[10px] font-bold border border-rose-200 dark:text-rose-300 dark:bg-rose-950/40 dark:border-rose-800/70">
                                   <ArrowUpRight className="w-3 h-3" /> Sale Due
                                 </span>
                               )}
                               {entry.type === 'PAYMENT_RECEIVED' && (
-                                <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
+                                <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800/70">
                                   <ArrowDownLeft className="w-3 h-3" /> Payment
                                 </span>
                               )}
                               {entry.type === 'CREDIT_NOTE' && (
-                                <span className="inline-flex items-center gap-1 text-sky-700 bg-sky-50 px-2 py-0.5 rounded text-[10px] font-bold border border-sky-200">
+                                <span className="inline-flex items-center gap-1 text-sky-700 bg-sky-50 px-2 py-0.5 rounded text-[10px] font-bold border border-sky-200 dark:text-sky-300 dark:bg-sky-950/40 dark:border-sky-800/70">
                                   Credit Note
                                 </span>
                               )}
                               {entry.type === 'ADJUSTMENT' && (
-                                <span className="inline-flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                                <span className="inline-flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-800">
                                   Adjustment
                                 </span>
                               )}
                             </td>
-                            <td className="py-2.5 px-3 whitespace-nowrap font-bold text-slate-800">
+                            <td className="py-2.5 px-3 whitespace-nowrap font-bold text-slate-800 dark:text-slate-100">
                               {entry.referenceId}
                             </td>
-                            <td className="py-2.5 px-3 font-sans text-slate-600 max-w-xs truncate" title={entry.description}>
+                            <td className="py-2.5 px-3 font-sans text-slate-600 max-w-xs truncate dark:text-slate-300" title={entry.description}>
                               {entry.description}
                               {entry.collectedBy && (
                                 <span className="block text-[10px] text-slate-400">By {entry.collectedBy}</span>
                               )}
                             </td>
-                            <td className="py-2.5 px-3 text-right font-bold text-rose-600">
+                            <td className="py-2.5 px-3 text-right font-bold text-rose-600 dark:text-rose-400">
                               {entry.debit > 0 ? formatCurrency(entry.debit) : '-'}
                             </td>
-                            <td className="py-2.5 px-3 text-right font-bold text-emerald-600">
+                            <td className="py-2.5 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400">
                               {entry.credit > 0 ? formatCurrency(entry.credit) : '-'}
                             </td>
-                            <td className="py-2.5 px-3 text-right font-bold text-slate-900 bg-slate-50/50">
+                            <td className="py-2.5 px-3 text-right font-bold text-slate-900 bg-slate-50/50 dark:text-white dark:bg-slate-900/70">
                               {formatCurrency(entry.runningBalance)}
                             </td>
                           </tr>
@@ -724,25 +724,25 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
 
               {/* Manual Point Adjustment Drawer */}
               {showAdjustPoints && (
-                <form onSubmit={handleAdjustPoints} className="bg-white p-4 rounded-xl border border-indigo-200 shadow-sm space-y-3 animate-in fade-in duration-150">
-                  <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <Award className="w-4 h-4 text-indigo-600" />
+                <form onSubmit={handleAdjustPoints} className="bg-white p-4 rounded-xl border border-indigo-200 shadow-sm space-y-3 animate-in fade-in duration-150 dark:bg-[#111827] dark:border-indigo-800/70">
+                  <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 dark:text-white">
+                    <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span>Supervisor Loyalty Point Adjustment</span>
                   </h4>
 
                   {adjustError && (
-                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded text-xs text-rose-700 font-semibold">
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded text-xs text-rose-700 font-semibold dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
                       {adjustError}
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-600 mb-1">Adjustment Action</label>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1 dark:text-slate-300">Adjustment Action</label>
                       <select
                         value={adjustType}
                         onChange={(e) => setAdjustType(e.target.value as any)}
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-800"
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold text-slate-800 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       >
                         <option value="adjusted">Credit Bonus Points (+)</option>
                         <option value="expired">Deduct Expired Points (-)</option>
@@ -750,7 +750,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-600 mb-1">Points Amount</label>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1 dark:text-slate-300">Points Amount</label>
                       <input
                         type="number"
                         min="1"
@@ -758,18 +758,18 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                         placeholder="e.g. 50"
                         value={adjustPointsDelta}
                         onChange={(e) => setAdjustPointsDelta(e.target.value)}
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-slate-800"
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-slate-800 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-600 mb-1">Audit Reason</label>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1 dark:text-slate-300">Audit Reason</label>
                       <input
                         type="text"
                         placeholder="e.g. Birthday gift, Promotion"
                         value={adjustReason}
                         onChange={(e) => setAdjustReason(e.target.value)}
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-800"
+                        className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-800 dark:bg-[#111827] dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -778,7 +778,7 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                     <button
                       type="button"
                       onClick={() => setShowAdjustPoints(false)}
-                      className="px-3 py-1 text-xs text-slate-600 hover:text-slate-800"
+                      className="px-3 py-1 text-xs text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white"
                     >
                       Cancel
                     </button>
@@ -794,16 +794,16 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
 
               {/* Loyalty History Table */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-700">Loyalty Movement History</h4>
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200">Loyalty Movement History</h4>
                 {loyaltyHistory.length === 0 ? (
-                  <div className="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200 text-xs">
+                  <div className="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200 text-xs dark:bg-[#111827] dark:border-slate-800">
                     No points transactions logged yet. Points are automatically credited upon POS checkout.
                   </div>
                 ) : (
-                  <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+                  <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs dark:bg-[#111827] dark:border-slate-800">
                     <table className="w-full text-left text-xs border-collapse font-mono">
                       <thead>
-                        <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 font-sans">
+                        <tr className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 font-sans dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800">
                           <th className="py-2.5 px-3">Date</th>
                           <th className="py-2.5 px-3">Action</th>
                           <th className="py-2.5 px-3">Description</th>
@@ -812,44 +812,44 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
                           <th className="py-2.5 px-3 text-right">Balance After</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 text-[11px]">
+                      <tbody className="divide-y divide-slate-100 text-[11px] dark:divide-slate-800">
                         {loyaltyHistory.map((tx) => (
-                          <tr key={tx.id} className="hover:bg-slate-50/70 transition">
-                            <td className="py-2.5 px-3 whitespace-nowrap text-slate-700">
+                          <tr key={tx.id} className="hover:bg-slate-50/70 transition dark:hover:bg-slate-800/60">
+                            <td className="py-2.5 px-3 whitespace-nowrap text-slate-700 dark:text-slate-200">
                               {tx.date} <span className="text-slate-400 text-[10px]">{tx.timestamp}</span>
                             </td>
                             <td className="py-2.5 px-3 whitespace-nowrap font-sans">
                               {tx.type === 'earned' && (
-                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
+                                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800/70">
                                   Earned
                                 </span>
                               )}
                               {tx.type === 'redeemed' && (
-                                <span className="text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-200">
+                                <span className="text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-200 dark:text-indigo-300 dark:bg-indigo-950/40 dark:border-indigo-800/70">
                                   Redeemed
                                 </span>
                               )}
                               {tx.type === 'expired' && (
-                                <span className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded text-[10px] font-bold border border-rose-200">
+                                <span className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded text-[10px] font-bold border border-rose-200 dark:text-rose-300 dark:bg-rose-950/40 dark:border-rose-800/70">
                                   Expired
                                 </span>
                               )}
                               {tx.type === 'adjusted' && (
-                                <span className="text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                                <span className="text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200 dark:text-slate-200 dark:bg-slate-800 dark:border-slate-800">
                                   Adjusted
                                 </span>
                               )}
                             </td>
-                            <td className="py-2.5 px-3 font-sans text-slate-600 max-w-xs truncate" title={tx.description}>
+                            <td className="py-2.5 px-3 font-sans text-slate-600 max-w-xs truncate dark:text-slate-300" title={tx.description}>
                               {tx.description}
                             </td>
                             <td className={`py-2.5 px-3 text-right font-bold ${tx.points > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                               {tx.points > 0 ? `+${tx.points}` : tx.points}
                             </td>
-                            <td className="py-2.5 px-3 text-right text-slate-600">
+                            <td className="py-2.5 px-3 text-right text-slate-600 dark:text-slate-300">
                               {tx.monetaryEquivalent ? formatCurrency(tx.monetaryEquivalent) : '-'}
                             </td>
-                            <td className="py-2.5 px-3 text-right font-bold text-slate-900 bg-slate-50/50">
+                            <td className="py-2.5 px-3 text-right font-bold text-slate-900 bg-slate-50/50 dark:text-white dark:bg-slate-900/70">
                               {tx.balanceAfter} Pts
                             </td>
                           </tr>
@@ -864,15 +864,15 @@ export const CustomerDuePaymentLoyaltyModal: React.FC<CustomerDuePaymentLoyaltyM
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0">
+        <div className="p-4 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0 dark:bg-slate-800 dark:border-slate-800 dark:text-slate-400">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Customer ID: <strong className="font-mono text-slate-700">{customer.id}</strong></span>
+            <span>Customer ID: <strong className="font-mono text-slate-700 dark:text-slate-200">{customer.id}</strong></span>
           </div>
 
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-bold cursor-pointer transition shadow-2xs"
+            className="px-4 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-bold cursor-pointer transition shadow-2xs dark:bg-[#111827] dark:border-slate-700 dark:hover:bg-slate-800/60 dark:text-slate-200"
           >
             Close Window
           </button>

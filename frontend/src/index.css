@@ -18,113 +18,83 @@
     color-scheme: dark;
   }
 
-  /* Prevent white inherited dark-mode text inside light-only cards/modals/inputs */
-  :where(html.dark)
-    :where(
-      .bg-white,
-      .bg-slate-50,
-      .bg-slate-100,
-      .bg-slate-200,
-      .bg-gray-50,
-      .bg-gray-100,
-      .bg-emerald-50,
-      .bg-amber-50,
-      .bg-rose-50,
-      .bg-red-50,
-      .bg-indigo-50,
-      .bg-sky-50,
-      .bg-blue-50,
-      .bg-purple-50,
-      [class*="bg-slate-50/"],
-      [class*="bg-emerald-50/"],
-      [class*="bg-amber-50/"],
-      [class*="bg-rose-50/"],
-      [class*="bg-indigo-50/"]
-    ):not([class*="dark:bg-"]):not([class*="bg-white/"]) {
+  /* Higher specificity than Preflight's input/button { color: inherit } (0,0,1),
+     while remaining inside @layer base so all @layer utilities (text-*, dark:text-*) override cleanly */
+  html.dark .bg-white:not([class*="dark:bg-"]):not([class*="bg-white/"]),
+  html.dark .bg-slate-50:not([class*="dark:bg-"]),
+  html.dark .bg-slate-100:not([class*="dark:bg-"]),
+  html.dark .bg-slate-200:not([class*="dark:bg-"]),
+  html.dark .bg-gray-50:not([class*="dark:bg-"]),
+  html.dark .bg-gray-100:not([class*="dark:bg-"]) {
     color: #0f172a;
   }
 
-  :where(html.dark)
-    :where(
-      .bg-white,
-      .bg-slate-50,
-      .bg-slate-100,
-      .bg-slate-200,
-      .bg-gray-50,
-      .bg-gray-100
-    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
-    :where(input, select, textarea, option) {
+  html.dark .bg-white:not([class*="dark:bg-"]):not([class*="bg-white/"]) :where(input, select, textarea, option),
+  html.dark .bg-slate-50:not([class*="dark:bg-"]) :where(input, select, textarea, option),
+  html.dark .bg-slate-100:not([class*="dark:bg-"]) :where(input, select, textarea, option),
+  html.dark .bg-white:not([class*="dark:bg-"]):not([class*="bg-white/"]) button {
     color: #0f172a;
   }
 
-  :where(html.dark)
-    :where(
-      .bg-white,
-      .bg-slate-50,
-      .bg-slate-100,
-      .bg-slate-200,
-      .bg-gray-50,
-      .bg-gray-100
-    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
-    :where(button):not([class*="dark:bg-"]):not([class*="-500"]):not([class*="-600"]):not([class*="-700"]):not([class*="-800"]):not([class*="-900"]):not([class*="-950"]) {
-    color: #0f172a;
-  }
-
-  :where(html.dark)
-    :where(
-      .bg-white,
-      .bg-slate-50,
-      .bg-slate-100,
-      .bg-gray-50,
-      .bg-gray-100
-    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
-    :where(input, textarea):not([class*="dark:bg-"])::placeholder {
+  html.dark .bg-white:not([class*="dark:bg-"]):not([class*="bg-white/"]) :where(input, textarea)::placeholder,
+  html.dark .bg-slate-50:not([class*="dark:bg-"]) :where(input, textarea)::placeholder {
     color: #64748b;
     opacity: 1;
   }
 
+  html.dark input,
+  html.dark select,
+  html.dark textarea {
+    color: #f1f5f9;
+  }
+
   /* Native dark selects/inputs & options in dark mode */
-  :where(html.dark) :where(select[class*="dark:bg-"]) option {
+  html.dark select[class*="dark:bg-"] option {
     background-color: #0f172a;
     color: #f8fafc;
   }
 
-  :where(html.dark) :where(select:not([class*="dark:bg-"])) option {
+  html.dark select:not([class*="dark:bg-"]) option {
     background-color: #ffffff;
     color: #0f172a;
   }
 
-  :where(html.dark) :where(input, textarea):where([class*="dark:bg-"])::placeholder {
+  html.dark input[class*="dark:bg-"]::placeholder,
+  html.dark textarea[class*="dark:bg-"]::placeholder {
     color: #94a3b8;
     opacity: 0.9;
   }
 
   /* Light-mode placeholders & native options */
-  :where(html:not(.dark)) :where(input, textarea)::placeholder {
+  html:not(.dark) input,
+  html:not(.dark) select,
+  html:not(.dark) textarea {
+    color: #0f172a;
+  }
+
+  html:not(.dark) input::placeholder,
+  html:not(.dark) textarea::placeholder {
     color: #64748b;
     opacity: 0.9;
   }
 
-  :where(html:not(.dark)) :where(select) option {
+  html:not(.dark) select option {
     background-color: #ffffff;
     color: #0f172a;
   }
 
   /* Explicit permanently-dark headers/modals keep light text even when global Light Mode is active */
-  :where(html:not(.dark))
-    :where(
-      .bg-slate-900,
-      .bg-slate-950,
-      .bg-emerald-950,
-      .bg-rose-950,
-      .bg-indigo-950,
-      .bg-red-900,
-      .bg-\[\#0e1525\],
-      .bg-\[\#0f172a\],
-      .bg-\[\#111827\],
-      .bg-\[\#12161f\],
-      .bg-\[\#161b26\]
-    ) {
+  html:not(.dark) .bg-slate-900,
+  html:not(.dark) .bg-slate-950,
+  html:not(.dark) .bg-emerald-950,
+  html:not(.dark) .bg-rose-950,
+  html:not(.dark) .bg-indigo-950,
+  html:not(.dark) .bg-red-900,
+  html:not(.dark) .bg-\[\#0e1525\],
+  html:not(.dark) .bg-\[\#0f172a\],
+  html:not(.dark) .bg-\[\#111827\],
+  html:not(.dark) .bg-\[\#12161f\],
+  html:not(.dark) .bg-\[\#161b26\] {
     color: #f8fafc;
   }
 }

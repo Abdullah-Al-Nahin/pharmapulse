@@ -205,23 +205,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================================= */}
       {/* SECTION 1: HEADER & DATE FILTER BAR                                       */}
       {/* ========================================================================= */}
-      <div id="dashboard-filter-header" className="bg-white rounded-xl shadow-xs border border-slate-200 p-4">
+      <div id="dashboard-filter-header" className="bg-white rounded-xl shadow-xs border border-slate-200 p-4 dark:bg-[#111827] dark:border-slate-800">
         {!hideHeaderBanner && (
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
             {/* Left Title & Status */}
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold dark:bg-emerald-950/60 dark:text-emerald-300">
                   <Activity className="w-4 h-4" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 dark:text-white">
                     Pharmacy Analytics &amp; Intelligence
-                    <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                    <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/70">
                       Live FEFO Metrics
                     </span>
                   </h1>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                     Real-time sales velocity, FEFO batch expiry risks, stock valuation, and supplier accounts.
                   </p>
                 </div>
@@ -234,9 +234,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="btn-view-reorder-list"
                 onClick={() => setIsReorderModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/70 dark:hover:bg-indigo-900/60"
               >
-                <Package className="w-3.5 h-3.5 text-indigo-600" />
+                <Package className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Reorder Queue</span>
                 {reorderList.length > 0 && (
                   <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
@@ -249,9 +249,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="btn-export-report"
                 onClick={handlePrintOrExport}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800 dark:hover:bg-slate-700"
               >
-                <Printer className="w-3.5 h-3.5 text-slate-600" />
+                <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
                 <span className="hidden sm:inline">Print / Export</span>
               </button>
 
@@ -273,7 +273,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className={`flex flex-wrap items-center justify-between gap-3 text-xs ${!hideHeaderBanner ? '' : ''}`}>
           {/* Preset Buttons */}
           <div className="flex flex-wrap items-center gap-1.5" id="date-filter-presets">
-            <span className="text-slate-500 font-medium mr-1 flex items-center gap-1">
+            <span className="text-slate-500 font-medium mr-1 flex items-center gap-1 dark:text-slate-400">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
               Period:
             </span>
@@ -303,22 +303,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {/* Custom Date Range Selector (Active when custom selected) */}
           {selectedPreset === 'custom' && (
-            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200 animate-fadeIn">
-              <span className="text-slate-500 text-[11px] font-medium">From:</span>
+            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200 animate-fadeIn dark:bg-slate-900 dark:border-slate-800">
+              <span className="text-slate-500 text-[11px] font-medium dark:text-slate-400">From:</span>
               <input
                 id="input-custom-start-date"
                 type="date"
                 value={customStartDate}
                 onChange={e => setCustomStartDate(e.target.value)}
-                className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-800 focus:outline-emerald-500"
+                className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-800 focus:outline-emerald-500 dark:border-slate-700 dark:bg-[#111827] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
-              <span className="text-slate-500 text-[11px] font-medium">To:</span>
+              <span className="text-slate-500 text-[11px] font-medium dark:text-slate-400">To:</span>
               <input
                 id="input-custom-end-date"
                 type="date"
                 value={customEndDate}
                 onChange={e => setCustomEndDate(e.target.value)}
-                className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-800 focus:outline-emerald-500"
+                className="px-2 py-1 text-xs border border-slate-300 rounded bg-white text-slate-800 focus:outline-emerald-500 dark:border-slate-700 dark:bg-[#111827] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
           )}
@@ -329,9 +329,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="btn-view-reorder-list-compact"
                 onClick={() => setIsReorderModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors cursor-pointer dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/70 dark:hover:bg-indigo-900/60"
               >
-                <Package className="w-3.5 h-3.5 text-indigo-600" />
+                <Package className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Reorder Queue</span>
                 {reorderList.length > 0 && (
                   <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
@@ -342,9 +342,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="btn-export-report-compact"
                 onClick={handlePrintOrExport}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer dark:bg-slate-800 dark:text-slate-200 dark:border-slate-800 dark:hover:bg-slate-700"
               >
-                <Printer className="w-3.5 h-3.5 text-slate-600" />
+                <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
                 <span className="hidden sm:inline">Print</span>
               </button>
               <button
@@ -360,9 +360,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
 
           {/* Active Period Label */}
-          <div className="text-[11px] text-slate-500 font-mono bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
-            Comparing: <strong className="text-slate-800">{kpis.dateRange.label}</strong> vs{' '}
-            <span className="text-slate-600">{kpis.previousRange.label}</span>
+          <div className="text-[11px] text-slate-500 font-mono bg-slate-50 px-2.5 py-1 rounded border border-slate-200 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800">
+            Comparing: <strong className="text-slate-800 dark:text-slate-100">{kpis.dateRange.label}</strong> vs{' '}
+            <span className="text-slate-600 dark:text-slate-300">{kpis.previousRange.label}</span>
           </div>
         </div>
       </div>
@@ -372,21 +372,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================================= */}
       <div id="dashboard-kpi-cards-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Sales Revenue */}
-        <div id="kpi-card-sales" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-sales" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               {selectedPreset === 'today' ? "Today's Sales" : 'Period Sales'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center dark:bg-emerald-950/40 dark:text-emerald-400">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+            <div className="text-2xl font-bold text-slate-900 tracking-tight dark:text-white">
               {fmt(kpis.sales.current)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">{kpis.sales.invoiceCount} invoices issued</span>
+              <span className="text-slate-500 dark:text-slate-400">{kpis.sales.invoiceCount} invoices issued</span>
               <div className={`flex items-center gap-0.5 font-bold ${kpis.sales.trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {kpis.sales.trend.isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 <span>{kpis.sales.trend.percent}%</span>
@@ -396,21 +396,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 2: Purchases / Inward Consignments */}
-        <div id="kpi-card-purchases" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-purchases" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               {selectedPreset === 'today' ? "Today's Purchases" : 'Period Purchases'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center dark:bg-sky-950/40 dark:text-sky-400">
               <Truck className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+            <div className="text-2xl font-bold text-slate-900 tracking-tight dark:text-white">
               {fmt(kpis.purchases.current)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">{kpis.purchases.billCount} inward bills</span>
+              <span className="text-slate-500 dark:text-slate-400">{kpis.purchases.billCount} inward bills</span>
               <div className={`flex items-center gap-0.5 font-bold ${kpis.purchases.trend.isPositive ? 'text-sky-600' : 'text-slate-600'}`}>
                 {kpis.purchases.trend.isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 <span>{kpis.purchases.trend.percent}%</span>
@@ -420,21 +420,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 3: Gross Profit */}
-        <div id="kpi-card-gross-profit" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-gross-profit" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Gross Profit
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center dark:bg-emerald-950/40 dark:text-emerald-400">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-slate-900 tracking-tight">
+            <div className="text-2xl font-bold text-slate-900 tracking-tight dark:text-white">
               {fmt(kpis.grossProfit.current)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Margin: {(kpis.grossProfit?.marginPercent ?? 0).toFixed(1)}%</span>
+              <span className="text-slate-500 dark:text-slate-400">Margin: {(kpis.grossProfit?.marginPercent ?? 0).toFixed(1)}%</span>
               <div className={`flex items-center gap-0.5 font-bold ${kpis.grossProfit.trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {kpis.grossProfit.trend.isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 <span>{kpis.grossProfit.trend.percent}%</span>
@@ -444,21 +444,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 4: Net Profit */}
-        <div id="kpi-card-net-profit" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-net-profit" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Net Profit
             </span>
-            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center dark:bg-teal-950/40 dark:text-teal-400">
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-teal-900 tracking-tight">
+            <div className="text-2xl font-bold text-teal-900 tracking-tight dark:text-teal-300">
               {fmt(kpis.netProfit.current)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">Net: {(kpis.netProfit?.marginPercent ?? 0).toFixed(1)}%</span>
+              <span className="text-slate-500 dark:text-slate-400">Net: {(kpis.netProfit?.marginPercent ?? 0).toFixed(1)}%</span>
               <div className={`flex items-center gap-0.5 font-bold ${kpis.netProfit.trend.isPositive ? 'text-teal-600' : 'text-rose-600'}`}>
                 {kpis.netProfit.trend.isPositive ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 <span>{kpis.netProfit.trend.percent}%</span>
@@ -468,23 +468,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 5: Low Stock Count */}
-        <div id="kpi-card-low-stock" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-low-stock" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Low Stock Alert
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center dark:bg-amber-950/40 dark:text-amber-400">
               <Boxes className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-amber-900 tracking-tight flex items-baseline gap-2">
+            <div className="text-2xl font-bold text-amber-900 tracking-tight flex items-baseline gap-2 dark:text-amber-300">
               <span>{kpis.lowStock.count}</span>
-              <span className="text-xs font-normal text-slate-500">medicines below min</span>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400">medicines below min</span>
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-amber-700 font-medium">Reorder required</span>
-              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded font-semibold text-[10px]">
+              <span className="text-amber-700 font-medium dark:text-amber-300">Reorder required</span>
+              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded font-semibold text-[10px] dark:bg-amber-950/60 dark:text-amber-300">
                 {kpis.lowStock.criticalItems} Critical
               </span>
             </div>
@@ -492,25 +492,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 6: Near Expiry Count */}
-        <div id="kpi-card-near-expiry" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-near-expiry" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Near Expiry (&lt;90d)
             </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center dark:bg-rose-950/40 dark:text-rose-400">
               <ClockAlert className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-rose-900 tracking-tight flex items-baseline gap-2">
+            <div className="text-2xl font-bold text-rose-900 tracking-tight flex items-baseline gap-2 dark:text-rose-300">
               <span>{kpis.nearExpiry.total}</span>
-              <span className="text-xs font-normal text-slate-500">batches at risk</span>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400">batches at risk</span>
             </div>
             <div className="mt-1 flex items-center gap-1.5 text-[10px]">
-              <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded font-bold">
+              <span className="px-1.5 py-0.5 bg-orange-100 text-orange-800 rounded font-bold dark:bg-orange-950/60 dark:text-orange-300">
                 &lt;30d: {kpis.nearExpiry.under30}
               </span>
-              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded font-bold">
+              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded font-bold dark:bg-amber-950/60 dark:text-amber-300">
                 &lt;60d: {kpis.nearExpiry.under60}
               </span>
               {kpis.nearExpiry.expired > 0 && (
@@ -523,43 +523,43 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Card 7: Supplier Payables */}
-        <div id="kpi-card-supplier-payables" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-supplier-payables" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Supplier Payables
             </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center dark:bg-purple-950/40 dark:text-purple-400">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-purple-900 tracking-tight">
+            <div className="text-2xl font-bold text-purple-900 tracking-tight dark:text-purple-300">
               {fmt(kpis.supplierPayables.amount)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">{kpis.supplierPayables.pendingBillsCount} pending supplier invoices</span>
-              <span className="text-purple-700 font-medium text-[11px]">Due Terms</span>
+              <span className="text-slate-500 dark:text-slate-400">{kpis.supplierPayables.pendingBillsCount} pending supplier invoices</span>
+              <span className="text-purple-700 font-medium text-[11px] dark:text-purple-300">Due Terms</span>
             </div>
           </div>
         </div>
 
         {/* Card 8: Customer Receivables */}
-        <div id="kpi-card-customer-receivables" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow">
+        <div id="kpi-card-customer-receivables" className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-shadow dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">
               Customer Receivables
             </span>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center dark:bg-indigo-950/40 dark:text-indigo-400">
               <Layers className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <div className="text-2xl font-bold text-indigo-900 tracking-tight">
+            <div className="text-2xl font-bold text-indigo-900 tracking-tight dark:text-indigo-300">
               {fmt(kpis.customerReceivables.amount)}
             </div>
             <div className="mt-1 flex items-center justify-between text-xs">
-              <span className="text-slate-500">{kpis.customerReceivables.creditAccountsCount} corporate credit accounts</span>
-              <div className="flex items-center gap-0.5 text-emerald-600 font-bold">
+              <span className="text-slate-500 dark:text-slate-400">{kpis.customerReceivables.creditAccountsCount} corporate credit accounts</span>
+              <div className="flex items-center gap-0.5 text-emerald-600 font-bold dark:text-emerald-400">
                 <ArrowUpRight className="w-3.5 h-3.5" />
                 <span>8.4%</span>
               </div>
@@ -573,19 +573,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CHART 1: LINE CHART (Sales vs Purchase Trend) */}
-        <div id="chart-sales-vs-purchases" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+        <div id="chart-sales-vs-purchases" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col dark:bg-[#111827] dark:border-slate-800">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <LineChartIcon className="w-4 h-4 text-emerald-600" />
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <LineChartIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Sales vs Purchase Trend
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                 Financial cashflow comparison of sales income against inventory inwards.
               </p>
             </div>
             {/* Granularity Toggle */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium dark:bg-slate-800">
               <button
                 id="btn-trend-daily"
                 onClick={() => setTrendGranularity('daily')}
@@ -665,21 +665,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* CHART 2: BAR CHART (Top 10 Selling Medicines & Fast vs Slow Moving Inventory) */}
-        <div id="chart-medicines-velocity" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+        <div id="chart-medicines-velocity" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col dark:bg-[#111827] dark:border-slate-800">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-indigo-600" />
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 {barChartMode === 'top_medicines' ? 'Top 10 Selling Medicines' : 'Fast vs Slow Moving Inventory'}
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                 {barChartMode === 'top_medicines' 
                   ? 'Ranked by gross sales revenue & dispensed unit volume.'
                   : 'Turnover velocity tracking overstock and stockout hazards.'}
               </p>
             </div>
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-medium dark:bg-slate-800">
               <button
                 id="btn-mode-top-medicines"
                 onClick={() => setBarChartMode('top_medicines')}
@@ -738,9 +738,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {/* Velocity Summary Badges */}
                 <div className="grid grid-cols-3 gap-2 mb-2 text-center text-xs">
                   {movementInventory.summary.map(s => (
-                    <div key={s.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200">
-                      <span className="block font-bold text-base text-slate-800">{s.count}</span>
-                      <span className="text-[10px] text-slate-500">{s.name}</span>
+                    <div key={s.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+                      <span className="block font-bold text-base text-slate-800 dark:text-slate-100">{s.count}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">{s.name}</span>
                     </div>
                   ))}
                 </div>
@@ -748,13 +748,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {/* Ranked Velocity Items */}
                 <div className="space-y-2 overflow-y-auto max-h-52 pr-1">
                   {movementInventory.all.slice(0, 7).map(item => (
-                    <div key={item.medicineId} className="flex items-center justify-between text-xs p-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200/80">
+                    <div key={item.medicineId} className="flex items-center justify-between text-xs p-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200/80 dark:bg-slate-900 dark:hover:bg-slate-800">
                       <div className="min-w-0 pr-2">
-                        <span className="font-semibold text-slate-800 block truncate">{item.name}</span>
-                        <span className="text-[10px] text-slate-500">{item.category} • Current Stock: {item.currentStock}</span>
+                        <span className="font-semibold text-slate-800 block truncate dark:text-slate-100">{item.name}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{item.category} • Current Stock: {item.currentStock}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="font-mono text-slate-700 text-right">{item.unitsSold} sold</span>
+                        <span className="font-mono text-slate-700 text-right dark:text-slate-200">{item.unitsSold} sold</span>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           item.movementType === 'fast' 
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
@@ -774,15 +774,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* CHART 3: DONUT CHARTS (Stock Valuation by Category & Payment Collection Split) */}
-        <div id="chart-valuation-and-payments" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+        <div id="chart-valuation-and-payments" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-teal-600" />
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <PieChartIcon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 Stock Valuation by Category
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Total active inventory retail worth: <strong className="text-slate-900">{fmt(totalStockValuation)}</strong>
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
+                Total active inventory retail worth: <strong className="text-slate-900 dark:text-white">{fmt(totalStockValuation)}</strong>
               </p>
             </div>
           </div>
@@ -822,9 +822,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 min-w-0 pr-1">
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className="text-slate-700 truncate text-[11px] font-medium">{item.name}</span>
+                    <span className="text-slate-700 truncate text-[11px] font-medium dark:text-slate-200">{item.name}</span>
                   </div>
-                  <span className="font-mono text-slate-900 font-semibold text-[11px]">
+                  <span className="font-mono text-slate-900 font-semibold text-[11px] dark:text-white">
                     {fmt(item.value)}
                   </span>
                 </div>
@@ -833,20 +833,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* Bottom Tender Split Ribbon */}
-          <div className="mt-3 pt-3 border-t border-slate-100">
-            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-2">
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-2 dark:text-slate-200">
               Payment Collection Tender Split ({fmt(totalCollectedAmount)})
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {paymentCollectionSplit.map(tender => (
-                <div key={tender.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                <div key={tender.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: tender.color }} />
-                    <span className="text-[11px] text-slate-600 font-medium truncate">{tender.name}</span>
+                    <span className="text-[11px] text-slate-600 font-medium truncate dark:text-slate-300">{tender.name}</span>
                   </div>
                   <div className="mt-1 flex items-baseline justify-between">
-                    <span className="font-bold text-xs text-slate-900 font-mono">{fmt(tender.value)}</span>
-                    <span className="text-[10px] font-bold text-slate-500">{tender.percentage}%</span>
+                    <span className="font-bold text-xs text-slate-900 font-mono dark:text-white">{fmt(tender.value)}</span>
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{tender.percentage}%</span>
                   </div>
                 </div>
               ))}
@@ -855,18 +855,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* CHART 4: AREA CHART (Expiry Risk Trend over Next 6 Months) */}
-        <div id="chart-expiry-risk-trend" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+        <div id="chart-expiry-risk-trend" className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col dark:bg-[#111827] dark:border-slate-800">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-rose-600" />
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                 Expiry Risk Trend (Next 6 Months)
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                 Financial risk exposure of batches expiring each month.
               </p>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded bg-rose-50 text-rose-700 text-xs font-semibold">
+            <div className="flex items-center gap-1 px-2 py-1 rounded bg-rose-50 text-rose-700 text-xs font-semibold dark:bg-rose-950/40 dark:text-rose-300">
               <ClockAlert className="w-3.5 h-3.5" />
               <span>FEFO Radar</span>
             </div>
@@ -930,14 +930,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* TABLE 1: TOP 5 MEDICINES ABOUT TO EXPIRE SOON */}
-        <div id="table-near-expiry-alerts" className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div id="table-near-expiry-alerts" className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col dark:bg-[#111827] dark:border-slate-800">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
                 <AlertTriangle className="w-4 h-4 text-rose-500" />
                 Top Medicines Expiring Soon (Priority FEFO Radar)
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                 Immediate FEFO dispensing priority to prevent inventory write-offs.
               </p>
             </div>
@@ -945,7 +945,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 id="btn-nav-batches-expiry"
                 onClick={() => onNavigateTab('batches_expiry')}
-                className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer"
+                className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer dark:text-rose-400"
               >
                 <span>View All Batches</span>
                 <ExternalLink className="w-3 h-3" />
@@ -954,8 +954,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="overflow-x-auto flex-1">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+              <thead className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                 <tr>
                   <th className="px-3 py-2.5">Medicine & Batch</th>
                   <th className="px-3 py-2.5">Expiry Date</th>
@@ -964,7 +964,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <th className="px-3 py-2.5 text-right">Value at Risk</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {nearExpiryBatches.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
@@ -979,22 +979,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     const isWarning = batch.riskLevel === 'warning';
 
                     return (
-                      <tr key={batch.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={batch.id} className="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/60">
                         <td className="px-3 py-2.5">
-                          <div className="font-semibold text-slate-900">{batch.medicineName}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">
+                          <div className="font-semibold text-slate-900 dark:text-white">{batch.medicineName}</div>
+                          <div className="text-[10px] text-slate-500 font-mono dark:text-slate-400">
                             Batch: {batch.batchNumber} • {batch.rackLocation}
                           </div>
                         </td>
                         <td className="px-3 py-2.5 font-mono">
-                          <span className="text-slate-800">{batch.expiryDate}</span>
+                          <span className="text-slate-800 dark:text-slate-100">{batch.expiryDate}</span>
                           <span className={`block text-[10px] font-bold ${
                             isExpired ? 'text-red-600' : isCritical ? 'text-orange-600' : 'text-amber-600'
                           }`}>
                             {batch.daysLeft <= 0 ? 'EXPIRED' : `${batch.daysLeft} days left`}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 font-semibold text-slate-900">
+                        <td className="px-3 py-2.5 font-semibold text-slate-900 dark:text-white">
                           {batch.currentStock} pcs
                         </td>
                         <td className="px-3 py-2.5">
@@ -1008,7 +1008,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             {isExpired ? 'Expired (Locked)' : isCritical ? '<30d (Critical)' : '<60d (Warning)'}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-right font-mono font-bold text-slate-900">
+                        <td className="px-3 py-2.5 text-right font-mono font-bold text-slate-900 dark:text-white">
                           {fmt(batch.totalValueAtRisk)}
                         </td>
                       </tr>
@@ -1021,14 +1021,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* TABLE 2: LOW STOCK ALERT TABLE WITH INSTANT REORDER BUTTON */}
-        <div id="table-low-stock-alerts" className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div id="table-low-stock-alerts" className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col dark:bg-[#111827] dark:border-slate-800">
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/70">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
                 <Boxes className="w-4 h-4 text-amber-500" />
                 Low Stock Threshold Alerts
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
                 Medicines at or below minimum reorder level. Instant supplier replenishment.
               </p>
             </div>
@@ -1047,7 +1047,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button
                   id="btn-nav-inventory"
                   onClick={() => onNavigateTab('inventory')}
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 flex items-center gap-1 cursor-pointer transition"
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 flex items-center gap-1 cursor-pointer transition dark:border-slate-800 dark:hover:bg-slate-800 dark:text-slate-200"
                 >
                   <span>Stock Master</span>
                   <ExternalLink className="w-3 h-3" />
@@ -1057,8 +1057,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="overflow-x-auto flex-1">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+              <thead className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase border-b border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                 <tr>
                   <th className="px-3 py-2.5">Medicine</th>
                   <th className="px-3 py-2.5">Stock / Min</th>
@@ -1067,7 +1067,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <th className="px-3 py-2.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {lowStockAlerts.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
@@ -1079,27 +1079,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     const isInList = reorderList.some(r => r.medicineId === item.medicineId);
 
                     return (
-                      <tr key={item.medicineId} className="hover:bg-slate-50 transition-colors">
+                      <tr key={item.medicineId} className="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/60">
                         <td className="px-3 py-2.5">
-                          <div className="font-semibold text-slate-900">{item.medicineName}</div>
-                          <div className="text-[10px] text-slate-500">{item.genericName} • {item.dosageForm}</div>
+                          <div className="font-semibold text-slate-900 dark:text-white">{item.medicineName}</div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400">{item.genericName} • {item.dosageForm}</div>
                         </td>
                         <td className="px-3 py-2.5 font-mono">
-                          <span className="font-bold text-rose-600">{item.currentStock}</span>
+                          <span className="font-bold text-rose-600 dark:text-rose-400">{item.currentStock}</span>
                           <span className="text-slate-400"> / {item.reorderLevel} min</span>
                         </td>
                         <td className="px-3 py-2.5">
-                          <span className="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-bold text-[10px]">
+                          <span className="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-bold text-[10px] dark:bg-rose-950/60 dark:text-rose-300">
                             -{item.deficit} {item.unitOfMeasure}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 text-[11px] text-slate-600 truncate max-w-[120px]">
+                        <td className="px-3 py-2.5 text-[11px] text-slate-600 truncate max-w-[120px] dark:text-slate-300">
                           {item.supplierName}
                         </td>
                         <td className="px-3 py-2.5 text-right">
                           {isInList ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded font-semibold border border-emerald-200">
-                              <Check className="w-3 h-3 text-emerald-600" />
+                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded font-semibold border border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800/70">
+                              <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               Added
                             </span>
                           ) : (
@@ -1128,23 +1128,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* ========================================================================= */}
       {isReorderModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-fadeIn">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-fadeIn dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center dark:bg-indigo-950/60 dark:text-indigo-300">
                   <Package className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">Purchase Reorder Queue</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className="font-bold text-slate-900 text-base dark:text-white">Purchase Reorder Queue</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {reorderList.length} items staged for supplier procurement order.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsReorderModalOpen(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer dark:hover:bg-slate-700 dark:text-slate-400 dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1155,23 +1155,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {reorderList.length === 0 ? (
                 <div className="py-12 text-center text-slate-400">
                   <Package className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                  <p className="font-semibold text-slate-600">Reorder Queue is Empty</p>
+                  <p className="font-semibold text-slate-600 dark:text-slate-300">Reorder Queue is Empty</p>
                   <p className="text-xs text-slate-400 mt-1">
                     Click "Reorder" next to any low-stock medicine on the dashboard to stage replenishment.
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden dark:divide-slate-800 dark:border-slate-800">
                   {reorderList.map(item => (
-                    <div key={item.id} className="p-3 bg-white hover:bg-slate-50 flex items-center justify-between gap-3 text-xs">
+                    <div key={item.id} className="p-3 bg-white hover:bg-slate-50 flex items-center justify-between gap-3 text-xs dark:bg-[#111827] dark:hover:bg-slate-800/60">
                       <div>
-                        <span className="font-bold text-slate-900 block">{item.medicineName}</span>
-                        <span className="text-slate-500 text-[11px]">
+                        <span className="font-bold text-slate-900 block dark:text-white">{item.medicineName}</span>
+                        <span className="text-slate-500 text-[11px] dark:text-slate-400">
                           Supplier: <strong>{item.supplierName || 'Apex Pharma Ltd'}</strong> • Stock: {item.currentStock} / Min: {item.reorderLevel}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="bg-indigo-50 border border-indigo-200 text-indigo-800 px-2.5 py-1 rounded font-mono font-bold">
+                        <span className="bg-indigo-50 border border-indigo-200 text-indigo-800 px-2.5 py-1 rounded font-mono font-bold dark:bg-indigo-950/40 dark:border-indigo-800/70 dark:text-indigo-300">
                           Order: {item.suggestedQty} pcs
                         </span>
                         <button
@@ -1189,14 +1189,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between dark:border-slate-800 dark:bg-slate-900">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Staged for immediate inward Purchase Order generation.
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsReorderModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Close
                 </button>

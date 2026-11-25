@@ -225,23 +225,23 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
   };
 
   return (
-    <div className="p-4 md:p-6 bg-slate-100 min-h-[calc(100vh-85px)] space-y-4">
+    <div className="p-4 md:p-6 bg-slate-100 min-h-[calc(100vh-85px)] space-y-4 dark:bg-slate-800">
 
       {/* Title ribbon */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs dark:bg-[#111827] dark:border-slate-800">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <ClockAlert className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+            <ClockAlert className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <span>FEFO Expiry Radar & Quarantine Management</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
             Strict First-Expiry-First-Out enforcement, zero-tolerance expired batch lockouts, and return risk audit.
           </p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/70">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Zero-Tolerance Lockout: Active</span>
           </div>
           <PermissionGuard permission="inventory:product:create">
@@ -259,64 +259,64 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
       {/* Financial Risk KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Expired Stock Loss */}
-        <div className="bg-white p-3.5 rounded-xl border border-red-200 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+        <div className="bg-white p-3.5 rounded-xl border border-red-200 shadow-xs flex items-center gap-3 dark:bg-[#111827] dark:border-red-800/70">
+          <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600 shrink-0 dark:bg-red-950/60 dark:text-red-400">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase text-red-700">Expired Stock (Locked)</div>
-            <div className="text-lg font-extrabold text-red-900 mt-0.5">
+            <div className="text-[11px] font-bold uppercase text-red-700 dark:text-red-300">Expired Stock (Locked)</div>
+            <div className="text-lg font-extrabold text-red-900 mt-0.5 dark:text-red-300">
               ৳{(riskMetrics?.expiredCost ?? 0).toFixed(2)}
             </div>
-            <p className="text-[10px] text-red-600">{riskMetrics?.expiredCount ?? 0} batches zero-tolerance blocked</p>
+            <p className="text-[10px] text-red-600 dark:text-red-400">{riskMetrics?.expiredCount ?? 0} batches zero-tolerance blocked</p>
           </div>
         </div>
 
         {/* Critical Expiry (<30d) */}
-        <div className="bg-white p-3.5 rounded-xl border border-rose-200 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+        <div className="bg-white p-3.5 rounded-xl border border-rose-200 shadow-xs flex items-center gap-3 dark:bg-[#111827] dark:border-rose-800/70">
+          <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600 shrink-0 dark:bg-rose-950/60 dark:text-rose-400">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase text-rose-700">Critical Expiry (&lt;30d)</div>
-            <div className="text-lg font-extrabold text-rose-900 mt-0.5">
+            <div className="text-[11px] font-bold uppercase text-rose-700 dark:text-rose-300">Critical Expiry (&lt;30d)</div>
+            <div className="text-lg font-extrabold text-rose-900 mt-0.5 dark:text-rose-300">
               ৳{(riskMetrics?.criticalCost ?? 0).toFixed(2)}
             </div>
-            <p className="text-[10px] text-rose-600">{riskMetrics?.criticalCount ?? 0} batches require immediate return/use</p>
+            <p className="text-[10px] text-rose-600 dark:text-rose-400">{riskMetrics?.criticalCount ?? 0} batches require immediate return/use</p>
           </div>
         </div>
 
         {/* Near Expiry (30-90d) */}
-        <div className="bg-white p-3.5 rounded-xl border border-amber-200 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+        <div className="bg-white p-3.5 rounded-xl border border-amber-200 shadow-xs flex items-center gap-3 dark:bg-[#111827] dark:border-amber-800/70">
+          <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shrink-0 dark:bg-amber-950/60 dark:text-amber-400">
             <ClockAlert className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase text-amber-700">Near Expiry (30-90d)</div>
-            <div className="text-lg font-extrabold text-amber-900 mt-0.5">
+            <div className="text-[11px] font-bold uppercase text-amber-700 dark:text-amber-300">Near Expiry (30-90d)</div>
+            <div className="text-lg font-extrabold text-amber-900 mt-0.5 dark:text-amber-300">
               ৳{(riskMetrics?.nearCost ?? 0).toFixed(2)}
             </div>
-            <p className="text-[10px] text-amber-600">{riskMetrics.nearCount} batches in FEFO priority queue</p>
+            <p className="text-[10px] text-amber-600 dark:text-amber-400">{riskMetrics.nearCount} batches in FEFO priority queue</p>
           </div>
         </div>
 
         {/* Safe Healthy Batches */}
-        <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+        <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-xs flex items-center gap-3 dark:bg-[#111827] dark:border-emerald-800/70">
+          <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 dark:bg-emerald-950/60 dark:text-emerald-400">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase text-emerald-700">Healthy Stock (&gt;90d)</div>
-            <div className="text-lg font-extrabold text-emerald-900 mt-0.5">
+            <div className="text-[11px] font-bold uppercase text-emerald-700 dark:text-emerald-300">Healthy Stock (&gt;90d)</div>
+            <div className="text-lg font-extrabold text-emerald-900 mt-0.5 dark:text-emerald-300">
               {riskMetrics.healthyCount} Batches
             </div>
-            <p className="text-[10px] text-emerald-600">Stable inventory with adequate shelf-life</p>
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Stable inventory with adequate shelf-life</p>
           </div>
         </div>
       </div>
 
       {/* Filter and Radar Tabs */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3 dark:bg-[#111827] dark:border-slate-800">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 w-full sm:max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -335,7 +335,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                   document.getElementById('batch-radar-all')?.focus();
                 }
               }}
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
 
@@ -386,11 +386,11 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
       </div>
 
       {/* Batches Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[11px]">
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[11px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
                 <th className="py-3 px-4">Batch Number</th>
                 <th className="py-3 px-4">Medicine & Location</th>
                 <th className="py-3 px-4">Expiry Date</th>
@@ -402,7 +402,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-8 text-slate-400">
@@ -443,10 +443,10 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                               : ''
                         }`}
                     >
-                      <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
                         <div>{b.batchNumber}</div>
                         {b.invoiceNumber && (
-                          <div className="text-[10px] font-sans font-semibold text-emerald-700">
+                          <div className="text-[10px] font-sans font-semibold text-emerald-700 dark:text-emerald-300">
                             Inv: {b.invoiceNumber}
                           </div>
                         )}
@@ -458,45 +458,45 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                       </td>
 
                       <td className="py-3 px-4">
-                        <div className="font-bold text-slate-900">{b.medicineName}</div>
-                        <div className="text-[10px] text-slate-500">{b.rackLocation || 'Shelf Storage'}</div>
+                        <div className="font-bold text-slate-900 dark:text-white">{b.medicineName}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">{b.rackLocation || 'Shelf Storage'}</div>
                       </td>
 
-                      <td className="py-3 px-4 font-medium text-slate-700">
+                      <td className="py-3 px-4 font-medium text-slate-700 dark:text-slate-200">
                         {b.expiryDate}
                       </td>
 
                       <td className="py-3 px-4 font-bold">
                         {isExpired ? (
-                          <span className="text-red-600 font-extrabold">
+                          <span className="text-red-600 font-extrabold dark:text-red-400">
                             Expired ({Math.abs(b.diffDays)} days ago)
                           </span>
                         ) : b.diffDays <= 30 ? (
-                          <span className="text-rose-600 font-bold">{b.diffDays} days left</span>
+                          <span className="text-rose-600 font-bold dark:text-rose-400">{b.diffDays} days left</span>
                         ) : b.diffDays <= 90 ? (
-                          <span className="text-amber-600 font-semibold">{b.diffDays} days left</span>
+                          <span className="text-amber-600 font-semibold dark:text-amber-400">{b.diffDays} days left</span>
                         ) : (
-                          <span className="text-emerald-700 font-medium">{b.diffDays} days left</span>
+                          <span className="text-emerald-700 font-medium dark:text-emerald-300">{b.diffDays} days left</span>
                         )}
                       </td>
 
-                      <td className="py-3 px-4 font-extrabold text-slate-900">
+                      <td className="py-3 px-4 font-extrabold text-slate-900 dark:text-white">
                         {b.currentStock}
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                         ৳{Number(b.costValue ?? 0).toFixed(2)}
                         <span className="text-[10px] text-slate-400 block">@৳{Number(b.purchasePrice ?? 0).toFixed(2)}</span>
                       </td>
 
-                      <td className="py-3 px-4 font-semibold text-slate-800">
+                      <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-100">
                         ৳{Number(b.salesValue ?? 0).toFixed(2)}
                         <span className="text-[10px] text-slate-400 block">@৳{Number(b.sellingPrice ?? 0).toFixed(2)}</span>
                       </td>
 
                       <td className="py-3 px-4">
                         {isQuarantined ? (
-                          <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded dark:bg-purple-950/60 dark:text-purple-300">
                             QUARANTINED
                           </span>
                         ) : isExpired ? (
@@ -504,15 +504,15 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                             EXPIRED • LOCKED
                           </span>
                         ) : b.category === 'critical' ? (
-                          <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded dark:bg-rose-950/60 dark:text-rose-300">
                             CRITICAL FEFO
                           </span>
                         ) : b.category === 'near' ? (
-                          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded dark:bg-amber-950/60 dark:text-amber-300">
                             PRIORITY FEFO
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded dark:bg-emerald-950/60 dark:text-emerald-300">
                             HEALTHY
                           </span>
                         )}
@@ -523,7 +523,7 @@ export const BatchExpiryView: React.FC<BatchExpiryViewProps> = ({ onDataChanged 
                           {!isQuarantined && (
                             <button
                               onClick={() => handleQuarantine(b)}
-                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold cursor-pointer"
+                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200"
                               title="Quarantine this batch"
                             >
                               Quarantine

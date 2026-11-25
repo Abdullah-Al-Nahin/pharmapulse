@@ -677,14 +677,14 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
           }`}
         >
           {notification.type === 'success' ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 dark:text-emerald-400" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 dark:text-rose-400" />
           )}
           <span>{notification.message}</span>
           <button 
             onClick={() => setNotification(null)}
-            className="ml-2 text-slate-400 hover:text-slate-700 cursor-pointer"
+            className="ml-2 text-slate-400 hover:text-slate-700 cursor-pointer dark:hover:text-slate-200"
           >
             <X className="w-4 h-4" />
           </button>
@@ -692,17 +692,17 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       )}
 
       {/* Top Header Card */}
-      <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#111827] dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+            <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base md:text-lg font-bold text-slate-900">
+              <h2 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">
                 Supplier Management & Purchase Inward Workflow
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 End-to-end Purchase Orders (PO), Goods Received Note (GRN) batch registration with future-expiry validation, and double-entry Supplier Ledgers.
               </p>
             </div>
@@ -711,7 +711,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
 
         {/* Sub-tab Pill Navigation & Quick Actions */}
         <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 dark:bg-slate-800 dark:border-slate-800">
             <button
               id="tab-btn-register"
               onClick={() => setActiveTab('register')}
@@ -721,7 +721,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>PO & GRN Register</span>
             </button>
 
@@ -747,7 +747,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Scale className="w-3.5 h-3.5 text-indigo-600" />
+              <Scale className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Supplier Ledger & Payables</span>
             </button>
 
@@ -826,35 +826,35 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Purchase Orders</span>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1 dark:bg-[#111827] dark:border-slate-800">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Total Purchase Orders</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-slate-900">{kpiStats.totalOrders}</span>
-            <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium">All Time</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white">{kpiStats.totalOrders}</span>
+            <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium dark:text-slate-400 dark:bg-slate-800">All Time</span>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Awaiting GRN Inward</span>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1 dark:bg-[#111827] dark:border-slate-800">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Awaiting GRN Inward</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-amber-600">{kpiStats.pendingDeliveries}</span>
-            <span className="text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-bold">Action Required</span>
+            <span className="text-xl font-black text-amber-600 dark:text-amber-400">{kpiStats.pendingDeliveries}</span>
+            <span className="text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-bold dark:text-amber-300 dark:bg-amber-950/60">Action Required</span>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Accounts Payable</span>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1 dark:bg-[#111827] dark:border-slate-800">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Total Accounts Payable</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-rose-600">${(kpiStats?.totalPayable != null ? Number(kpiStats.totalPayable) : 0).toFixed(2)}</span>
-            <span className="text-[10px] text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold">Vendor Liability</span>
+            <span className="text-xl font-black text-rose-600 dark:text-rose-400">${(kpiStats?.totalPayable != null ? Number(kpiStats.totalPayable) : 0).toFixed(2)}</span>
+            <span className="text-[10px] text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded font-bold dark:text-rose-300 dark:bg-rose-950/60">Vendor Liability</span>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Received GRN Batches</span>
+        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-1 dark:bg-[#111827] dark:border-slate-800">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Received GRN Batches</span>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-emerald-600">{kpiStats.completedGrns}</span>
-            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-medium">Stock Active</span>
+            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">{kpiStats.completedGrns}</span>
+            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-medium dark:text-emerald-300 dark:bg-emerald-950/60">Stock Active</span>
           </div>
         </div>
       </div>
@@ -866,14 +866,14 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
         <div className="space-y-4">
           {/* Automated Replenishment Notification Banner */}
           {lowStockCount > 0 && (
-            <div id="banner-reorder-alert" className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
-              <div className="flex items-center gap-2.5 text-amber-900">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <div id="banner-reorder-alert" className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs dark:from-amber-950/40 dark:to-orange-950/30 dark:border-amber-800/70">
+              <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-300">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 dark:bg-amber-950/60 dark:text-amber-300">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="font-bold">Automated Replenishment Alert: </span>
-                  <span className="text-amber-800">
+                  <span className="text-amber-800 dark:text-amber-300">
                     <strong>{lowStockCount} item(s)</strong> are at or below reorder threshold. Run the Auto PO Suggester to calculate optimal quantities by supplier.
                   </span>
                 </div>
@@ -891,7 +891,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
           )}
 
           {/* Filter and Search Bar */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -900,7 +900,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                 placeholder="Search by PO #, Vendor Invoice, or Supplier..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
@@ -924,11 +924,11 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
           </div>
 
           {/* Orders Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[11px]">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[11px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
                     <th className="py-3 px-4">PO & Bill Reference</th>
                     <th className="py-3 px-4">Distributor / Supplier</th>
                     <th className="py-3 px-4">Order / Delivery Date</th>
@@ -939,7 +939,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     <th className="py-3 px-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                   {filteredPurchases.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-slate-400">
@@ -953,29 +953,29 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                       const isOrdered = po.status === 'ordered' || po.status === 'draft';
 
                       return (
-                        <tr key={po.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={po.id} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
                           <td className="py-3 px-4">
-                            <div className="font-mono font-bold text-slate-900">{po.poNumber || po.id}</div>
-                            <div className="text-[11px] text-slate-500 font-mono">Inv: {po.invoiceNumber}</div>
+                            <div className="font-mono font-bold text-slate-900 dark:text-white">{po.poNumber || po.id}</div>
+                            <div className="text-[11px] text-slate-500 font-mono dark:text-slate-400">Inv: {po.invoiceNumber}</div>
                           </td>
 
                           <td className="py-3 px-4">
-                            <div className="font-semibold text-slate-800">{po.supplierName}</div>
+                            <div className="font-semibold text-slate-800 dark:text-slate-100">{po.supplierName}</div>
                             {po.paymentTerms && (
-                              <div className="text-[10px] text-slate-500">Terms: {po.paymentTerms}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400">Terms: {po.paymentTerms}</div>
                             )}
                           </td>
 
                           <td className="py-3 px-4">
-                            <div className="text-slate-700">{po.purchaseDate}</div>
+                            <div className="text-slate-700 dark:text-slate-200">{po.purchaseDate}</div>
                             {po.expectedDeliveryDate && (
-                              <div className="text-[10px] text-slate-500">ETA: {po.expectedDeliveryDate}</div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400">ETA: {po.expectedDeliveryDate}</div>
                             )}
                           </td>
 
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                             <div>{po.items.length} product(s)</div>
-                            <div className="text-[10px] text-slate-500">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">
                               {po.items.reduce((s, it) => s + (it.receivedQuantity || it.quantity), 0)} base units
                             </div>
                           </td>
@@ -1006,13 +1006,13 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                               {po.paymentStatus}
                             </span>
                             {po.dueAmount != null && Number(po.dueAmount) > 0 && (
-                              <div className="text-[10px] text-rose-600 font-semibold mt-0.5">
+                              <div className="text-[10px] text-rose-600 font-semibold mt-0.5 dark:text-rose-400">
                                 Due: ${Number(po.dueAmount).toFixed(2)}
                               </div>
                             )}
                           </td>
 
-                          <td className="py-3 px-4 text-right font-extrabold text-slate-900">
+                          <td className="py-3 px-4 text-right font-extrabold text-slate-900 dark:text-white">
                             ${(po.totalAmount != null ? Number(po.totalAmount) : 0).toFixed(2)}
                           </td>
 
@@ -1040,7 +1040,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                                   const freshPO = freshPurchases.find(p => p.id === po.id) || po;
                                   setViewingPO(freshPO);
                                 }}
-                                className="p-1.5 hover:bg-slate-200 text-slate-600 rounded transition-colors cursor-pointer"
+                                className="p-1.5 hover:bg-slate-200 text-slate-600 rounded transition-colors cursor-pointer dark:hover:bg-slate-700 dark:text-slate-300"
                                 title="View Purchase Inward Voucher"
                               >
                                 <Eye className="w-4 h-4" />
@@ -1064,9 +1064,9 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {activeTab === 'create_po' && (
         <form onSubmit={handleSubmitPurchaseOrder} className="space-y-4">
           {/* Suggester Shortcut Banner */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5 text-emerald-900">
-              <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs dark:bg-emerald-950/40 dark:border-emerald-800/70">
+            <div className="flex items-center gap-2.5 text-emerald-900 dark:text-emerald-300">
+              <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 dark:text-emerald-400" />
               <span>
                 Want automated replenishment recommendations? Use the <strong>Auto PO Suggester</strong> to analyze 30-day sales velocity and generate multi-supplier requisitions in one click.
               </span>
@@ -1083,42 +1083,42 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
           </div>
 
           {/* Header Card: Supplier Details & Payment Terms */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Building className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4 dark:bg-[#111827] dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <Building className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Supplier Information & Commercial Terms</span>
               </h3>
-              <span className="text-xs text-slate-500 font-mono">Step 1 of 2</span>
+              <span className="text-xs text-slate-500 font-mono dark:text-slate-400">Step 1 of 2</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
               {/* Supplier Selection */}
               <div>
-                <label className="font-bold text-slate-700">Vendor / Distributor *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Vendor / Distributor *</label>
                 <select
                   id="po-supplier-select"
                   value={poSupplierId}
                   onChange={(e) => setPoSupplierId(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 >
                   {suppliers.map(s => (
                     <option key={s.id} value={s.id}>{s.name} ({s.companyName})</option>
                   ))}
                 </select>
-                <div className="mt-1 text-[11px] text-slate-500">
+                <div className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                   DL: {currentPoSupplier?.drugLicenseNumber} | TIN: {currentPoSupplier?.taxId}
                 </div>
               </div>
 
               {/* Payment Terms */}
               <div>
-                <label className="font-bold text-slate-700">Payment Terms *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Payment Terms *</label>
                 <select
                   id="po-terms-select"
                   value={poPaymentTerms}
                   onChange={(e) => setPoPaymentTerms(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 >
                   <option value="Net 15">Net 15 Days</option>
                   <option value="Net 30">Net 30 Days (Standard)</option>
@@ -1126,34 +1126,34 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                   <option value="Cash on Delivery">Cash on Delivery (COD)</option>
                   <option value="Advance">100% Advance Payment</option>
                 </select>
-                <div className="mt-1 text-[11px] text-slate-500">
+                <div className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                   Credit Window: {currentPoSupplier?.paymentTermsDays || 30} days
                 </div>
               </div>
 
               {/* PO Date */}
               <div>
-                <label className="font-bold text-slate-700">Order Date *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Order Date *</label>
                 <input
                   id="po-order-date"
                   type="date"
                   required
                   value={poOrderDate}
                   onChange={(e) => setPoOrderDate(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Expected Delivery Date */}
               <div>
-                <label className="font-bold text-slate-700">Expected Delivery Date *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Expected Delivery Date *</label>
                 <input
                   id="po-expected-delivery"
                   type="date"
                   required
                   value={poExpectedDelivery}
                   onChange={(e) => setPoExpectedDelivery(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
@@ -1161,37 +1161,37 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             {/* Optional Proforma / Notes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
               <div>
-                <label className="font-bold text-slate-700">Vendor Proforma Quote / Ref # (Optional)</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Vendor Proforma Quote / Ref # (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. QUOTE-2026-981"
                   value={poProformaInv}
                   onChange={(e) => setPoProformaInv(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate-700">Order Instructions & Remarks</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Order Instructions & Remarks</label>
                 <input
                   type="text"
                   placeholder="e.g. Ensure cold-chain temperature monitor included during transit."
                   value={poNotes}
                   onChange={(e) => setPoNotes(e.target.value)}
-                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Product Grid Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4 dark:bg-[#111827] dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Boxes className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                  <Boxes className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Pharmaceutical Product Grid & Unit Pricing</span>
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Select unit/box size, purchase rate, bonus items, trade discount, and VAT.
                 </p>
               </div>
@@ -1211,12 +1211,12 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs min-w-[900px]">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px]">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
                     <th className="py-2.5 px-3 w-64">Medicine & Generic</th>
                     <th className="py-2.5 px-3 w-28">Unit / Pack</th>
                     <th className="py-2.5 px-3 w-24">Unit Cost ($)</th>
                     <th className="py-2.5 px-3 w-20">Order Qty</th>
-                    <th className="py-2.5 px-3 w-20 text-emerald-700">Free Bonus</th>
+                    <th className="py-2.5 px-3 w-20 text-emerald-700 dark:text-emerald-300">Free Bonus</th>
                     <th className="py-2.5 px-3 w-24">Exp. MRP ($)</th>
                     <th className="py-2.5 px-3 w-20">Disc %</th>
                     <th className="py-2.5 px-3 w-20">VAT %</th>
@@ -1224,7 +1224,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     <th className="py-2.5 px-3 w-10 text-center"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {poItems.map((row, idx) => {
                     const lineRaw = row.unitPurchasePrice * row.orderedQuantity;
                     const disc = lineRaw * (row.discountPercent / 100);
@@ -1233,13 +1233,13 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     const selectedMed = medicines.find(m => m.id === row.medicineId);
 
                     return (
-                      <tr key={idx} className="hover:bg-slate-50/50">
+                      <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/60">
                         {/* Medicine Selector */}
                         <td className="py-2 px-3">
                           <select
                             value={row.medicineId}
                             onChange={(e) => handleUpdatePoItemField(idx, 'medicineId', e.target.value)}
-                            className="w-full px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-xs font-semibold text-slate-900 focus:ring-1 focus:ring-emerald-500"
+                            className="w-full px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-xs font-semibold text-slate-900 focus:ring-1 focus:ring-emerald-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           >
                             {filteredMedicines.map(m => (
                               <option key={m.id} value={m.id}>
@@ -1258,7 +1258,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             <select
                               value={row.unitType}
                               onChange={(e) => handleUpdatePoItemField(idx, 'unitType', e.target.value)}
-                              className="px-1.5 py-1 bg-slate-50 border border-slate-300 rounded text-xs"
+                              className="px-1.5 py-1 bg-slate-50 border border-slate-300 rounded text-xs dark:bg-slate-900 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                             >
                               <option value="Box">Box</option>
                               <option value="Strip">Strip</option>
@@ -1269,7 +1269,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                               min="1"
                               value={row.packSize}
                               onChange={(e) => handleUpdatePoItemField(idx, 'packSize', Math.max(1, Number(e.target.value)))}
-                              className="w-12 px-1.5 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center"
+                              className="w-12 px-1.5 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                               title="Units per box/pack"
                             />
                           </div>
@@ -1283,7 +1283,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             min="0.01"
                             value={row.unitPurchasePrice}
                             onChange={(e) => handleUpdatePoItemField(idx, 'unitPurchasePrice', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-mono font-bold text-slate-800"
+                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-mono font-bold text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           />
                         </td>
 
@@ -1294,7 +1294,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             min="1"
                             value={row.orderedQuantity}
                             onChange={(e) => handleUpdatePoItemField(idx, 'orderedQuantity', Math.max(1, Number(e.target.value)))}
-                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-center"
+                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-bold text-center dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </td>
 
@@ -1305,7 +1305,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             min="0"
                             value={row.freeQuantity}
                             onChange={(e) => handleUpdatePoItemField(idx, 'freeQuantity', Math.max(0, Number(e.target.value)))}
-                            className="w-full px-2 py-1 bg-emerald-50 border border-emerald-300 rounded text-xs font-bold text-emerald-800 text-center"
+                            className="w-full px-2 py-1 bg-emerald-50 border border-emerald-300 rounded text-xs font-bold text-emerald-800 text-center dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             placeholder="0"
                           />
                         </td>
@@ -1318,7 +1318,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             min="0.01"
                             value={row.expectedMrp}
                             onChange={(e) => handleUpdatePoItemField(idx, 'expectedMrp', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-mono"
+                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs font-mono dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </td>
 
@@ -1331,7 +1331,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             step="0.5"
                             value={row.discountPercent}
                             onChange={(e) => handleUpdatePoItemField(idx, 'discountPercent', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center"
+                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </td>
 
@@ -1343,12 +1343,12 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                             max="30"
                             value={row.taxRate}
                             onChange={(e) => handleUpdatePoItemField(idx, 'taxRate', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center"
+                            className="w-full px-2 py-1 bg-slate-50 border border-slate-300 rounded text-xs text-center dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </td>
 
                         {/* Net Line Total */}
-                        <td className="py-2 px-3 text-right font-mono font-extrabold text-slate-900">
+                        <td className="py-2 px-3 text-right font-mono font-extrabold text-slate-900 dark:text-white">
                           ${(lineTotal != null ? Number(lineTotal) : 0).toFixed(2)}
                         </td>
 
@@ -1370,29 +1370,29 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             </div>
 
             {/* Financial Summary Calculation Banner */}
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
-              <div className="text-xs text-slate-500 space-y-1">
-                <div>Total Product Rows: <span className="font-bold text-slate-800">{poItems.length}</span></div>
-                <div>Total Pack Units: <span className="font-bold text-slate-800">{poItems.reduce((s, it) => s + (it.orderedQuantity * it.packSize), 0)} units</span></div>
-                <div>Bonus Stock Units: <span className="font-bold text-emerald-700">+{poItems.reduce((s, it) => s + (it.freeQuantity * it.packSize), 0)} free units</span></div>
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-end md:items-center justify-between gap-4 dark:bg-slate-900 dark:border-slate-800">
+              <div className="text-xs text-slate-500 space-y-1 dark:text-slate-400">
+                <div>Total Product Rows: <span className="font-bold text-slate-800 dark:text-slate-100">{poItems.length}</span></div>
+                <div>Total Pack Units: <span className="font-bold text-slate-800 dark:text-slate-100">{poItems.reduce((s, it) => s + (it.orderedQuantity * it.packSize), 0)} units</span></div>
+                <div>Bonus Stock Units: <span className="font-bold text-emerald-700 dark:text-emerald-300">+{poItems.reduce((s, it) => s + (it.freeQuantity * it.packSize), 0)} free units</span></div>
               </div>
 
               <div className="w-full md:w-80 space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-600 dark:text-slate-300">
                   <span>Subtotal:</span>
                   <span className="font-mono font-bold">${(poCalculations?.subtotal != null ? Number(poCalculations.subtotal) : 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-emerald-700 dark:text-emerald-300">
                   <span>Trade Discount:</span>
                   <span className="font-mono font-bold">-${(poCalculations?.totalDiscount != null ? Number(poCalculations.totalDiscount) : 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-600 dark:text-slate-300">
                   <span>Applicable Tax / VAT:</span>
                   <span className="font-mono font-bold">+${(poCalculations?.totalTax != null ? Number(poCalculations.totalTax) : 0).toFixed(2)}</span>
                 </div>
-                <div className="pt-2 border-t border-slate-300 flex justify-between text-sm font-black text-slate-900">
+                <div className="pt-2 border-t border-slate-300 flex justify-between text-sm font-black text-slate-900 dark:border-slate-700 dark:text-white">
                   <span>Net Payable Grand Total:</span>
-                  <span className="font-mono text-emerald-600">${(poCalculations?.grandTotal != null ? Number(poCalculations.grandTotal) : 0).toFixed(2)}</span>
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400">${(poCalculations?.grandTotal != null ? Number(poCalculations.grandTotal) : 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -1402,7 +1402,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
               <button
                 type="button"
                 onClick={() => setActiveTab('register')}
-                className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>
@@ -1426,14 +1426,14 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {activeTab === 'supplier_ledger' && (
         <div className="space-y-4">
           {/* Supplier Selector and Summary Header */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-[#111827] dark:border-slate-800">
             <div className="flex-1 max-w-sm">
-              <label className="text-xs font-bold text-slate-700">Select Supplier Account:</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Select Supplier Account:</label>
               <select
                 id="ledger-supplier-select"
                 value={selectedSupplierForLedger}
                 onChange={(e) => setSelectedSupplierForLedger(e.target.value)}
-                className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900"
+                className="w-full mt-1.5 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
               >
                 {suppliers.map(s => (
                   <option key={s.id} value={s.id}>{s.name} ({s.companyName})</option>
@@ -1444,8 +1444,8 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             {/* Balance Badge and Settlement Button */}
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="text-[11px] font-semibold text-slate-500 uppercase">Current Balance Due</span>
-                <div className="text-xl font-black text-rose-600 font-mono">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase dark:text-slate-400">Current Balance Due</span>
+                <div className="text-xl font-black text-rose-600 font-mono dark:text-rose-400">
                   ${(activeSupplierData?.balancePayable != null ? Number(activeSupplierData.balancePayable) : 0).toFixed(2)}
                 </div>
               </div>
@@ -1476,33 +1476,33 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
           </div>
 
           {/* Supplier Profile Info Card */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs dark:bg-slate-900 dark:border-slate-800">
             <div>
-              <span className="text-slate-500 font-medium">Drug License Number:</span>
-              <p className="font-mono font-bold text-slate-800">{activeSupplierData.drugLicenseNumber}</p>
+              <span className="text-slate-500 font-medium dark:text-slate-400">Drug License Number:</span>
+              <p className="font-mono font-bold text-slate-800 dark:text-slate-100">{activeSupplierData.drugLicenseNumber}</p>
             </div>
             <div>
-              <span className="text-slate-500 font-medium">Tax BIN / TIN:</span>
-              <p className="font-mono font-bold text-slate-800">{activeSupplierData.taxId}</p>
+              <span className="text-slate-500 font-medium dark:text-slate-400">Tax BIN / TIN:</span>
+              <p className="font-mono font-bold text-slate-800 dark:text-slate-100">{activeSupplierData.taxId}</p>
             </div>
             <div>
-              <span className="text-slate-500 font-medium">Phone / Contact:</span>
-              <p className="text-slate-800 font-semibold">{activeSupplierData.phone}</p>
+              <span className="text-slate-500 font-medium dark:text-slate-400">Phone / Contact:</span>
+              <p className="text-slate-800 font-semibold dark:text-slate-100">{activeSupplierData.phone}</p>
             </div>
             <div>
-              <span className="text-slate-500 font-medium">Payment Terms:</span>
-              <p className="text-slate-800 font-semibold">{activeSupplierData.paymentTermsDays} Days Credit</p>
+              <span className="text-slate-500 font-medium dark:text-slate-400">Payment Terms:</span>
+              <p className="text-slate-800 font-semibold dark:text-slate-100">{activeSupplierData.paymentTermsDays} Days Credit</p>
             </div>
           </div>
 
           {/* Ledger Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-              <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                <Receipt className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between dark:border-slate-800">
+              <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 dark:text-white">
+                <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Vendor Statement of Account & Transaction History</span>
               </h4>
-              <span className="text-[11px] text-slate-500 font-mono">
+              <span className="text-[11px] text-slate-500 font-mono dark:text-slate-400">
                 {supplierLedgerEntries.length} Transactions Recorded
               </span>
             </div>
@@ -1510,17 +1510,17 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px]">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase font-semibold text-[10px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
                     <th className="py-3 px-4">Date</th>
                     <th className="py-3 px-4">Type</th>
                     <th className="py-3 px-4">Reference #</th>
                     <th className="py-3 px-4">Description</th>
-                    <th className="py-3 px-4 text-right text-emerald-700">Debit (Payment Out)</th>
-                    <th className="py-3 px-4 text-right text-rose-700">Credit (Invoice Inward)</th>
+                    <th className="py-3 px-4 text-right text-emerald-700 dark:text-emerald-300">Debit (Payment Out)</th>
+                    <th className="py-3 px-4 text-right text-rose-700 dark:text-rose-300">Credit (Invoice Inward)</th>
                     <th className="py-3 px-4 text-right">Running Balance Due</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {supplierLedgerEntries.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-8 text-center text-slate-400">
@@ -1531,8 +1531,8 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     supplierLedgerEntries.map((entry) => {
                       const isInvoice = entry.type === 'INVOICE';
                       return (
-                        <tr key={entry.id} className="hover:bg-slate-50 transition-colors font-mono">
-                          <td className="py-2.5 px-4 text-slate-700 font-sans">{entry.date}</td>
+                        <tr key={entry.id} className="hover:bg-slate-50 transition-colors font-mono dark:hover:bg-slate-800/60">
+                          <td className="py-2.5 px-4 text-slate-700 font-sans dark:text-slate-200">{entry.date}</td>
                           <td className="py-2.5 px-4 font-sans">
                             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
                               isInvoice 
@@ -1542,15 +1542,15 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                               {entry.type}
                             </span>
                           </td>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">{entry.reference}</td>
-                          <td className="py-2.5 px-4 text-slate-600 font-sans">{entry.description}</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-emerald-700">
+                          <td className="py-2.5 px-4 font-bold text-slate-900 dark:text-white">{entry.reference}</td>
+                          <td className="py-2.5 px-4 text-slate-600 font-sans dark:text-slate-300">{entry.description}</td>
+                          <td className="py-2.5 px-4 text-right font-bold text-emerald-700 dark:text-emerald-300">
                             {entry.debit != null && Number(entry.debit) > 0 ? `$${Number(entry.debit).toFixed(2)}` : '—'}
                           </td>
-                          <td className="py-2.5 px-4 text-right font-bold text-rose-700">
+                          <td className="py-2.5 px-4 text-right font-bold text-rose-700 dark:text-rose-300">
                             {entry.credit != null && Number(entry.credit) > 0 ? `$${Number(entry.credit).toFixed(2)}` : '—'}
                           </td>
-                          <td className="py-2.5 px-4 text-right font-extrabold text-slate-900">
+                          <td className="py-2.5 px-4 text-right font-extrabold text-slate-900 dark:text-white">
                             ${(entry.runningBalance != null ? Number(entry.runningBalance) : 0).toFixed(2)}
                           </td>
                         </tr>
@@ -1643,7 +1643,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {/* ========================================================================= */}
       {grnModalPO && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 md:p-6 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full overflow-hidden border border-slate-200 my-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full overflow-hidden border border-slate-200 my-auto dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             {/* Modal Header */}
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -1672,8 +1672,8 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
 
             {/* Error Banner if any */}
             {grnError && (
-              <div className="bg-rose-50 border-b border-rose-200 p-3.5 text-xs text-rose-900 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="bg-rose-50 border-b border-rose-200 p-3.5 text-xs text-rose-900 flex items-start gap-2 dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5 dark:text-rose-400" />
                 <div className="font-semibold">{grnError}</div>
               </div>
             )}
@@ -1681,9 +1681,9 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             <form onSubmit={handleConfirmGrnSubmit} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
               
               {/* GRN Configuration Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                 <div>
-                  <label className="font-bold text-slate-700">Vendor Bill / Invoice # *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Vendor Bill / Invoice # *</label>
                   <input
                     id="grn-invoice-num"
                     type="text"
@@ -1691,17 +1691,17 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     value={grnVendorInvoice}
                     onChange={(e) => setGrnVendorInvoice(e.target.value)}
                     placeholder="e.g. INV-VENDOR-8821"
-                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Receiving Warehouse *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Receiving Warehouse *</label>
                   <select
                     id="grn-warehouse"
                     value={grnWarehouse}
                     onChange={(e) => setGrnWarehouse(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="Main Central Pharmacy Depot">Main Central Pharmacy Depot</option>
                     <option value="Cold Storage Safe (2-8°C)">Cold Storage Safe (2-8°C)</option>
@@ -1711,12 +1711,12 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Receive Mode</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Receive Mode</label>
                   <select
                     id="grn-receive-mode"
                     value={grnReceiveMode}
                     onChange={(e) => setGrnReceiveMode(e.target.value as any)}
-                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="full">Full Receive (All goods arrived intact)</option>
                     <option value="partial">Partial Receive (Pending backorder)</option>
@@ -1725,13 +1725,13 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Inward Date *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Inward Date *</label>
                   <input
                     type="date"
                     required
                     value={grnReceivedDate}
                     onChange={(e) => setGrnReceivedDate(e.target.value)}
-                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full mt-1.5 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -1739,11 +1739,11 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
               {/* Line-by-Line Batch Entry Form */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5 dark:text-white">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>Batch Identification & Regulatory Quality Gate</span>
                   </h4>
-                  <span className="text-[11px] text-slate-500 font-mono">
+                  <span className="text-[11px] text-slate-500 font-mono dark:text-slate-400">
                     {grnItems.length} Products to Inward
                   </span>
                 </div>
@@ -1763,29 +1763,29 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                       }`}
                     >
                       {/* Top Medicine details and Regulatory status indicator */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5 dark:border-slate-800">
                         <div>
-                          <div className="font-bold text-slate-900 text-sm">{row.medicineName}</div>
-                          <div className="text-[11px] text-slate-500">
-                            {row.dosageForm} • Ordered: <span className="font-bold text-slate-700">{row.orderedQuantity}</span> units
+                          <div className="font-bold text-slate-900 text-sm dark:text-white">{row.medicineName}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {row.dosageForm} • Ordered: <span className="font-bold text-slate-700 dark:text-slate-200">{row.orderedQuantity}</span> units
                           </div>
                         </div>
 
                         {/* Shelf Life Status Badge */}
                         <div className="flex items-center gap-2">
                           {isExpired ? (
-                            <span className="text-[11px] font-bold text-rose-700 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded flex items-center gap-1">
-                              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                            <span className="text-[11px] font-bold text-rose-700 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded flex items-center gap-1 dark:text-rose-300 dark:bg-rose-950/60 dark:border-rose-800/70">
+                              <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                               EXPIRED: Regulatory Violation
                             </span>
                           ) : daysToExpiry <= 90 ? (
-                            <span className="text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            <span className="text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded flex items-center gap-1 dark:text-amber-300 dark:bg-amber-950/60 dark:border-amber-800/70">
+                              <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                               Near Expiry Alert ({daysToExpiry}d shelf life)
                             </span>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded flex items-center gap-1 dark:text-emerald-300 dark:bg-emerald-950/60 dark:border-emerald-800/70">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               Safe Stock ({daysToExpiry}d shelf life)
                             </span>
                           )}
@@ -1796,26 +1796,26 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                       <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
                         {/* Batch Number */}
                         <div className="col-span-2 sm:col-span-1">
-                          <label className="font-bold text-slate-700">Batch # *</label>
+                          <label className="font-bold text-slate-700 dark:text-slate-200">Batch # *</label>
                           <input
                             type="text"
                             required
                             value={row.batchNumber}
                             onChange={(e) => handleUpdateGrnItem(idx, 'batchNumber', e.target.value.toUpperCase())}
-                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded font-mono font-bold text-slate-900"
+                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded font-mono font-bold text-slate-900 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             placeholder="e.g. BTH-902"
                           />
                         </div>
 
                         {/* Manufacturing Date */}
                         <div className="col-span-2 sm:col-span-1">
-                          <label className="font-bold text-slate-700">Mfg Date *</label>
+                          <label className="font-bold text-slate-700 dark:text-slate-200">Mfg Date *</label>
                           <input
                             type="date"
                             required
                             value={row.manufacturingDate}
                             onChange={(e) => handleUpdateGrnItem(idx, 'manufacturingDate', e.target.value)}
-                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded"
+                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </div>
 
@@ -1839,85 +1839,85 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
 
                         {/* Received Quantity */}
                         <div>
-                          <label className="font-bold text-slate-700">Received Qty</label>
+                          <label className="font-bold text-slate-700 dark:text-slate-200">Received Qty</label>
                           <input
                             type="number"
                             min="0"
                             required
                             value={row.receivedQuantity}
                             onChange={(e) => handleUpdateGrnItem(idx, 'receivedQuantity', Math.max(0, Number(e.target.value)))}
-                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-center font-bold"
+                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-center font-bold dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </div>
 
                         {/* Free / Bonus Quantity */}
                         <div>
-                          <label className="font-bold text-emerald-700">Bonus Qty</label>
+                          <label className="font-bold text-emerald-700 dark:text-emerald-300">Bonus Qty</label>
                           <input
                             type="number"
                             min="0"
                             value={row.freeQuantity}
                             onChange={(e) => handleUpdateGrnItem(idx, 'freeQuantity', Math.max(0, Number(e.target.value)))}
-                            className="w-full mt-1 px-2 py-1.5 bg-emerald-50 border border-emerald-300 rounded text-center font-bold text-emerald-800"
+                            className="w-full mt-1 px-2 py-1.5 bg-emerald-50 border border-emerald-300 rounded text-center font-bold text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           />
                         </div>
 
                         {/* Rack / Shelf Location */}
                         <div>
-                          <label className="font-bold text-slate-700">Rack / Shelf</label>
+                          <label className="font-bold text-slate-700 dark:text-slate-200">Rack / Shelf</label>
                           <input
                             type="text"
                             value={row.rackLocation}
                             onChange={(e) => handleUpdateGrnItem(idx, 'rackLocation', e.target.value)}
-                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-slate-800"
+                            className="w-full mt-1 px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             placeholder="Rack A-01"
                           />
                         </div>
                       </div>
 
                       {/* Pricing Row */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 border-t border-slate-100 text-[11px]">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 border-t border-slate-100 text-[11px] dark:border-slate-800">
                         <div>
-                          <span className="text-slate-500">Unit Purchase Rate:</span>
+                          <span className="text-slate-500 dark:text-slate-400">Unit Purchase Rate:</span>
                           <input
                             type="number"
                             step="0.01"
                             value={row.unitPurchasePrice}
                             onChange={(e) => handleUpdateGrnItem(idx, 'unitPurchasePrice', Number(e.target.value))}
-                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono font-bold"
+                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono font-bold dark:bg-slate-900 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </div>
 
                         <div>
-                          <span className="text-slate-500">Maximum Retail Price (MRP):</span>
+                          <span className="text-slate-500 dark:text-slate-400">Maximum Retail Price (MRP):</span>
                           <input
                             type="number"
                             step="0.01"
                             value={row.mrp}
                             onChange={(e) => handleUpdateGrnItem(idx, 'mrp', Number(e.target.value))}
-                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono"
+                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono dark:bg-slate-900 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                           />
                         </div>
 
                         <div>
-                          <span className="text-slate-500">POS Selling Price:</span>
+                          <span className="text-slate-500 dark:text-slate-400">POS Selling Price:</span>
                           <input
                             type="number"
                             step="0.01"
                             value={row.sellingPrice}
                             onChange={(e) => handleUpdateGrnItem(idx, 'sellingPrice', Number(e.target.value))}
-                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono text-emerald-700 font-bold"
+                            className="w-full mt-0.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded font-mono text-emerald-700 font-bold dark:bg-slate-900 dark:border-slate-800 dark:text-emerald-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                           />
                         </div>
 
                         <div>
-                          <span className="text-slate-500">Damaged / Quarantine Qty:</span>
+                          <span className="text-slate-500 dark:text-slate-400">Damaged / Quarantine Qty:</span>
                           <input
                             type="number"
                             min="0"
                             value={row.damagedQuantity}
                             onChange={(e) => handleUpdateGrnItem(idx, 'damagedQuantity', Math.max(0, Number(e.target.value)))}
-                            className="w-full mt-0.5 px-2 py-1 bg-rose-50 border border-rose-200 rounded font-bold text-rose-800 text-center"
+                            className="w-full mt-0.5 px-2 py-1 bg-rose-50 border border-rose-200 rounded font-bold text-rose-800 text-center dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             placeholder="0"
                           />
                         </div>
@@ -1928,27 +1928,27 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
               </div>
 
               {/* Payment Settlement for GRN */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 dark:bg-slate-900 dark:border-slate-800">
                 <div>
-                  <label className="font-bold text-slate-700">Immediate Disbursement ($)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Immediate Disbursement ($)</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={grnPaidAmount}
                     onChange={(e) => setGrnPaidAmount(Number(e.target.value))}
-                    className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900"
+                    className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 dark:bg-[#111827] dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     placeholder="0.00 for Credit Inward"
                   />
-                  <div className="text-[10px] text-slate-500 mt-1">Leave 0 for standard credit invoice.</div>
+                  <div className="text-[10px] text-slate-500 mt-1 dark:text-slate-400">Leave 0 for standard credit invoice.</div>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Payment Method</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Payment Method</label>
                   <select
                     value={grnPaymentMethod}
                     onChange={(e) => setGrnPaymentMethod(e.target.value as any)}
-                    className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs dark:bg-[#111827] dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   >
                     <option value="Bank Transfer">Bank Transfer</option>
                     <option value="Cash">Cash Drawer</option>
@@ -1957,20 +1957,20 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                   </select>
                 </div>
 
-                <div className="flex flex-col justify-center bg-white p-3 rounded-lg border border-slate-200 text-right">
-                  <span className="text-slate-500 font-medium">Added to Supplier Liability:</span>
-                  <span className="text-sm font-black text-rose-600 font-mono">
+                <div className="flex flex-col justify-center bg-white p-3 rounded-lg border border-slate-200 text-right dark:bg-[#111827] dark:border-slate-800">
+                  <span className="text-slate-500 font-medium dark:text-slate-400">Added to Supplier Liability:</span>
+                  <span className="text-sm font-black text-rose-600 font-mono dark:text-rose-400">
                     ${Math.max(0, grnModalPO.totalAmount - grnPaidAmount).toFixed(2)}
                   </span>
                 </div>
               </div>
 
               {/* Modal Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setGrnModalPO(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-bold transition-all cursor-pointer dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -1994,7 +1994,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {/* ========================================================================= */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold">Record Supplier Settlement</h3>
@@ -2006,15 +2006,15 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             </div>
 
             <form onSubmit={handleRecordPaymentSubmit} className="p-5 space-y-3.5 text-xs">
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center">
-                <span className="text-slate-600 font-medium">Outstanding Balance:</span>
-                <span className="font-mono font-black text-rose-600 text-sm">
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center dark:bg-slate-900 dark:border-slate-800">
+                <span className="text-slate-600 font-medium dark:text-slate-300">Outstanding Balance:</span>
+                <span className="font-mono font-black text-rose-600 text-sm dark:text-rose-400">
                   ${(showPaymentModal?.balancePayable != null ? Number(showPaymentModal.balancePayable) : 0).toFixed(2)}
                 </span>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Settlement Amount ($) *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Settlement Amount ($) *</label>
                 <input
                   id="pay-amount-input"
                   type="number"
@@ -2023,16 +2023,16 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                   required
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900"
+                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Payment Instrument</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Payment Instrument</label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 >
                   <option value="Bank Transfer">Bank Transfer (EFT / NEFT)</option>
                   <option value="Company Cheque">Company Cheque</option>
@@ -2042,33 +2042,33 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Transaction / Cheque Reference #</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Transaction / Cheque Reference #</label>
                 <input
                   type="text"
                   required
                   value={paymentRef}
                   onChange={(e) => setPaymentRef(e.target.value)}
                   placeholder="e.g. TR-99402 or CHQ-00129"
-                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono"
+                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Remarks & Voucher Notes</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Remarks & Voucher Notes</label>
                 <input
                   type="text"
                   value={paymentNotes}
                   onChange={(e) => setPaymentNotes(e.target.value)}
                   placeholder="e.g. Payment for invoice batch #INV-881"
-                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg"
+                  className="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg dark:bg-slate-900 dark:border-slate-700 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg font-bold transition-all cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg font-bold transition-all cursor-pointer dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -2090,7 +2090,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {/* ========================================================================= */}
       {viewingPO && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold flex items-center gap-2">
@@ -2105,27 +2105,27 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             </div>
 
             <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
-              <div className="grid grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                 <div>
-                  <span className="text-slate-500 font-medium">Order Date:</span>
-                  <p className="font-bold text-slate-800">{viewingPO.purchaseDate}</p>
+                  <span className="text-slate-500 font-medium dark:text-slate-400">Order Date:</span>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{viewingPO.purchaseDate}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500 font-medium">Payment Status:</span>
-                  <p className="font-bold uppercase text-emerald-700">{viewingPO.paymentStatus}</p>
+                  <span className="text-slate-500 font-medium dark:text-slate-400">Payment Status:</span>
+                  <p className="font-bold uppercase text-emerald-700 dark:text-emerald-300">{viewingPO.paymentStatus}</p>
                 </div>
                 <div>
-                  <span className="text-slate-500 font-medium">Paid vs Due:</span>
-                  <p className="font-bold text-slate-800 font-mono">
+                  <span className="text-slate-500 font-medium dark:text-slate-400">Paid vs Due:</span>
+                  <p className="font-bold text-slate-800 font-mono dark:text-slate-100">
                     ${((viewingPO.paidAmount || 0)).toFixed(2)} / ${((viewingPO.dueAmount || 0)).toFixed(2)}
                   </p>
                 </div>
               </div>
 
               {/* Items List */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="border border-slate-200 rounded-xl overflow-hidden dark:border-slate-800">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100 text-slate-600 font-semibold uppercase text-[10px]">
+                  <thead className="bg-slate-100 text-slate-600 font-semibold uppercase text-[10px] dark:bg-slate-800 dark:text-slate-300">
                     <tr>
                       <th className="py-2.5 px-3">Medicine</th>
                       <th className="py-2.5 px-3">Batch #</th>
@@ -2135,30 +2135,30 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                       <th className="py-2.5 px-3 text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {viewingPO.items.map((it, i) => (
-                      <tr key={i} className="hover:bg-slate-50">
-                        <td className="py-2 px-3 font-semibold text-slate-800">{it.medicineName}</td>
-                        <td className="py-2 px-3 font-mono font-bold text-slate-700">{it.batchNumber}</td>
-                        <td className="py-2 px-3 font-mono text-slate-600">{it.expiryDate}</td>
-                        <td className="py-2 px-3 text-center font-bold text-slate-800">{it.quantity}</td>
+                      <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                        <td className="py-2 px-3 font-semibold text-slate-800 dark:text-slate-100">{it.medicineName}</td>
+                        <td className="py-2 px-3 font-mono font-bold text-slate-700 dark:text-slate-200">{it.batchNumber}</td>
+                        <td className="py-2 px-3 font-mono text-slate-600 dark:text-slate-300">{it.expiryDate}</td>
+                        <td className="py-2 px-3 text-center font-bold text-slate-800 dark:text-slate-100">{it.quantity}</td>
                         <td className="py-2 px-3 text-right font-mono">${(it.purchasePrice != null ? Number(it.purchasePrice) : 0).toFixed(2)}</td>
-                        <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">${(it.totalAmount != null ? Number(it.totalAmount) : 0).toFixed(2)}</td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">${(it.totalAmount != null ? Number(it.totalAmount) : 0).toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center text-xs">
-                <span className="text-slate-600 font-semibold">Grand Invoice Total:</span>
-                <span className="font-mono text-base font-black text-slate-900">
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex justify-between items-center text-xs dark:bg-slate-900 dark:border-slate-800">
+                <span className="text-slate-600 font-semibold dark:text-slate-300">Grand Invoice Total:</span>
+                <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                   ${(viewingPO?.totalAmount != null ? Number(viewingPO.totalAmount) : 0).toFixed(2)}
                 </span>
               </div>
             </div>
 
-            <div className="bg-slate-100 px-5 py-3 flex justify-end">
+            <div className="bg-slate-100 px-5 py-3 flex justify-end dark:bg-slate-800">
               <button
                 onClick={() => setViewingPO(null)}
                 className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
@@ -2175,7 +2175,7 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
       {/* ========================================================================= */}
       {showAddSupplierModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold flex items-center gap-2">
@@ -2195,99 +2195,99 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
             <form onSubmit={handleSaveSupplier} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Company / Brand Name *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Company / Brand Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Square Pharmaceuticals PLC, Beximco, Incepta, Renata"
                     value={newSupplier.companyName}
                     onChange={(e) => setNewSupplier({ ...newSupplier, companyName: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">Authorized Contact Person / Representative *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Authorized Contact Person / Representative *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Md. Rafiqul Islam (Senior MPO)"
                     value={newSupplier.name}
                     onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">Contact Phone Number *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Contact Phone Number *</label>
                   <input
                     type="tel"
                     required
                     placeholder="e.g. +880 1711-234567"
                     value={newSupplier.phone}
                     onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">Official Email</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Official Email</label>
                   <input
                     type="email"
                     placeholder="e.g. sales@squarepharma.com.bd"
                     value={newSupplier.email}
                     onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">Credit Payment Terms (Days)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Credit Payment Terms (Days)</label>
                   <input
                     type="number"
                     min="0"
                     placeholder="30"
                     value={newSupplier.paymentTermsDays}
                     onChange={(e) => setNewSupplier({ ...newSupplier, paymentTermsDays: parseInt(e.target.value) || 30 })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">DGDA Drug License #</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">DGDA Drug License #</label>
                   <input
                     type="text"
                     placeholder="e.g. DL-DGDA-7890"
                     value={newSupplier.drugLicenseNumber}
                     onChange={(e) => setNewSupplier({ ...newSupplier, drugLicenseNumber: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="font-bold text-slate-700">Tax BIN / TIN Number</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Tax BIN / TIN Number</label>
                   <input
                     type="text"
                     placeholder="e.g. BIN-002391029-01"
                     value={newSupplier.taxId}
                     onChange={(e) => setNewSupplier({ ...newSupplier, taxId: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Depot / Warehouse Address</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Depot / Warehouse Address</label>
                   <input
                     type="text"
                     placeholder="e.g. Tejgaon Industrial Area, Dhaka-1208"
                     value={newSupplier.address}
                     onChange={(e) => setNewSupplier({ ...newSupplier, address: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Initial Opening Balance Due ($ / ৳)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Initial Opening Balance Due ($ / ৳)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -2295,17 +2295,17 @@ export const PurchaseOrdersView: React.FC<PurchaseOrdersViewProps> = ({ onDataCh
                     placeholder="0.00"
                     value={newSupplier.balancePayable}
                     onChange={(e) => setNewSupplier({ ...newSupplier, balancePayable: parseFloat(e.target.value) || 0 })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono font-bold"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono font-bold dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">If there is any previous pending credit/balance with this supplier, enter it here.</p>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddSupplierModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800"
                 >
                   Cancel
                 </button>

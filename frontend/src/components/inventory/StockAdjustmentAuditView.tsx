@@ -333,27 +333,27 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
       {activeSubTab === 'new_adjustment' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Form */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs p-6">
-            <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
-              <h2 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
+          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs p-6 dark:bg-[#111827] dark:border-slate-800">
+            <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-100 dark:border-slate-800">
+              <h2 className="text-base font-semibold text-slate-800 flex items-center gap-2 dark:text-slate-100">
+                <SlidersHorizontal className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{t('adjustments.new_adjustment', 'Initiate Controlled Stock Adjustment')}</span>
               </h2>
-              <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-mono">
+              <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-mono dark:bg-slate-800 dark:text-slate-300">
                 Threshold: {formatCurrency(StockAdjustmentService.getApprovalThreshold(), locale)}
               </span>
             </div>
 
             {formError && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center gap-2.5 text-xs text-rose-700">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center gap-2.5 text-xs text-rose-700 dark:bg-rose-950/40 dark:border-rose-800/70 dark:text-rose-300">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span>{formError}</span>
               </div>
             )}
 
             {formSuccess && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-xs text-emerald-700">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-xs text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800/70 dark:text-emerald-300">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                 <span>{formSuccess}</span>
               </div>
             )}
@@ -361,13 +361,13 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
             <form onSubmit={handleFormSubmit} className="space-y-4">
               {/* Medicine Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                   {t('adjustments.select_medicine', '1. Select Medicine')} *
                 </label>
                 <select
                   value={selectedMedicineId}
                   onChange={(e) => setSelectedMedicineId(e.target.value)}
-                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   required
                 >
                   <option value="">-- Choose Pharmaceutical Product --</option>
@@ -381,7 +381,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
               {/* Batch Selector (Specific Batch, Expiry, Rack) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                   {t('adjustments.select_batch', '2. Select Specific Batch (FEFO Tracked)')} *
                 </label>
                 {selectedMedicineId ? (
@@ -401,15 +401,15 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                           >
                             <div className="flex items-center justify-between font-bold">
                               <span>Batch: {b.batchNumber}</span>
-                              <span className="px-1.5 py-0.5 rounded text-[11px] bg-white border border-slate-200">
+                              <span className="px-1.5 py-0.5 rounded text-[11px] bg-white border border-slate-200 dark:bg-[#111827] dark:border-slate-800">
                                 Stock: {formatNumber(b.currentStock, locale)}
                               </span>
                             </div>
-                            <div className="mt-1 text-slate-500 flex items-center justify-between text-[11px]">
+                            <div className="mt-1 text-slate-500 flex items-center justify-between text-[11px] dark:text-slate-400">
                               <span>Exp: {formatDate(b.expiryDate, locale)}</span>
                               <span>Rack: {b.rackLocation || 'A-01'}</span>
                             </div>
-                            <div className="mt-1 text-[11px] text-slate-600 font-medium">
+                            <div className="mt-1 text-[11px] text-slate-600 font-medium dark:text-slate-300">
                               Unit Cost: {formatCurrency(b.purchasePrice || (b.mrp * 0.7), locale)}
                             </div>
                           </div>
@@ -417,12 +417,12 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                       })}
                     </div>
                   ) : (
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 dark:bg-amber-950/40 dark:border-amber-800/70 dark:text-amber-300">
                       No active batches found for this product.
                     </div>
                   )
                 ) : (
-                  <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-xs text-slate-400 text-center">
+                  <div className="p-3 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-xs text-slate-400 text-center dark:bg-slate-900 dark:border-slate-700">
                     Select a medicine above to load its FEFO tracked batches.
                   </div>
                 )}
@@ -431,13 +431,13 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
               {/* Adjustment Type & Direction */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                     {t('adjustments.adjustment_type', '3. Adjustment Type')} *
                   </label>
                   <select
                     value={adjustmentType}
                     onChange={(e) => setAdjustmentType(e.target.value as StockAdjustmentType)}
-                    className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                    className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   >
                     <option value="inventory_reconciliation">{t('adjustments.inventory_reconciliation', 'Inventory Count Reconciliation')}</option>
                     <option value="physical_damage">{t('adjustments.physical_damage', 'Physical Damage')}</option>
@@ -449,7 +449,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                     {t('adjustments.direction', '4. Adjustment Direction')} *
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -481,7 +481,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
               {/* Quantity to Adjust */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                   {t('adjustments.quantity_to_adjust', '5. Quantity to Adjust (Units)')} *
                 </label>
                 <div className="flex items-center gap-3">
@@ -491,12 +491,12 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                     max={direction === 'decrease' ? currentPhysicalStock : 9999}
                     value={quantityInput}
                     onChange={(e) => setQuantityInput(e.target.value)}
-                    className="w-48 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                    className="w-48 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-hidden dark:bg-slate-900 dark:border-slate-700 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     required
                   />
                   {selectedBatch && direction === 'decrease' && (
-                    <span className="text-xs text-slate-500">
-                      Available: <strong className="text-slate-800 font-mono">{currentPhysicalStock}</strong> units
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      Available: <strong className="text-slate-800 font-mono dark:text-slate-100">{currentPhysicalStock}</strong> units
                     </span>
                   )}
                 </div>
@@ -504,7 +504,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
               {/* Reason & Audit Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                   {t('adjustments.reason', '6. Primary Reason')} *
                 </label>
                 <input
@@ -512,13 +512,13 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                   value={reasonInput}
                   onChange={(e) => setReasonInput(e.target.value)}
                   placeholder="e.g., Physical damage due to broken shelf, or monthly count reconciliation"
-                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5 dark:text-slate-200">
                   {t('adjustments.notes', '7. Detailed Audit Notes / Observation')}
                 </label>
                 <textarea
@@ -526,7 +526,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                   onChange={(e) => setNotesInput(e.target.value)}
                   rows={2}
                   placeholder="Additional context, incident report number, or batch verification notes..."
-                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                  className="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-hidden dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
@@ -615,12 +615,12 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
             </div>
 
             {/* Regulatory Compliance Card */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 space-y-2">
-              <div className="font-semibold text-slate-800 flex items-center gap-1.5">
-                <FileCode className="w-4 h-4 text-slate-500" />
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 space-y-2 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300">
+              <div className="font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
+                <FileCode className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 <span>Regulatory Audit Standard</span>
               </div>
-              <p className="text-[11px] leading-relaxed text-slate-500">
+              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                 All quantity updates execute in an append-only transaction. An immutable audit record will log your User ID ({currentUser?.id}), Role, and before/after inventory states.
               </p>
             </div>
@@ -630,18 +630,18 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
 
       {/* SUBTAB 2: HISTORY & APPROVALS */}
       {activeSubTab === 'history' && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden dark:bg-[#111827] dark:border-slate-800">
           {/* Filters Bar */}
-          <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3 dark:border-slate-800 dark:bg-slate-900/70">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium dark:text-slate-300">
                 <Filter className="w-3.5 h-3.5 text-slate-400" />
                 <span>Filter Status:</span>
               </div>
               <select
                 value={historyStatusFilter}
                 onChange={(e) => setHistoryStatusFilter(e.target.value)}
-                className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-hidden"
+                className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-hidden dark:bg-[#111827] dark:border-slate-700 dark:text-slate-200"
               >
                 <option value="all">All Statuses</option>
                 <option value="pending_approval">Pending Approval</option>
@@ -652,7 +652,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
               <select
                 value={historyTypeFilter}
                 onChange={(e) => setHistoryTypeFilter(e.target.value)}
-                className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-hidden"
+                className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-hidden dark:bg-[#111827] dark:border-slate-700 dark:text-slate-200"
               >
                 <option value="all">All Adjustment Types</option>
                 <option value="inventory_reconciliation">Count Reconciliation</option>
@@ -664,8 +664,8 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
               </select>
             </div>
 
-            <div className="text-xs text-slate-500">
-              Showing <strong className="text-slate-800">{filteredAdjustments.length}</strong> adjustments
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              Showing <strong className="text-slate-800 dark:text-slate-100">{filteredAdjustments.length}</strong> adjustments
             </div>
           </div>
 
@@ -673,7 +673,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100/80 text-slate-600 border-b border-slate-200 font-semibold">
+                <tr className="bg-slate-100/80 text-slate-600 border-b border-slate-200 font-semibold dark:bg-slate-800/70 dark:text-slate-300 dark:border-slate-800">
                   <th className="py-3 px-4">Adjustment #</th>
                   <th className="py-3 px-4">Date</th>
                   <th className="py-3 px-4">Medicine & Batch</th>
@@ -685,7 +685,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                   <th className="py-3 px-4 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredAdjustments.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="py-8 text-center text-slate-400 text-xs">
@@ -699,21 +699,21 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                     const isRejected = adj.status === 'rejected';
 
                     return (
-                      <tr key={adj.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                      <tr key={adj.id} className="hover:bg-slate-50/80 transition-colors dark:hover:bg-slate-800/60">
+                        <td className="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">
                           {adj.adjustmentNumber}
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                           {formatDate(adj.createdAt, locale, true)}
                         </td>
                         <td className="py-3 px-4">
-                          <div className="font-semibold text-slate-800">{adj.medicineName}</div>
-                          <div className="text-[11px] text-slate-500 font-mono">
+                          <div className="font-semibold text-slate-800 dark:text-slate-100">{adj.medicineName}</div>
+                          <div className="text-[11px] text-slate-500 font-mono dark:text-slate-400">
                             Batch: {adj.batchNumber} • Exp: {formatDate(adj.expiryDate, locale)}
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium capitalize">
+                          <span className="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium capitalize dark:bg-slate-800 dark:text-slate-200">
                             {adj.type.replace('_', ' ')}
                           </span>
                         </td>
@@ -725,38 +725,38 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                             {formatNumber(adj.previousStock, locale)} → {formatNumber(adj.newStock, locale)}
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-right font-mono font-bold text-slate-800">
+                        <td className="py-3 px-4 text-right font-mono font-bold text-slate-800 dark:text-slate-100">
                           {formatCurrency(adj.totalMonetaryValue, locale)}
                         </td>
                         <td className="py-3 px-4">
                           {isPending && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                              <Clock className="w-3 h-3 text-amber-600 animate-spin" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
+                              <Clock className="w-3 h-3 text-amber-600 animate-spin dark:text-amber-400" />
                               Pending Approval
                             </span>
                           )}
                           {isApproved && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               Approved
                             </span>
                           )}
                           {isRejected && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-300">
-                              <XCircle className="w-3 h-3 text-rose-600" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70">
+                              <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                               Rejected
                             </span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-[11px] text-slate-600">
+                        <td className="py-3 px-4 text-[11px] text-slate-600 dark:text-slate-300">
                           <div>Req: <strong>{adj.requestedBy.userName}</strong></div>
                           {adj.approvedBy && (
-                            <div className="text-emerald-700 mt-0.5">
+                            <div className="text-emerald-700 mt-0.5 dark:text-emerald-300">
                               Appr: {adj.approvedBy.userName}
                             </div>
                           )}
                           {adj.rejectedBy && (
-                            <div className="text-rose-700 mt-0.5">
+                            <div className="text-rose-700 mt-0.5 dark:text-rose-300">
                               Rej: {adj.rejectedBy.userName} ({adj.rejectionReason})
                             </div>
                           )}
@@ -922,27 +922,27 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
       {/* REJECTION REASON MODAL */}
       {rejectionTargetAdj && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-rose-600" />
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-5 space-y-4 dark:bg-[#111827] placeholder:text-slate-400 dark:placeholder:text-slate-500">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+                <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                 <span>Reject Stock Adjustment</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setRejectionTargetAdj(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 dark:text-slate-300">
               Rejecting adjustment <strong className="font-mono">{rejectionTargetAdj.adjustmentNumber}</strong> for {rejectionTargetAdj.medicineName} ({formatCurrency(rejectionTargetAdj.totalMonetaryValue, locale)}).
             </p>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1 dark:text-slate-200">
                 Reason for Rejection *
               </label>
               <textarea
@@ -950,7 +950,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
                 onChange={(e) => setRejectionReasonText(e.target.value)}
                 rows={3}
                 placeholder="Specify audit rationale (e.g. physical count re-verified; discrepancy resolved)..."
-                className="w-full text-xs p-2.5 border border-slate-300 rounded-lg text-slate-800 focus:outline-hidden focus:border-rose-500"
+                className="w-full text-xs p-2.5 border border-slate-300 rounded-lg text-slate-800 focus:outline-hidden focus:border-rose-500 dark:border-slate-700 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 required
               />
             </div>
@@ -959,7 +959,7 @@ export const StockAdjustmentAuditView: React.FC<StockAdjustmentAuditViewProps> =
               <button
                 type="button"
                 onClick={() => setRejectionTargetAdj(null)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
+                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>

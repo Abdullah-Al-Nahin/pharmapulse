@@ -63,28 +63,28 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
       case 'cold_chain':
         return <Snowflake className="w-4 h-4 text-sky-500" />;
       case 'ophthalmic_bay':
-        return <Eye className="w-4 h-4 text-emerald-600" />;
+        return <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
       case 'narcotic_vault':
-        return <Lock className="w-4 h-4 text-purple-600" />;
+        return <Lock className="w-4 h-4 text-purple-600 dark:text-purple-400" />;
       case 'ot_emergency_cart':
-        return <Activity className="w-4 h-4 text-rose-600" />;
+        return <Activity className="w-4 h-4 text-rose-600 dark:text-rose-400" />;
       default:
-        return <MapPin className="w-4 h-4 text-slate-500" />;
+        return <MapPin className="w-4 h-4 text-slate-500 dark:text-slate-400" />;
     }
   };
 
   const getZoneBadge = (zone: StorageZone) => {
     switch (zone) {
       case 'cold_chain':
-        return <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded">2°C - 8°C Cold Chain</span>;
+        return <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-sky-950/60 dark:text-sky-300">2°C - 8°C Cold Chain</span>;
       case 'ophthalmic_bay':
-        return <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Ophthalmic Bay</span>;
+        return <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-emerald-950/60 dark:text-emerald-300">Ophthalmic Bay</span>;
       case 'narcotic_vault':
-        return <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">Controlled Vault</span>;
+        return <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-purple-950/60 dark:text-purple-300">Controlled Vault</span>;
       case 'ot_emergency_cart':
-        return <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded">OT Emergency Cart</span>;
+        return <span className="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded dark:bg-rose-950/60 dark:text-rose-300">OT Emergency Cart</span>;
       default:
-        return <span className="bg-slate-100 text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded">Ambient Solid</span>;
+        return <span className="bg-slate-100 text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-200">Ambient Solid</span>;
     }
   };
 
@@ -119,13 +119,13 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
   return (
     <div className="space-y-4">
       {/* Top Banner & Quick Controls */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 dark:bg-[#111827] dark:border-slate-800">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-emerald-600" />
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 dark:text-white">
+            <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Warehouse Spatial Mapping: Rack / Shelf / Bin Locations</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
             Real-time visual map of physical storage bays, cold chain refrigerators, ophthalmic shelves, and emergency crash carts.
           </p>
         </div>
@@ -133,9 +133,9 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowRelocateModal(true)}
-            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer border border-slate-300"
+            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700"
           >
-            <Move className="w-3.5 h-3.5 text-slate-600" />
+            <Move className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             <span>Relocate Medicine to Bin</span>
           </button>
 
@@ -194,40 +194,40 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
           return (
             <div 
               key={loc.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col justify-between space-y-3"
+              className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col justify-between space-y-3 dark:bg-[#111827] dark:border-slate-800"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="p-2 bg-slate-50 rounded-lg border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
                       {getZoneIcon(loc.zone)}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
                         {loc.aisle} • {loc.rack}
                       </h4>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="font-mono text-xs font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                        <span className="font-mono text-xs font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800/70">
                           {loc.bin}
                         </span>
-                        <span className="text-[11px] text-slate-500 font-medium">({loc.shelf})</span>
+                        <span className="text-[11px] text-slate-500 font-medium dark:text-slate-400">({loc.shelf})</span>
                       </div>
                     </div>
                   </div>
                   <div>{getZoneBadge(loc.zone)}</div>
                 </div>
 
-                <div className="mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs space-y-1.5">
-                  <div className="flex items-center justify-between text-slate-600">
+                <div className="mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs space-y-1.5 dark:bg-slate-900 dark:border-slate-800">
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                     <span className="flex items-center gap-1">
                       <Thermometer className="w-3 h-3 text-slate-400" />
                       Temp Spec:
                     </span>
-                    <strong className="text-slate-800">{loc.temperatureRange}</strong>
+                    <strong className="text-slate-800 dark:text-slate-100">{loc.temperatureRange}</strong>
                   </div>
 
                   {loc.notes && (
-                    <p className="text-[11px] text-slate-500 italic">"{loc.notes}"</p>
+                    <p className="text-[11px] text-slate-500 italic dark:text-slate-400">"{loc.notes}"</p>
                   )}
                 </div>
 
@@ -239,12 +239,12 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
                   ) : (
                     <div className="flex flex-wrap gap-1">
                       {storedMeds.slice(0, 3).map(m => (
-                        <span key={m.id} className="text-[10px] bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 font-medium">
+                        <span key={m.id} className="text-[10px] bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200 font-medium dark:bg-slate-800 dark:text-slate-100 dark:border-slate-800">
                           {m.name.split(' ')[0]} {m.strength}
                         </span>
                       ))}
                       {storedMeds.length > 3 && (
-                        <span className="text-[10px] bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">
+                        <span className="text-[10px] bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800">
                           +{storedMeds.length - 3} more
                         </span>
                       )}
@@ -254,14 +254,14 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
               </div>
 
               {/* Occupancy Progress Bar */}
-              <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
+              <div className="pt-2 border-t border-slate-100 space-y-1 text-xs dark:border-slate-800">
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-500">Bin Capacity Utilization</span>
-                  <span className="font-bold text-slate-800">
+                  <span className="text-slate-500 dark:text-slate-400">Bin Capacity Utilization</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-100">
                     {loc.currentOccupancy} / {loc.capacityUnits} units ({occupancyPercent}%)
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden dark:bg-slate-800">
                   <div 
                     className={`h-full rounded-full transition-all ${
                       occupancyPercent > 90 
@@ -282,7 +282,7 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
       {/* Relocate Medicine Modal */}
       {showRelocateModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold">Relocate Medicine to Bin / Shelf</h3>
@@ -293,11 +293,11 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
 
             <form onSubmit={handleExecuteRelocation} className="p-5 space-y-3.5 text-xs">
               <div>
-                <label className="font-bold text-slate-700">Select Pharmaceutical Product</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Select Pharmaceutical Product</label>
                 <select
                   value={selectedMedId}
                   onChange={(e) => setSelectedMedId(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 >
                   {medicines.map(m => (
                     <option key={m.id} value={m.id}>
@@ -308,22 +308,22 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Target Warehouse Storage Location *</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Target Warehouse Storage Location *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Ophthalmic Bay Rack E-01 or Cold Storage Fridge-1"
                   value={targetLocation}
                   onChange={(e) => setTargetLocation(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900 dark:border-slate-700 dark:text-white bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowRelocateModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer dark:border-slate-700"
                 >
                   Cancel
                 </button>
@@ -342,7 +342,7 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
       {/* Add New Bin Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:bg-[#111827] dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500">
             <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold">Register Storage Bin / Shelf</h3>
@@ -354,62 +354,62 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
             <form onSubmit={handleCreateLocation} className="p-5 space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="font-bold text-slate-700">Aisle / Zone</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Aisle / Zone</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Aisle 01, Cold Vault"
                     value={newLoc.aisle}
                     onChange={(e) => setNewLoc({ ...newLoc, aisle: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Rack / Fridge</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Rack / Fridge</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Rack A or Fridge 1"
                     value={newLoc.rack}
                     onChange={(e) => setNewLoc({ ...newLoc, rack: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="font-bold text-slate-700">Shelf Tier</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Shelf Tier</label>
                   <input
                     type="text"
                     placeholder="e.g. Shelf 2 or Middle Tray"
                     value={newLoc.shelf}
                     onChange={(e) => setNewLoc({ ...newLoc, shelf: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Bin / Slot Number *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Bin / Slot Number *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Bin 104 or Slot B-2"
                     value={newLoc.bin}
                     onChange={(e) => setNewLoc({ ...newLoc, bin: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs font-bold text-slate-900"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg font-mono text-xs font-bold text-slate-900 dark:border-slate-700 dark:text-white bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="font-bold text-slate-700">Storage Zone Archetype</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Storage Zone Archetype</label>
                   <select
                     value={newLoc.zone}
                     onChange={(e) => setNewLoc({ ...newLoc, zone: e.target.value as any })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   >
                     <option value="ambient">Ambient (15°C - 25°C)</option>
                     <option value="cold_chain">Cold Chain (2°C - 8°C)</option>
@@ -420,33 +420,33 @@ export const RackBinManager: React.FC<RackBinManagerProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Unit Capacity</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Unit Capacity</label>
                   <input
                     type="number"
                     min="10"
                     value={newLoc.capacityUnits}
                     onChange={(e) => setNewLoc({ ...newLoc, capacityUnits: Number(e.target.value) || 100 })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700">Temperature Specification</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200">Temperature Specification</label>
                 <input
                   type="text"
                   placeholder="e.g. 2°C - 8°C Keep Refrigerated"
                   value={newLoc.temperatureRange}
                   onChange={(e) => setNewLoc({ ...newLoc, temperatureRange: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs dark:border-slate-700 bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-200 flex justify-end gap-2 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 rounded-lg font-semibold cursor-pointer dark:border-slate-700"
                 >
                   Cancel
                 </button>
