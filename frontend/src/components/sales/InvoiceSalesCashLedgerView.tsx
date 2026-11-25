@@ -95,6 +95,7 @@ const PIE_COLORS = ['#10b981', '#ec4899', '#6366f1', '#a855f7', '#ef4444'];
 
 export const InvoiceSalesCashLedgerView: React.FC<InvoiceSalesCashLedgerViewProps> = ({
   onOpenFullPos,
+  onNavigateTab,
 }) => {
   const { currentUser, isSuperAdmin } = useAuth();
   const [locale, setLocaleState] = useState<'en' | 'bn'>(() => getCurrentLocale());
@@ -2096,9 +2097,23 @@ export const InvoiceSalesCashLedgerView: React.FC<InvoiceSalesCashLedgerViewProp
                     : branches.find((b) => b.id === selectedBranchId)?.name || 'Counter Drawer'}
                 </p>
               </div>
-              <button onClick={() => setShowCashbookModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {onNavigateTab && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCashbookModal(false);
+                      onNavigateTab('cashbook_expenses');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold cursor-pointer transition"
+                  >
+                    {isBn ? 'সম্পূর্ণ ক্যাশবুক খুলুন' : 'Open Full Cashbook & Expenses'}
+                  </button>
+                )}
+                <button onClick={() => setShowCashbookModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="p-5 space-y-4 overflow-y-auto text-xs">

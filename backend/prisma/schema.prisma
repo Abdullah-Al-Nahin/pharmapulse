@@ -1028,3 +1028,56 @@ model StockTransfer {
 
   @@map("stock_transfers")
 }
+
+// ==============================================================================
+// 11. DAILY CASHBOOK, EXPENSE VOUCHERS & DAY-END CLOSINGS
+// ==============================================================================
+
+model CashbookVoucher {
+  id            String   @id @db.VarChar(100)
+  voucherNo     String   @unique @db.VarChar(60)
+  voucherDate   String   @db.VarChar(20) // YYYY-MM-DD
+  voucherType   String   @db.VarChar(40) // SHOP_EXPENSE | SUPPLIER_CASH_PAID | DUE_COLLECTION | MISC_CASH_IN
+  direction     String   @db.VarChar(10) // IN | OUT
+  category      String   @db.VarChar(100)
+  amount        Decimal  @db.Decimal(12, 2)
+  partyName     String   @db.VarChar(150)
+  partyId       String?  @db.VarChar(100)
+  referenceNo   String?  @db.VarChar(100)
+  paymentMethod String   @default("CASH") @db.VarChar(30)
+  description   String   @db.Text
+  branchId      String?  @db.VarChar(100)
+  branchName    String?  @db.VarChar(150)
+  createdBy     String?  @db.VarChar(100)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([voucherDate])
+  @@index([branchId])
+  @@map("cashbook_vouchers")
+}
+
+model CashbookDailyClosing {
+  id                  String    @id @db.VarChar(100)
+  cashbookDate        String    @db.VarChar(20) // YYYY-MM-DD
+  branchId            String    @default("HQ-MAIN") @db.VarChar(100)
+  branchName          String?   @db.VarChar(150)
+  openingCash         Decimal   @default(15000.00) @db.Decimal(12, 2)
+  posCashSales        Decimal   @default(0.00) @db.Decimal(12, 2)
+  dueAndMiscCashIn    Decimal   @default(0.00) @db.Decimal(12, 2)
+  dailyShopExpense    Decimal   @default(0.00) @db.Decimal(12, 2)
+  supplierCashPaid    Decimal   @default(0.00) @db.Decimal(12, 2)
+  expectedClosingCash Decimal   @default(0.00) @db.Decimal(12, 2)
+  countedPhysicalCash Decimal   @default(0.00) @db.Decimal(12, 2)
+  variance            Decimal   @default(0.00) @db.Decimal(12, 2)
+  vaultTransfer       Decimal   @default(0.00) @db.Decimal(12, 2)
+  carryForwardFloat   Decimal   @default(0.00) @db.Decimal(12, 2)
+  denominations       Json?     @default("{}")
+  status              String    @default("OPEN") @db.VarChar(30)
+  closedBy            String?   @db.VarChar(100)
+  notes               String?   @db.Text
+  closedAt            DateTime? @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([cashbookDate, branchId])
+  @@map("cashbook_daily_closings")
+}

@@ -84,6 +84,7 @@ const BN_TO_EN_PHRASES: Record<string, string> = {
   'মাস্টার এমআরপি (৳)': 'Master MRP (৳)',
   'মাস্টার বিক্রয়মূল্য (৳)': 'Master Selling Price (৳)',
   'ইনভয়েস ও ক্যাশ লেজার': 'Sales & Cash Ledger',
+  'ক্যাশবুক ও খরচ': 'Cashbook & Expenses',
 };
 
 /**
@@ -519,6 +520,16 @@ const EN_TO_BN_WORDS: Record<string, string> = {
   'accounts': 'হিসাবসমূহ',
   'accounting': 'হিসাবরক্ষণ',
   'ledger': 'লেজার',
+  'cashbook': 'ক্যাশবুক',
+  'voucher': 'ভাউচার',
+  'vouchers': 'ভাউচারসমূহ',
+  'denomination': 'নোট গণনা',
+  'inflow': 'জমা',
+  'outflow': 'ব্যয়',
+  'disbursed': 'পরিশোধিত',
+  'float': 'ফ্লোট',
+  'opening': 'প্রারম্ভিক',
+  'closing': 'সমাপনী',
   'payable': 'প্রদেয়',
   'payables': 'পাওনা',
   'receivable': 'প্রাপ্য',

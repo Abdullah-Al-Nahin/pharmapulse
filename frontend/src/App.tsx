@@ -2,6 +2,7 @@ import React, { Component, useEffect } from 'react';
 import { PharmaPulseDashboard } from './components/pharmapulse/PharmaPulseDashboard';
 import { LoginPage } from './components/auth/LoginPage';
 import { PharmacyService } from './services/pharmacyService';
+import { CashbookService } from './services/cashbookService';
 import { useAuth } from './context/AuthContext';
 import { initializeDomTranslator } from './i18n/domTranslator';
 import { getCurrentLocale } from './utils/i18nFormatter';
@@ -67,6 +68,7 @@ export default function App() {
     document.documentElement.lang = getCurrentLocale();
     initializeDomTranslator();
     PharmacyService.initialize();
+    CashbookService.initialize();
   }, []);
 
   return (

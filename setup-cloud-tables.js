@@ -98,6 +98,60 @@ async function main() {
       ADD COLUMN IF NOT EXISTS "branchName" VARCHAR(150);
   `);
   console.log('✓ products pricing, batches invoice, & sales branch columns ensured');
+
+  // 6. Create cashbook_vouchers & cashbook_daily_closings tables
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "cashbook_vouchers" (
+      "id" VARCHAR(100) PRIMARY KEY,
+      "voucherNo" VARCHAR(60) NOT NULL UNIQUE,
+      "voucherDate" VARCHAR(20) NOT NULL,
+      "voucherType" VARCHAR(40) NOT NULL,
+      "direction" VARCHAR(10) NOT NULL,
+      "category" VARCHAR(100) NOT NULL,
+      "amount" DECIMAL(12, 2) NOT NULL,
+      "partyName" VARCHAR(150) NOT NULL,
+      "partyId" VARCHAR(100),
+      "referenceNo" VARCHAR(100),
+      "paymentMethod" VARCHAR(30) DEFAULT 'CASH',
+      "description" TEXT NOT NULL,
+      "branchId" VARCHAR(100),
+      "branchName" VARCHAR(150),
+      "createdBy" VARCHAR(100),
+      "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE INDEX IF NOT EXISTS "cashbook_vouchers_voucherDate_idx" ON "cashbook_vouchers" ("voucherDate");
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE INDEX IF NOT EXISTS "cashbook_vouchers_branchId_idx" ON "cashbook_vouchers" ("branchId");
+  `);
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "cashbook_daily_closings" (
+      "id" VARCHAR(100) PRIMARY KEY,
+      "cashbookDate" VARCHAR(20) NOT NULL,
+      "branchId" VARCHAR(100) NOT NULL DEFAULT 'HQ-MAIN',
+      "branchName" VARCHAR(150),
+      "openingCash" DECIMAL(12, 2) DEFAULT 15000.00,
+      "posCashSales" DECIMAL(12, 2) DEFAULT 0.00,
+      "dueAndMiscCashIn" DECIMAL(12, 2) DEFAULT 0.00,
+      "dailyShopExpense" DECIMAL(12, 2) DEFAULT 0.00,
+      "supplierCashPaid" DECIMAL(12, 2) DEFAULT 0.00,
+      "expectedClosingCash" DECIMAL(12, 2) DEFAULT 0.00,
+      "countedPhysicalCash" DECIMAL(12, 2) DEFAULT 0.00,
+      "variance" DECIMAL(12, 2) DEFAULT 0.00,
+      "vaultTransfer" DECIMAL(12, 2) DEFAULT 0.00,
+      "carryForwardFloat" DECIMAL(12, 2) DEFAULT 0.00,
+      "denominations" JSONB DEFAULT '{}',
+      "status" VARCHAR(30) DEFAULT 'OPEN',
+      "closedBy" VARCHAR(100),
+      "notes" TEXT,
+      "closedAt" TIMESTAMP WITH TIME ZONE,
+      "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      UNIQUE ("cashbookDate", "branchId")
+    );
+  `);
+  console.log('✓ cashbook_vouchers & cashbook_daily_closings tables ensured');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

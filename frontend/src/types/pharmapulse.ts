@@ -137,6 +137,7 @@ export type PharmaNavTab =
   | 'executive_dashboard'
   | 'pos'
   | 'invoice_sales_ledger'
+  | 'cashbook_expenses'
   | 'command_center'
   | 'prescriptions'
   | 'inventory'

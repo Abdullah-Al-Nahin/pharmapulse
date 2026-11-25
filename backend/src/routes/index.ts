@@ -11,6 +11,7 @@ import customerRoutes from './customer.routes';
 import adjustmentRoutes from './adjustment.routes';
 import transferRoutes from './transfer.routes';
 import systemRoutes from './system.routes';
+import cashbookRoutes from './cashbook.routes';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/customers', customerRoutes);
 router.use('/adjustments', adjustmentRoutes);
 router.use('/transfers', transferRoutes);
 router.use('/system', systemRoutes);
+router.use('/cashbook', cashbookRoutes);
 
 export default router;

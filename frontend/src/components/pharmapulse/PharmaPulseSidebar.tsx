@@ -32,6 +32,7 @@ import { PharmacyService } from '../../services/pharmacyService';
 const TAB_PERMISSIONS: Partial<Record<PharmaNavTab, Permission[]>> = {
   pos: ['pos:sale:create', 'pos:sale:view'],
   invoice_sales_ledger: ['pos:sale:view', 'reports:sales:view'],
+  cashbook_expenses: ['pos:sale:view', 'pos:sale:create', 'accounting:ledger:view', 'reports:sales:view'],
   prescriptions: ['prescriptions:rx:view', 'prescriptions:rx:dispense'],
   returns: ['returns:sale:process', 'returns:sale:view'],
   customers: ['customers:profile:view', 'customers:profile:manage'],
@@ -113,6 +114,15 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
           badge: 'Live',
           badgeBn: 'লাইভ',
           badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+        },
+        {
+          id: 'cashbook_expenses',
+          label: 'Cashbook & Expenses',
+          labelBn: 'ক্যাশবুক ও খরচ',
+          icon: Wallet,
+          badge: 'Register',
+          badgeBn: 'রেজিস্টার',
+          badgeColor: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800',
         },
         { id: 'prescriptions', label: 'Prescription Hub', labelBn: 'প্রেসক্রিপশন', icon: FileText },
         { id: 'returns', label: 'Returns & Refunds', labelBn: 'রিটার্ন ও রিফান্ড', icon: RotateCcw },

@@ -36,6 +36,7 @@ import { BatchExpiryView } from '../batches/BatchExpiryView';
 import { MultiBranchHub } from '../branches/MultiBranchHub';
 import { ExecutiveDashboardView } from '../executive/ExecutiveDashboardView';
 import { InvoiceSalesCashLedgerView } from '../sales/InvoiceSalesCashLedgerView';
+import { DailyCashbookExpensesView } from '../sales/DailyCashbookExpensesView';
 import { InventoryAnomalyModal } from '../inventory/InventoryAnomalyModal';
 import { DatabaseControlView } from '../admin/DatabaseControlView';
 import { useAuth } from '../../context/AuthContext';
@@ -1002,6 +1003,15 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           {activeTab === 'invoice_sales_ledger' && (
             <div className="w-full">
               <InvoiceSalesCashLedgerView
+                onOpenFullPos={() => setActiveTab('pos')}
+                onNavigateTab={(tab) => setActiveTab(tab as PharmaNavTab)}
+              />
+            </div>
+          )}
+
+          {activeTab === 'cashbook_expenses' && (
+            <div className="w-full">
+              <DailyCashbookExpensesView
                 onOpenFullPos={() => setActiveTab('pos')}
                 onNavigateTab={(tab) => setActiveTab(tab as PharmaNavTab)}
               />

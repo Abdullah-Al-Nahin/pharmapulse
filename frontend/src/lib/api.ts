@@ -176,6 +176,23 @@ export const saleApi = {
   collectDue: async (id: string, data: any) => (await api.post(`/sales/${id}/collect-due`, data)).data,
 };
 
+// Daily Cashbook, Expense Vouchers & Closing Register
+export const cashbookApi = {
+  getVouchers: async (params?: { date?: string; branchId?: string }) =>
+    (await api.get('/cashbook/vouchers', { params })).data,
+  createVoucher: async (data: any) => (await api.post('/cashbook/vouchers', data)).data,
+  deleteVoucher: async (id: string) => (await api.delete(`/cashbook/vouchers/${id}`)).data,
+  getDailyClosings: async (params?: { date?: string; branchId?: string }) =>
+    (await api.get('/cashbook/daily-closings', { params })).data,
+  saveOpeningCash: async (data: {
+    cashbookDate: string;
+    branchId: string;
+    branchName?: string;
+    openingCash: number;
+  }) => (await api.put('/cashbook/opening-cash', data)).data,
+  closeDay: async (data: any) => (await api.post('/cashbook/close-day', data)).data,
+};
+
 // Purchase Orders & GRN (v1 + v2)
 export const purchaseOrderApi = {
   getPurchaseOrders: async () => (await api.get('/purchase-orders')).data,
