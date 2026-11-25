@@ -891,10 +891,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
       {/* --- ADD MEDICINE MODAL --- */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
-            <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-900 dark:bg-slate-950 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold">Add New Pharmaceutical Product</h3>
+                <h3 className="text-sm font-bold text-white">Add New Pharmaceutical Product</h3>
                 <p className="text-xs text-slate-400">Register master medicine specifications</p>
               </div>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
@@ -902,49 +902,49 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
               </button>
             </div>
 
-            <form onSubmit={handleSaveMedicine} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto text-xs">
+            <form onSubmit={handleSaveMedicine} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto text-xs text-slate-900 dark:text-slate-100">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="font-bold text-slate-700">Commercial / Product Name *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Commercial / Product Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g., Amoxicillin + Clavulanate 625mg"
                     value={newMed.name}
                     onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Generic / Chemical Name *</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Generic / Chemical Name *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g., Amoxicillin & Potassium Clavulanate"
                     value={newMed.genericName}
                     onChange={(e) => setNewMed({ ...newMed, genericName: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Brand Name (Optional)</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Brand Name (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g., Augmentin Duo"
                     value={newMed.brandName}
                     onChange={(e) => setNewMed({ ...newMed, brandName: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Therapeutic Category</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Therapeutic Category</label>
                   <select
                     value={newMed.category}
                     onChange={(e) => setNewMed({ ...newMed, category: e.target.value as any })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   >
                     <option value="Antibiotics">Antibiotics</option>
                     <option value="Analgesics & Antipyretics">Analgesics & Antipyretics</option>
@@ -959,11 +959,11 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Dosage Form</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Dosage Form</label>
                   <select
                     value={newMed.dosageForm}
                     onChange={(e) => setNewMed({ ...newMed, dosageForm: e.target.value as any })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   >
                     <option value="TABLET">Tablet</option>
                     <option value="CAPSULE">Capsule</option>
@@ -977,20 +977,20 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Strength Specification</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Strength Specification</label>
                   <input
                     type="text"
                     placeholder="e.g. 500mg, 10ml, 100mcg"
                     value={newMed.strength}
                     onChange={(e) => setNewMed({ ...newMed, strength: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-slate-700">Manufacturer / Company</label>
-                    <span className="text-[10px] text-emerald-600 font-semibold">Select or type new</span>
+                    <label className="font-bold text-slate-700 dark:text-slate-200">Manufacturer / Company</label>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Select or type new</span>
                   </div>
                   <input
                     type="text"
@@ -998,7 +998,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                     placeholder="e.g. Square Pharmaceuticals PLC, Beximco, Incepta"
                     value={newMed.manufacturer}
                     onChange={(e) => setNewMed({ ...newMed, manufacturer: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   />
                   <datalist id="registered-suppliers-list">
                     {suppliers.map((sup) => (
@@ -1010,31 +1010,31 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Rack / Storage Location</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Rack / Storage Location</label>
                   <input
                     type="text"
                     placeholder="e.g. Rack A-01 or Cold Storage"
                     value={newMed.rackLocation}
                     onChange={(e) => setNewMed({ ...newMed, rackLocation: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700">Reorder Alert Level</label>
+                  <label className="font-bold text-slate-700 dark:text-slate-200">Reorder Alert Level</label>
                   <input
                     type="number"
                     min="1"
                     value={newMed.reorderLevel}
                     onChange={(e) => setNewMed({ ...newMed, reorderLevel: parseInt(e.target.value) || 10 })}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full mt-1 px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
                   />
                 </div>
 
                 {/* Master Unit Pricing (Auto-fetched during Invoice-Wise Batch Entry) */}
-                <div className="col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-3 gap-2.5">
+                <div className="col-span-2 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl p-3 grid grid-cols-3 gap-2.5">
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'মাস্টার ক্রয়মূল্য (৳)' : 'Master Cost Price (৳)'}
                     </label>
                     <input
@@ -1043,11 +1043,11 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                       min="0"
                       value={newMed.purchasePrice ?? 0}
                       onChange={(e) => setNewMed({ ...newMed, purchasePrice: parseFloat(e.target.value) || 0 })}
-                      className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                      className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-mono"
                     />
                   </div>
                   <div>
-                    <label className="font-bold text-slate-700">
+                    <label className="font-bold text-slate-700 dark:text-slate-200">
                       {isBn ? 'মাস্টার এমআরপি (৳)' : 'Master MRP (৳)'}
                     </label>
                     <input
@@ -1056,11 +1056,11 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                       min="0"
                       value={newMed.mrp ?? 0}
                       onChange={(e) => setNewMed({ ...newMed, mrp: parseFloat(e.target.value) || 0 })}
-                      className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-mono"
+                      className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-mono"
                     />
                   </div>
                   <div>
-                    <label className="font-bold text-emerald-700">
+                    <label className="font-bold text-emerald-700 dark:text-emerald-400">
                       {isBn ? 'মাস্টার বিক্রয়মূল্য (৳)' : 'Master Selling Price (৳)'}
                     </label>
                     <input
@@ -1069,16 +1069,16 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                       min="0"
                       value={newMed.sellingPrice ?? 0}
                       onChange={(e) => setNewMed({ ...newMed, sellingPrice: parseFloat(e.target.value) || 0 })}
-                      className="w-full mt-1 px-2.5 py-1.5 border border-emerald-300 bg-emerald-50/40 rounded-lg text-xs font-mono font-bold text-emerald-900"
+                      className="w-full mt-1 px-2.5 py-1.5 border border-emerald-300 dark:border-emerald-700 bg-emerald-50/40 dark:bg-emerald-950/50 rounded-lg text-xs font-mono font-bold text-emerald-900 dark:text-emerald-300"
                     />
                   </div>
                 </div>
 
                 {/* Product Barcode / GTIN Integration */}
-                <div className="col-span-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5 space-y-2">
+                <div className="col-span-2 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
-                      <Barcode className="w-4 h-4 text-emerald-600" />
+                    <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
+                      <Barcode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span>Product Barcode / GTIN / EAN-13 (বারকোড নম্বর)</span>
                     </label>
                     <button
@@ -1087,7 +1087,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                         const randomDigits = Math.floor(1000000000 + Math.random() * 9000000000).toString();
                         setNewMed({ ...newMed, barcode: `890${randomDigits.slice(0, 10)}` });
                       }}
-                      className="px-2.5 py-1 text-[11px] font-semibold bg-white hover:bg-emerald-100 border border-emerald-300 text-emerald-700 rounded-lg transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                      className="px-2.5 py-1 text-[11px] font-semibold bg-white dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 rounded-lg transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Auto Generate Barcode</span>
@@ -1099,13 +1099,13 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                       placeholder="Scan with barcode gun or type EAN-13 / GTIN code..."
                       value={newMed.barcode || ''}
                       onChange={(e) => setNewMed({ ...newMed, barcode: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 rounded-lg text-xs font-mono font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-500">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-slate-500 dark:text-slate-400">
                     <span>💡 ইউএসবি বারকোড স্ক্যানার দিয়ে ড্রাগ বক্সের বারকোড সরাসরি স্ক্যান করতে পারেন অথবা অটো-জেনারেট বাটনে ক্লিক করুন।</span>
                     {newMed.barcode && (
-                      <span className="font-mono text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 shrink-0">
+                      <span className="font-mono text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-700 shrink-0">
                         GTIN: {newMed.barcode}
                       </span>
                     )}
@@ -1120,16 +1120,16 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                       onChange={(e) => setNewMed({ ...newMed, requiresPrescription: e.target.checked })}
                       className="rounded text-emerald-600 focus:ring-emerald-500"
                     />
-                    <span className="font-bold text-slate-800">Requires Prescription (Schedule H / Rx)</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">Requires Prescription (Schedule H / Rx)</span>
                   </label>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex justify-end gap-2">
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1162,10 +1162,10 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
       {/* --- DEDUCT BATCH MODAL --- */}
       {deductModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-red-200">
+          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-red-200 dark:border-red-900">
             <div className="bg-red-900 text-white px-5 py-3.5 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold">Deduct / Write-off Stock</h3>
+                <h3 className="text-sm font-bold text-white">Deduct / Write-off Stock</h3>
                 <p className="text-xs text-red-200">{deductModal.med.name} (Batch {deductModal.batch.batchNumber})</p>
               </div>
               <button onClick={() => setDeductModal(null)} className="text-red-300 hover:text-white cursor-pointer">
@@ -1173,26 +1173,26 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
               </button>
             </div>
 
-            <form onSubmit={handleDeductSubmit} className="p-5 space-y-4 text-sm">
+            <form onSubmit={handleDeductSubmit} className="p-5 space-y-4 text-sm text-slate-900 dark:text-slate-100">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Quantity to Deduct (Max: {deductModal.batch.currentStock})</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Quantity to Deduct (Max: {deductModal.batch.currentStock})</label>
                 <input
                   type="number"
                   min="1"
                   max={deductModal.batch.currentStock}
                   value={deductForm.quantity}
                   onChange={(e) => setDeductForm({ ...deductForm, quantity: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg font-bold"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg font-bold"
                   required
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Reason for Deduction</label>
+                <label className="font-bold text-slate-700 dark:text-slate-200 block mb-1">Reason for Deduction</label>
                 <select
                   value={deductForm.reason}
                   onChange={(e) => setDeductForm({ ...deductForm, reason: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-800"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 rounded-lg"
                 >
                   <option value="Damaged / Broken">Damaged / Broken</option>
                   <option value="Expired Stock Write-off">Expired Stock Write-off</option>
@@ -1202,7 +1202,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                 </select>
               </div>
 
-              <div className={`p-3 rounded-lg border text-xs ${deductForm.reason === 'Wrong Entry' ? 'bg-blue-50 border-blue-100 text-blue-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
+              <div className={`p-3 rounded-lg border text-xs ${deductForm.reason === 'Wrong Entry' ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-100 dark:border-blue-800 text-blue-800 dark:text-blue-200' : 'bg-red-50 dark:bg-red-950/50 border-red-100 dark:border-red-800 text-red-800 dark:text-red-200'}`}>
                 <span className="font-bold">Financial Impact:</span> {deductForm.reason === 'Wrong Entry' 
                   ? `This will log a non-expense Inventory Correction of ৳${((deductForm.quantity || 0) * (deductModal.batch.purchasePrice || 0)).toFixed(2)}. It will not hit the profit & loss statement.`
                   : `Deducting this stock will automatically log an accounting expense (loss) of ৳${((deductForm.quantity || 0) * (deductModal.batch.purchasePrice || 0)).toFixed(2)} to keep your profit reports accurate.`
@@ -1213,7 +1213,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({ onDataChanged }) =
                 <button
                   type="button"
                   onClick={() => setDeductModal(null)}
-                  className="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg font-semibold cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -516,7 +516,7 @@ export const InvoiceInwardBatchModal: React.FC<InvoiceInwardBatchModalProps> = (
       aria-modal="true"
       aria-labelledby="inward-modal-title"
     >
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
+      <div className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
         {/* Dark Navy Header matching Reference Screenshot 1 */}
         <div className="bg-[#0f172a] text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
           <div className="min-w-0">

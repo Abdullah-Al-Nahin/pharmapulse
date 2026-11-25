@@ -8,6 +8,127 @@
   --font-bn: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
 }
 
+/* ── Global Contrast Safety Guards (Light & Dark Modes) ── */
+@layer base {
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Prevent white inherited dark-mode text inside light-only cards/modals/inputs */
+  :where(html.dark)
+    :where(
+      .bg-white,
+      .bg-slate-50,
+      .bg-slate-100,
+      .bg-slate-200,
+      .bg-gray-50,
+      .bg-gray-100,
+      .bg-emerald-50,
+      .bg-amber-50,
+      .bg-rose-50,
+      .bg-red-50,
+      .bg-indigo-50,
+      .bg-sky-50,
+      .bg-blue-50,
+      .bg-purple-50,
+      [class*="bg-slate-50/"],
+      [class*="bg-emerald-50/"],
+      [class*="bg-amber-50/"],
+      [class*="bg-rose-50/"],
+      [class*="bg-indigo-50/"]
+    ):not([class*="dark:bg-"]):not([class*="bg-white/"]) {
+    color: #0f172a;
+  }
+
+  :where(html.dark)
+    :where(
+      .bg-white,
+      .bg-slate-50,
+      .bg-slate-100,
+      .bg-slate-200,
+      .bg-gray-50,
+      .bg-gray-100
+    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
+    :where(input, select, textarea, option) {
+    color: #0f172a;
+  }
+
+  :where(html.dark)
+    :where(
+      .bg-white,
+      .bg-slate-50,
+      .bg-slate-100,
+      .bg-slate-200,
+      .bg-gray-50,
+      .bg-gray-100
+    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
+    :where(button):not([class*="dark:bg-"]):not([class*="-500"]):not([class*="-600"]):not([class*="-700"]):not([class*="-800"]):not([class*="-900"]):not([class*="-950"]) {
+    color: #0f172a;
+  }
+
+  :where(html.dark)
+    :where(
+      .bg-white,
+      .bg-slate-50,
+      .bg-slate-100,
+      .bg-gray-50,
+      .bg-gray-100
+    ):not([class*="dark:bg-"]):not([class*="bg-white/"])
+    :where(input, textarea):not([class*="dark:bg-"])::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+
+  /* Native dark selects/inputs & options in dark mode */
+  :where(html.dark) :where(select[class*="dark:bg-"]) option {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+
+  :where(html.dark) :where(select:not([class*="dark:bg-"])) option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+
+  :where(html.dark) :where(input, textarea):where([class*="dark:bg-"])::placeholder {
+    color: #94a3b8;
+    opacity: 0.9;
+  }
+
+  /* Light-mode placeholders & native options */
+  :where(html:not(.dark)) :where(input, textarea)::placeholder {
+    color: #64748b;
+    opacity: 0.9;
+  }
+
+  :where(html:not(.dark)) :where(select) option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+
+  /* Explicit permanently-dark headers/modals keep light text even when global Light Mode is active */
+  :where(html:not(.dark))
+    :where(
+      .bg-slate-900,
+      .bg-slate-950,
+      .bg-emerald-950,
+      .bg-rose-950,
+      .bg-indigo-950,
+      .bg-red-900,
+      .bg-\[\#0e1525\],
+      .bg-\[\#0f172a\],
+      .bg-\[\#111827\],
+      .bg-\[\#12161f\],
+      .bg-\[\#161b26\]
+    ) {
+    color: #f8fafc;
+  }
+}
+
 /* ── Unified Font Enforcement per Active Language ── */
 html[lang="en"],
 html[lang="en"] body,
