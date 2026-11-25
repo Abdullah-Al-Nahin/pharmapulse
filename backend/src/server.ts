@@ -81,6 +81,11 @@ async function ensureInvoiceAndPricingColumns() {
         ADD COLUMN IF NOT EXISTS "invoiceNumber" VARCHAR(60),
         ADD COLUMN IF NOT EXISTS "invoiceDate" DATE;
     `);
+    await prisma.$executeRawUnsafe(`
+      ALTER TABLE "sales"
+        ADD COLUMN IF NOT EXISTS "branchId" VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS "branchName" VARCHAR(150);
+    `);
   } catch (err) {
     console.warn('[server]: Column auto-migration skipped or failed:', err);
   }

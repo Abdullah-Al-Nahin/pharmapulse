@@ -6,5 +6,6 @@ const router = Router();
 router.get('/', SaleController.getAll);
 router.get('/:id', SaleController.getById);
 router.post('/', SaleController.create);
+router.post('/:id/collect-due', SaleController.collectDue);
 
 export default router;

@@ -83,6 +83,7 @@ const BN_TO_EN_PHRASES: Record<string, string> = {
   'মাস্টার ক্রয়মূল্য (৳)': 'Master Cost Price (৳)',
   'মাস্টার এমআরপি (৳)': 'Master MRP (৳)',
   'মাস্টার বিক্রয়মূল্য (৳)': 'Master Selling Price (৳)',
+  'ইনভয়েস ও ক্যাশ লেজার': 'Sales & Cash Ledger',
 };
 
 /**
@@ -117,6 +118,7 @@ const EN_TO_BN_PHRASES: Record<string, string> = {
   // Sidebar Navigation
   'sales & pos': 'বিক্রয় ও কাউন্টার',
   'pos billing': 'ক্যাশ কাউন্টার',
+  'sales & cash ledger': 'ইনভয়েস ও ক্যাশ লেজার',
   'prescription hub': 'প্রেসক্রিপশন হাব',
   'returns & refunds': 'রিটার্ন ও রিফান্ড',
   'customers & dues': 'কাস্টমার ও বাকি',

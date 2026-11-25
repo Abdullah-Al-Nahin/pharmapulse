@@ -227,6 +227,8 @@ export class SaleService {
           changeGiven: data.changeGiven ?? 0,
           dueAmount,
           status: 'COMPLETED',
+          branchId: data.branchId || null,
+          branchName: data.branchName || null,
           notes: data.notes || null,
           items: {
             create: validSaleItems,
@@ -245,6 +247,102 @@ export class SaleService {
           },
         },
       });
+    });
+  }
+
+  static async collectDue(
+    saleId: string,
+    data: {
+      amountPaid: number;
+      paymentMethod?: string;
+      trxRef?: string;
+      collectedBy?: string;
+    }
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const sale = await tx.sale.findFirst({
+        where: {
+          OR: [{ id: saleId }, { invoiceNumber: saleId }],
+        },
+      });
+      if (!sale) throw new Error('Sale invoice not found');
+
+      const currentDue = Number(sale.dueAmount || 0);
+      const requested = Math.max(0, Number(data.amountPaid) || 0);
+      const payNow = Math.min(currentDue, requested);
+      if (payNow <= 0) {
+        return sale;
+      }
+
+      const nextPaid = Number(sale.paidAmount || 0) + payNow;
+      const nextDue = Math.max(0, currentDue - payNow);
+      const method = data.paymentMethod || 'cash';
+
+      // Parse existing META: JSON payload or initialize
+      let meta: any = {};
+      if (sale.notes && sale.notes.startsWith('META:')) {
+        try {
+          meta = JSON.parse(sale.notes.slice(5));
+        } catch {
+          meta = {};
+        }
+      } else if (sale.notes && sale.notes.startsWith('METHOD:')) {
+        meta = { paymentMethod: sale.notes.replace('METHOD:', '').trim() };
+      }
+
+      const prevSplit = meta.splitDetails || {};
+      const nextSplit = {
+        cashAmount: Number(prevSplit.cashAmount || 0),
+        mobileAmount: Number(prevSplit.mobileAmount || 0),
+        cardAmount: Number(prevSplit.cardAmount || 0),
+        mobileTrxId: prevSplit.mobileTrxId || undefined,
+        cardAuthCode: prevSplit.cardAuthCode || undefined,
+      };
+
+      if (method === 'bkash_nagad' || method === 'upi_mobile' || method === 'mfs') {
+        nextSplit.mobileAmount = Number((nextSplit.mobileAmount + payNow).toFixed(2));
+        if (data.trxRef) nextSplit.mobileTrxId = data.trxRef;
+      } else if (method === 'card') {
+        nextSplit.cardAmount = Number((nextSplit.cardAmount + payNow).toFixed(2));
+        if (data.trxRef) nextSplit.cardAuthCode = data.trxRef;
+      } else {
+        nextSplit.cashAmount = Number((nextSplit.cashAmount + payNow).toFixed(2));
+      }
+
+      const nextMeta = {
+        ...meta,
+        paymentMethod: meta.paymentMethod || 'due_credit',
+        splitDetails: nextSplit,
+        lastDueCollectedBy: data.collectedBy || 'Counter Staff',
+        lastDueCollectedAt: new Date().toISOString(),
+      };
+
+      const updatedSale = await tx.sale.update({
+        where: { id: sale.id },
+        data: {
+          paidAmount: nextPaid,
+          dueAmount: nextDue,
+          notes: `META:${JSON.stringify(nextMeta)}`,
+        },
+        include: {
+          items: { include: { product: true, batch: true } },
+          customer: true,
+          cashier: { select: { id: true, fullName: true, username: true } },
+        },
+      });
+
+      if (sale.customerId) {
+        const cust = await tx.customer.findUnique({ where: { id: sale.customerId } });
+        if (cust) {
+          const nextBal = Math.max(0, Number(cust.outstandingBalance || 0) - payNow);
+          await tx.customer.update({
+            where: { id: cust.id },
+            data: { outstandingBalance: nextBal },
+          });
+        }
+      }
+
+      return updatedSale;
     });
   }
 }

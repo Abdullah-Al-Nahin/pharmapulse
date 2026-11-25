@@ -21,6 +21,7 @@ import {
   Crown,
   LogOut,
   Database,
+  Receipt,
 } from 'lucide-react';
 import { PharmaNavTab } from '../../types/pharmapulse';
 import { useAuth } from '../../context/AuthContext';
@@ -30,6 +31,7 @@ import { PharmacyService } from '../../services/pharmacyService';
 
 const TAB_PERMISSIONS: Partial<Record<PharmaNavTab, Permission[]>> = {
   pos: ['pos:sale:create', 'pos:sale:view'],
+  invoice_sales_ledger: ['pos:sale:view', 'reports:sales:view'],
   prescriptions: ['prescriptions:rx:view', 'prescriptions:rx:dispense'],
   returns: ['returns:sale:process', 'returns:sale:view'],
   customers: ['customers:profile:view', 'customers:profile:manage'],
@@ -103,6 +105,15 @@ export const PharmaPulseSidebar: React.FC<PharmaPulseSidebarProps> = ({
       titleBn: 'বিক্রয় ও কাউন্টার',
       items: [
         { id: 'pos', label: 'POS Billing', labelBn: 'ক্যাশ কাউন্টার', icon: ShoppingCart },
+        {
+          id: 'invoice_sales_ledger',
+          label: 'Sales & Cash Ledger',
+          labelBn: 'ইনভয়েস ও ক্যাশ লেজার',
+          icon: Receipt,
+          badge: 'Live',
+          badgeBn: 'লাইভ',
+          badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+        },
         { id: 'prescriptions', label: 'Prescription Hub', labelBn: 'প্রেসক্রিপশন', icon: FileText },
         { id: 'returns', label: 'Returns & Refunds', labelBn: 'রিটার্ন ও রিফান্ড', icon: RotateCcw },
         { id: 'customers', label: 'Customers & Dues', labelBn: 'কাস্টমার ও বাকি', icon: Users },

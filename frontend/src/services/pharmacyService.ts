@@ -215,43 +215,80 @@ export class PharmacyService {
 
       let syncedSales = this.cache.sales;
       if (Array.isArray(apiSales) && apiSales.length > 0) {
-        const formattedSales: Sale[] = apiSales.map((s: any) => ({
-          id: s.id,
-          invoiceNumber: s.invoiceNumber,
-          date: s.createdAt ? new Date(s.createdAt).toISOString().split('T')[0] : '2026-01-01',
-          timestamp: s.createdAt ? new Date(s.createdAt).toISOString() : '2026-01-01T00:00:00.000Z',
-          customerName: s.customer?.name || 'Walk-In Customer',
-          customerPhone: s.customer?.phone || '',
-          items: (s.items || []).map((it: any) => ({
-            medicineId: it.productId,
-            medicineName: it.product?.name || 'Item',
-            genericName: '',
-            batchId: it.batchId,
-            batchNumber: it.batch?.batchNumber || '',
-            expiryDate: it.batch?.expiryDate ? new Date(it.batch.expiryDate).toISOString().split('T')[0] : '',
-            quantity: it.quantity,
-            unitPrice: Number(it.unitSellingPrice || 0),
-            unitCost: Number(it.unitCostPrice || 0),
-            mrp: Number(it.unitMrp || 0),
-            discountPercent: 0,
-            taxRate: Number(it.taxRate || 0),
-            subtotal: Number(it.lineTotal || 0),
-            taxAmount: Number(it.taxAmount || 0),
-            total: Number(it.lineTotal || 0),
-          })),
-          subtotal: Number(s.subTotal || 0),
-          discountTotal: Number(s.discountAmount || 0),
-          taxTotal: Number(s.taxAmount || 0),
-          grandTotal: Number(s.grandTotal || 0),
-          totalCost: Number(s.costOfGoodsSold || 0),
-          grossProfit: Number(s.grandTotal || 0) - Number(s.taxAmount || 0) - Number(s.costOfGoodsSold || 0),
-          dueAmount: Number(s.dueAmount || 0),
-          paymentMethod: (s.notes && s.notes.startsWith('METHOD:'))
-            ? (s.notes.replace('METHOD:', '').trim() as any)
-            : (Number(s.dueAmount || 0) > 0 ? 'credit' : 'cash'),
-          paymentStatus: Number(s.dueAmount || 0) > 0 ? 'due' : 'paid',
-          cashierName: s.cashier?.fullName || s.cashier?.username || 'Cashier',
-        }));
+        const formattedSales: Sale[] = apiSales.map((s: any) => {
+          let meta: any = {};
+          if (s.notes && typeof s.notes === 'string') {
+            if (s.notes.startsWith('META:')) {
+              try {
+                meta = JSON.parse(s.notes.slice(5));
+              } catch {
+                meta = {};
+              }
+            } else if (s.notes.startsWith('METHOD:')) {
+              meta = { paymentMethod: s.notes.replace('METHOD:', '').trim() };
+            }
+          }
+
+          const resolvedDue = Number(s.dueAmount || 0);
+          const resolvedGrand = Number(s.grandTotal || 0);
+          const resolvedTax = Number(s.taxAmount || 0);
+          const resolvedCogs = Number(s.costOfGoodsSold || 0);
+          const resolvedMode =
+            meta.paymentMethod || (resolvedDue > 0 ? 'due_credit' : 'cash');
+
+          return {
+            id: s.id,
+            invoiceNumber: s.invoiceNumber,
+            date: s.createdAt ? new Date(s.createdAt).toISOString().split('T')[0] : '2026-01-01',
+            timestamp: s.createdAt ? new Date(s.createdAt).toISOString() : '2026-01-01T00:00:00.000Z',
+            customerId: s.customerId || meta.customerId || undefined,
+            customerName: s.customer?.name || meta.customerName || 'Walk-In Customer',
+            customerPhone: s.customer?.phone || meta.customerPhone || '',
+            items: (s.items || []).map((it: any) => {
+              const qty = Number(it.quantity || 0);
+              const lineTotal = Number(it.lineTotal || 0);
+              const discAmt = Number(it.discountAmount || 0);
+              const unitRate = Number(it.unitMrp || it.unitSellingPrice || 0);
+              const grossLine = qty * unitRate;
+              const discPct = grossLine > 0 ? Number(((discAmt / grossLine) * 100).toFixed(2)) : 0;
+              return {
+                medicineId: it.productId,
+                medicineName: it.product?.name || 'Item',
+                genericName: it.product?.generic?.name || '',
+                batchId: it.batchId,
+                batchNumber: it.batch?.batchNumber || '',
+                expiryDate: it.batch?.expiryDate ? new Date(it.batch.expiryDate).toISOString().split('T')[0] : '',
+                quantity: qty,
+                unitPrice: Number(it.unitSellingPrice || 0),
+                unitCost: Number(it.unitCostPrice || 0),
+                mrp: Number(it.unitMrp || 0),
+                discountPercent: discPct,
+                taxRate: Number(it.taxRate || 0),
+                subtotal: grossLine > 0 ? grossLine : lineTotal + discAmt,
+                taxAmount: Number(it.taxAmount || 0),
+                total: lineTotal,
+              };
+            }),
+            subtotal: Number(s.subTotal || 0),
+            discountTotal: Number(s.discountAmount || 0),
+            taxTotal: resolvedTax,
+            roundOff: Number(s.roundOff || meta.roundOff || 0),
+            grandTotal: resolvedGrand,
+            totalCost: resolvedCogs,
+            grossProfit: resolvedGrand - resolvedTax - resolvedCogs,
+            dueAmount: resolvedDue,
+            cashTendered: meta.cashTendered !== undefined ? Number(meta.cashTendered) : undefined,
+            changeGiven: Number(s.changeGiven ?? meta.changeGiven ?? 0),
+            splitDetails: meta.splitDetails || undefined,
+            paymentMethod: resolvedMode as any,
+            paymentStatus: resolvedDue <= 0.009 ? 'paid' : resolvedDue < resolvedGrand ? 'partially_paid' : 'due',
+            cashierId: s.cashierId || undefined,
+            cashierName: meta.cashierName || s.cashier?.fullName || s.cashier?.username || 'Cashier',
+            branchId: s.branchId || meta.branchId || undefined,
+            branchName: s.branchName || meta.branchName || undefined,
+            notes: s.notes || undefined,
+          };
+        });
         syncedSales = formattedSales;
       }
 
@@ -1771,17 +1808,34 @@ export class PharmacyService {
         };
       });
 
+      const serializedMeta = {
+        paymentMethod: sale.paymentMethod,
+        cashTendered: sale.cashTendered,
+        changeGiven: sale.changeGiven,
+        roundOff: sale.roundOff,
+        splitDetails: sale.splitDetails,
+        cashierName: sale.cashierName,
+        customerName: sale.customerName,
+        customerPhone: sale.customerPhone,
+        branchId: sale.branchId,
+        branchName: sale.branchName,
+      };
+
       await saleApi.createSale({
         invoiceNumber: sale.invoiceNumber,
         cashierId,
         customerId: sale.customerId || null,
+        branchId: sale.branchId || null,
+        branchName: sale.branchName || null,
         subTotal: sale.subtotal,
         discountAmount: sale.discountTotal || 0,
         taxAmount: sale.taxTotal || 0,
+        roundOff: sale.roundOff || 0,
         grandTotal: sale.grandTotal,
         paidAmount: sale.grandTotal - (sale.dueAmount || 0),
         dueAmount: sale.dueAmount || 0,
         changeGiven: sale.changeGiven || 0,
+        notes: `META:${JSON.stringify(serializedMeta)}`,
         items: salePayloadItems
       });
       await this.syncDatabase();
@@ -1846,6 +1900,105 @@ export class PharmacyService {
     if (sale.prescriptionId) {
       this.updatePrescriptionStatus(sale.prescriptionId, 'dispensed');
     }
+  }
+
+  /**
+   * Collect Due Cash / MFS / Card against an existing Sale Invoice
+   */
+  public static async collectInvoiceDue(params: {
+    saleId: string;
+    amountPaid: number;
+    method: 'cash' | 'bkash_nagad' | 'card';
+    trxRef?: string;
+    collectedBy?: string;
+  }): Promise<Sale | null> {
+    const sales = this.getSales();
+    const idx = sales.findIndex((s) => s.id === params.saleId || s.invoiceNumber === params.saleId);
+    if (idx === -1) return null;
+
+    const target = { ...sales[idx] };
+    const currentDue = Number(target.dueAmount ?? 0);
+    if (currentDue <= 0) return target;
+
+    const payNow = Math.min(currentDue, Math.max(0, Number(params.amountPaid) || 0));
+    if (payNow <= 0) return target;
+
+    const prevSplit = { ...(target.splitDetails || {}) };
+    const existingRealized = Math.max(0, Number(target.grandTotal || 0) - currentDue);
+
+    // Seed baseline realized split if missing before adding the new due settlement
+    if (
+      prevSplit.cashAmount === undefined &&
+      prevSplit.mobileAmount === undefined &&
+      prevSplit.cardAmount === undefined
+    ) {
+      if (target.paymentMethod === 'bkash_nagad' || target.paymentMethod === 'upi_mobile') {
+        prevSplit.mobileAmount = existingRealized;
+      } else if (target.paymentMethod === 'card') {
+        prevSplit.cardAmount = existingRealized;
+      } else {
+        prevSplit.cashAmount = existingRealized;
+      }
+    }
+
+    if (params.method === 'bkash_nagad') {
+      prevSplit.mobileAmount = Number(((prevSplit.mobileAmount || 0) + payNow).toFixed(2));
+      if (params.trxRef) prevSplit.mobileTrxId = params.trxRef;
+    } else if (params.method === 'card') {
+      prevSplit.cardAmount = Number(((prevSplit.cardAmount || 0) + payNow).toFixed(2));
+      if (params.trxRef) prevSplit.cardAuthCode = params.trxRef;
+    } else {
+      prevSplit.cashAmount = Number(((prevSplit.cashAmount || 0) + payNow).toFixed(2));
+    }
+
+    const nextDue = Number(Math.max(0, currentDue - payNow).toFixed(2));
+    target.dueAmount = nextDue;
+    target.splitDetails = prevSplit;
+    target.paymentStatus = nextDue <= 0.009 ? 'paid' : 'partially_paid';
+
+    sales[idx] = target;
+    this.cache.sales = [...sales];
+    setLocalItem(STORAGE_KEYS.SALES, this.cache.sales);
+    this.emitChange();
+
+    // Accounting entry for collected due
+    this.addAccountingTransaction({
+      id: `tx-due-col-${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+      type: 'sale_revenue',
+      referenceId: target.invoiceNumber,
+      description: `Due Collection for #${target.invoiceNumber} (${params.method.toUpperCase()})`,
+      debit: 0,
+      credit: payNow,
+      account: params.method === 'cash' ? 'Cash' : 'Bank',
+      branchId: target.branchId,
+      branchName: target.branchName,
+    });
+
+    AuditService.recordAuditLog({
+      userId: 'current-user',
+      userName: params.collectedBy || 'Cashier',
+      userRole: 'Pharmacist',
+      action: 'UPDATE',
+      module: 'pos',
+      targetEntityId: target.invoiceNumber,
+      targetEntityType: 'SaleInvoice',
+      summary: `Collected ৳${payNow.toFixed(2)} due on #${target.invoiceNumber} via ${params.method.toUpperCase()}`,
+      beforeState: { dueAmount: currentDue },
+      afterState: { dueAmount: nextDue, collected: payNow, method: params.method },
+    });
+
+    // Persist to Neon DB
+    saleApi
+      .collectDue(target.id, {
+        amountPaid: payNow,
+        paymentMethod: params.method,
+        trxRef: params.trxRef,
+        collectedBy: params.collectedBy,
+      })
+      .catch((e) => console.error('Failed to sync due collection to backend:', e));
+
+    return target;
   }
 
   // --- Held Sales (F8 shortcut) ---

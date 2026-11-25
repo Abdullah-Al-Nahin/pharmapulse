@@ -270,9 +270,10 @@ export interface Sale {
   loyaltyDiscountAmount?: number;
   dueAmount?: number;
   
-  paymentMethod: 'cash' | 'card' | 'upi_mobile' | 'bkash_nagad' | 'split' | 'due_credit';
+  paymentMethod: 'cash' | 'card' | 'upi_mobile' | 'bkash_nagad' | 'split' | 'due_credit' | 'credit';
   cashTendered?: number;
   changeGiven?: number;
+  roundOff?: number;
   splitDetails?: {
     cashAmount?: number;
     mobileAmount?: number;

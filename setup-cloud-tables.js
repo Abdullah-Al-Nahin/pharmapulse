@@ -92,7 +92,12 @@ async function main() {
       ADD COLUMN IF NOT EXISTS "invoiceNumber" VARCHAR(60),
       ADD COLUMN IF NOT EXISTS "invoiceDate" DATE;
   `);
-  console.log('✓ products pricing & batches invoice columns ensured');
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "sales"
+      ADD COLUMN IF NOT EXISTS "branchId" VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS "branchName" VARCHAR(150);
+  `);
+  console.log('✓ products pricing, batches invoice, & sales branch columns ensured');
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

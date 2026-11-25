@@ -670,6 +670,8 @@ model Sale {
   dueAmount             Decimal              @default(0.00) @db.Decimal(10, 2)
   status                SaleStatus           @default(COMPLETED)
   isScheduleHCompliant  Boolean              @default(false)
+  branchId              String?              @db.VarChar(100)
+  branchName            String?              @db.VarChar(150)
   notes                 String?              @db.Text
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt

@@ -35,6 +35,7 @@ import { StockAdjustmentAuditView } from '../inventory/StockAdjustmentAuditView'
 import { BatchExpiryView } from '../batches/BatchExpiryView';
 import { MultiBranchHub } from '../branches/MultiBranchHub';
 import { ExecutiveDashboardView } from '../executive/ExecutiveDashboardView';
+import { InvoiceSalesCashLedgerView } from '../sales/InvoiceSalesCashLedgerView';
 import { InventoryAnomalyModal } from '../inventory/InventoryAnomalyModal';
 import { DatabaseControlView } from '../admin/DatabaseControlView';
 import { useAuth } from '../../context/AuthContext';
@@ -549,7 +550,18 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     try {
       const invoiceNumber = `INV-2026-${Math.floor(9200 + Math.random() * 500)}`;
       const totalCost = cart.reduce((sum, item) => sum + ((item.purchasePrice || 0) * item.qty), 0);
-      
+      const rawGrossSubtotal = Number(cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2));
+      const itemLevelDiscount = Number(Math.max(0, rawGrossSubtotal - subtotal).toFixed(2));
+      const totalDiscount = Number((itemLevelDiscount + discount).toFixed(2));
+      const resolvedCashTendered =
+        paymentMethod === 'cash'
+          ? tenderedAmount >= grandTotal
+            ? tenderedAmount
+            : grandTotal
+          : 0;
+      const resolvedChangeGiven =
+        paymentMethod === 'cash' ? Number(Math.max(0, resolvedCashTendered - grandTotal).toFixed(2)) : 0;
+
       const newSale: any = {
         id: `sale-${Date.now()}`,
         invoiceNumber,
@@ -559,6 +571,9 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         customerName: selectedCustomer?.name || 'Walk-In Customer',
         customerPhone: selectedCustomer?.phone || '',
         dueAmount: paymentMethod === 'due_credit' ? grandTotal : 0,
+        cashTendered: resolvedCashTendered,
+        changeGiven: resolvedChangeGiven,
+        roundOff,
         notes: `METHOD:${paymentMethod === 'mfs' ? 'bkash_nagad' : paymentMethod === 'due_credit' ? 'credit' : paymentMethod}`,
         items: cart.map(item => ({
           medicineId: item.medicineId || 'unknown-med',
@@ -573,12 +588,12 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           mrp: item.price, // assuming MRP is price
           discountPercent: item.disc,
           taxRate: 0,
-          subtotal: item.price * item.qty,
+          subtotal: Number((item.price * item.qty).toFixed(2)),
           taxAmount: 0,
-          total: (item.price * item.qty) * (1 - (item.disc / 100))
+          total: Number(((item.price * item.qty) * (1 - (item.disc / 100))).toFixed(2))
         })),
-        subtotal,
-        discountTotal: discount,
+        subtotal: rawGrossSubtotal,
+        discountTotal: totalDiscount,
         taxTotal: tax,
         grandTotal,
         totalCost,
@@ -594,7 +609,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         paymentStatus: paymentMethod === 'due_credit' ? 'due' : 'paid',
         cashierId: currentUser?.id || 'user-super-admin-01',
         cashierName: currentUser?.name || 'Duty Pharmacist',
-        branchId: currentUser?.branchId || 'main',
+        branchId: currentUser?.branchId || 'HQ-MAIN',
         branchName: currentUser?.branchName || 'Main Branch',
       };
 
@@ -984,6 +999,15 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
           )}
 
           {/* Sub-Module Views inside PharmaPulse Enterprise Layout */}
+          {activeTab === 'invoice_sales_ledger' && (
+            <div className="w-full">
+              <InvoiceSalesCashLedgerView
+                onOpenFullPos={() => setActiveTab('pos')}
+                onNavigateTab={(tab) => setActiveTab(tab as PharmaNavTab)}
+              />
+            </div>
+          )}
+
           {activeTab === 'executive_dashboard' && (
             <div className="w-full">
               <ExecutiveDashboardView onNavigateToTab={(tab) => setActiveTab(tab as PharmaNavTab)} />

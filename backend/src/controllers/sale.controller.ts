@@ -29,4 +29,13 @@ export class SaleController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  static async collectDue(req: Request, res: Response) {
+    try {
+      const sale = await SaleService.collectDue(req.params.id, req.body);
+      res.json(sale);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

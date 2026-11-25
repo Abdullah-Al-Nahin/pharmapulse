@@ -173,6 +173,7 @@ export const saleApi = {
   getSales: async () => (await api.get('/sales')).data,
   getSaleById: async (id: string) => (await api.get(`/sales/${id}`)).data,
   createSale: async (data: any) => (await api.post('/sales', data)).data,
+  collectDue: async (id: string, data: any) => (await api.post(`/sales/${id}/collect-due`, data)).data,
 };
 
 // Purchase Orders & GRN (v1 + v2)

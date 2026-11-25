@@ -136,6 +136,7 @@ export interface FefoQueueItem {
 export type PharmaNavTab =
   | 'executive_dashboard'
   | 'pos'
+  | 'invoice_sales_ledger'
   | 'command_center'
   | 'prescriptions'
   | 'inventory'
