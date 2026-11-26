@@ -11,7 +11,6 @@ import {
   AlertCircle,
   TrendingUp,
   Award,
-  Languages,
   ChevronDown,
   Coins,
   Building2,
@@ -828,28 +827,28 @@ export const PharmaPulseCheckout: React.FC<PharmaPulseCheckoutProps> = ({
           </div>
         )}
 
-        {/* Bengali Thermal Receipt Toggle */}
-        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+        {/* Official English Sales Memo Card */}
+        <div
+          data-no-translate="true"
+          className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"
+        >
           <div className="flex items-center gap-2">
-            <Languages className="w-4 h-4 text-emerald-600" />
+            <Receipt className="w-4 h-4 text-emerald-600" />
             <div className="flex flex-col">
               <span className="text-xs font-bold text-slate-800 dark:text-white">
-                বাংলা থার্মাল রসিদ (Bengali Thermal Receipt)
+                Official English Sales Memo
               </span>
-              <span className="text-[10px] text-slate-400">
-                ওষুধের বিবরণ ও ভাউচার বাংলায় প্রিন্ট হবে
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                Standardized 80mm POS &amp; A4 Tax Invoice with Batch/Exp
               </span>
             </div>
           </div>
           <button
-            onClick={onToggleBengaliReceipt}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-              isBengaliReceipt
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-            }`}
+            type="button"
+            onClick={onPrintThermal}
+            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition cursor-pointer"
           >
-            {isBengaliReceipt ? 'বাংলা ON' : 'EN Only'}
+            Preview
           </button>
         </div>
 

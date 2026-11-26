@@ -2571,7 +2571,7 @@ export const InvoiceSalesCashLedgerView: React.FC<InvoiceSalesCashLedgerViewProp
       )}
 
       {/* ===================================================================== */}
-      {/* MODAL 4: THERMAL RECEIPT MODAL                                        */}
+      {/* MODAL 4: OFFICIAL ENGLISH SALES MEMO / TAX INVOICE                    */}
       {/* ===================================================================== */}
       {receiptInvoice && (
         <ThermalReceiptModal
@@ -2592,12 +2592,26 @@ export const InvoiceSalesCashLedgerView: React.FC<InvoiceSalesCashLedgerViewProp
           }))}
           subtotal={receiptInvoice.grossBill}
           discount={receiptInvoice.discountGiven}
+          discountPercent={receiptInvoice.discountPercent}
           tax={receiptInvoice.vatAmount}
+          roundOff={receiptInvoice.roundOff}
           grandTotal={receiptInvoice.netSale}
           orderNumber={receiptInvoice.invoiceNumber}
-          isBengaliDefault={isBn}
-          tenderedAmount={receiptInvoice.cashTendered || receiptInvoice.netSale}
-          changeDue={receiptInvoice.changeGiven}
+          invoiceDate={receiptInvoice.timestamp || receiptInvoice.date}
+          paymentMethod={receiptInvoice.normalizedMode}
+          paymentStatus={receiptInvoice.paymentStatus}
+          tenderedAmount={receiptInvoice.cashTendered || receiptInvoice.cashCollected || 0}
+          changeDue={receiptInvoice.changeGiven || 0}
+          cashPaid={receiptInvoice.cashCollected}
+          mfsOrCardPaid={receiptInvoice.mfsOrCardTotal}
+          mfsOrCardRef={receiptInvoice.mfsOrCardRef}
+          dueAmount={receiptInvoice.dueAmount}
+          customerName={receiptInvoice.customerName}
+          customerPhone={receiptInvoice.customerPhone}
+          cashierName={receiptInvoice.cashierName}
+          branchId={receiptInvoice.branchId}
+          branchName={receiptInvoice.branchName}
+          branchCode={receiptInvoice.branchCode}
         />
       )}
     </div>

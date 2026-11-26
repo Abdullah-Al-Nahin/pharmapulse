@@ -24,6 +24,7 @@ import {
 } from '../../types/pharmapulse';
 import { useAuth } from '../../context/AuthContext';
 import { PharmacyService } from '../../services/pharmacyService';
+import { BranchService } from '../../services/branchService';
 
 // Pre-registered doctors database
 export const REGISTERED_DOCTORS: DoctorInfo[] = [
@@ -233,7 +234,103 @@ export const F10DispatchModal: React.FC<F10DispatchModalProps> = ({
   );
 };
 
-// 2. Thermal Bill ESC/POS Simulation Modal (English & Bengali Support)
+function amountToEnglishWords(amount: number): string {
+  const num = Math.max(0, Number(amount) || 0);
+  const whole = Math.floor(num);
+  const paisa = Math.round((num - whole) * 100);
+
+  const ones = [
+    '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+    'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+    'Seventeen', 'Eighteen', 'Nineteen',
+  ];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  const convertBelowThousand = (n: number): string => {
+    if (n === 0) return '';
+    if (n < 20) return ones[n];
+    if (n < 100) return `${tens[Math.floor(n / 10)]}${n % 10 ? ` ${ones[n % 10]}` : ''}`;
+    return `${ones[Math.floor(n / 100)]} Hundred${n % 100 ? ` ${convertBelowThousand(n % 100)}` : ''}`;
+  };
+
+  const convertInt = (n: number): string => {
+    if (n === 0) return 'Zero';
+    const parts: string[] = [];
+    const crore = Math.floor(n / 10000000);
+    const lakh = Math.floor((n % 10000000) / 100000);
+    const thousand = Math.floor((n % 100000) / 1000);
+    const rem = n % 1000;
+    if (crore > 0) parts.push(`${convertInt(crore)} Crore`);
+    if (lakh > 0) parts.push(`${convertBelowThousand(lakh)} Lakh`);
+    if (thousand > 0) parts.push(`${convertBelowThousand(thousand)} Thousand`);
+    if (rem > 0) parts.push(convertBelowThousand(rem));
+    return parts.join(' ');
+  };
+
+  const wholeWords = `${convertInt(whole)} Taka`;
+  if (paisa > 0) {
+    return `${wholeWords} and ${convertBelowThousand(paisa)} Paisa Only`;
+  }
+  return `${wholeWords} Only`;
+}
+
+function buildBarcodeBars(code: string): Array<{ x: number; w: number }> {
+  const safe = (code || 'INV-0000').toUpperCase();
+  const bars: Array<{ x: number; w: number }> = [];
+  let cursor = 4;
+  // Quiet start guard
+  bars.push({ x: cursor, w: 2 }); cursor += 4;
+  bars.push({ x: cursor, w: 1 }); cursor += 3;
+
+  for (let i = 0; i < safe.length; i++) {
+    const ch = safe.charCodeAt(i);
+    const pattern = [
+      (ch % 3) + 1,
+      ((ch >> 1) % 2) + 1,
+      ((ch >> 2) % 3) + 1,
+      ((ch >> 4) % 2) + 1,
+    ];
+    for (let j = 0; j < pattern.length; j++) {
+      const width = pattern[j];
+      if (j % 2 === 0) {
+        bars.push({ x: cursor, w: width });
+      }
+      cursor += width + 1;
+    }
+  }
+  // End guard
+  bars.push({ x: cursor, w: 2 }); cursor += 4;
+  bars.push({ x: cursor, w: 1 });
+  return bars;
+}
+
+const InvoiceBarcodeSvg: React.FC<{ value: string }> = ({ value }) => {
+  const bars = buildBarcodeBars(value);
+  const lastBar = bars[bars.length - 1];
+  const totalWidth = Math.max(160, (lastBar ? lastBar.x + lastBar.w + 4 : 160));
+  return (
+    <svg
+      viewBox={`0 0 ${totalWidth} 32`}
+      className="h-8 w-auto max-w-full mx-auto"
+      role="img"
+      aria-label={`Invoice Barcode ${value}`}
+    >
+      <rect x={0} y={0} width={totalWidth} height={32} fill="#ffffff" />
+      {bars.map((b, idx) => (
+        <rect key={idx} x={b.x} y={2} width={b.w} height={28} fill="#0f172a" />
+      ))}
+    </svg>
+  );
+};
+
+const escapeHtml = (v: string | number | undefined | null): string =>
+  String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+// 2. Official English Pharmacy Sales Memo / Tax Invoice Modal (80mm Thermal & A4 Formats)
 interface ThermalReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -248,6 +345,28 @@ interface ThermalReceiptModalProps {
   changeDue?: number;
   doctor?: DoctorInfo | null;
   autoPrint?: boolean;
+  invoiceDate?: string;
+  roundOff?: number;
+  vatPercent?: number;
+  discountPercent?: number;
+  paymentMethod?: string;
+  paymentStatus?: 'paid' | 'partially_paid' | 'due' | 'draft';
+  cashPaid?: number;
+  mfsOrCardPaid?: number;
+  mfsOrCardRef?: string;
+  dueAmount?: number;
+  customerName?: string;
+  customerPhone?: string;
+  customerCode?: string;
+  customerLoyaltyPoints?: number;
+  cashierName?: string;
+  cashierRole?: string;
+  branchId?: string;
+  branchName?: string;
+  branchCode?: string;
+  branchAddress?: string;
+  branchPhone?: string;
+  dgdaLicense?: string;
 }
 
 export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
@@ -259,19 +378,397 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
   tax,
   grandTotal,
   orderNumber,
-  isBengaliDefault = false,
-  tenderedAmount = 1000,
-  changeDue = 133,
+  tenderedAmount = 0,
+  changeDue = 0,
   doctor = null,
-  autoPrint = false
+  autoPrint = false,
+  invoiceDate,
+  roundOff,
+  vatPercent,
+  discountPercent,
+  paymentMethod = 'cash',
+  paymentStatus = 'paid',
+  cashPaid,
+  mfsOrCardPaid = 0,
+  mfsOrCardRef,
+  dueAmount = 0,
+  customerName = 'Walk-In Customer',
+  customerPhone = '',
+  customerCode,
+  customerLoyaltyPoints,
+  cashierName,
+  cashierRole,
+  branchId,
+  branchName,
+  branchCode,
+  branchAddress,
+  branchPhone,
+  dgdaLicense,
 }) => {
-  const [isBengali, setIsBengali] = useState(isBengaliDefault);
+  const { currentUser } = useAuth();
+  const [paperFormat, setPaperFormat] = useState<'80mm' | 'a4'>('80mm');
+
+  const resolvedBranch =
+    BranchService.getBranchById(branchId || currentUser?.branchId || 'HQ-MAIN') ||
+    BranchService.getBranches()[0];
+
+  const orgName = 'Madina Eye Hospital & Central Pharmacy';
+  const displayBranchName = branchName || resolvedBranch?.name || 'Central Dispensary';
+  const displayBranchCode = branchCode || resolvedBranch?.code || 'HQ-MAIN';
+  const displayAddress = branchAddress || resolvedBranch?.address || 'Plot 12, Mirpur Main Road, Dhaka';
+  const displayPhone = branchPhone || resolvedBranch?.phone || '+880 1711-001122';
+  const displayLicense = dgdaLicense || resolvedBranch?.licenseNo || 'DGDA-DH-10492';
+  const vatBinNo = '00482910-0201 (Mushak-6.3)';
+
+  const issuedDateObj = invoiceDate ? new Date(invoiceDate) : new Date();
+  const safeIssuedDate = Number.isNaN(issuedDateObj.getTime()) ? new Date() : issuedDateObj;
+  const formattedDateTime = `${safeIssuedDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })}, ${safeIssuedDate.toLocaleTimeString('en-US', {
+    hour12: true,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })}`;
+
+  const totalUnits = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+  const taxableNet = Math.max(0, subtotal - discount);
+  const computedRoundOff =
+    roundOff !== undefined ? roundOff : grandTotal - (taxableNet + tax);
+
+  const normalizedPayMethod = (paymentMethod || 'cash').toLowerCase();
+  const paymentMethodLabel =
+    normalizedPayMethod === 'due_credit' || normalizedPayMethod === 'credit'
+      ? 'CREDIT / DUE'
+      : normalizedPayMethod === 'bkash_nagad' || normalizedPayMethod === 'mfs'
+      ? 'MFS (bKash / Nagad)'
+      : normalizedPayMethod === 'card'
+      ? 'CARD POS'
+      : normalizedPayMethod === 'split'
+      ? 'SPLIT SETTLEMENT'
+      : 'CASH';
+
+  const statusBadge =
+    dueAmount > 0.01 || paymentStatus === 'due'
+      ? { label: 'CREDIT DUE', cls: 'bg-rose-100 text-rose-800 border-rose-300' }
+      : paymentStatus === 'partially_paid'
+      ? { label: 'PARTIAL PAID', cls: 'bg-amber-100 text-amber-800 border-amber-300' }
+      : paymentStatus === 'draft'
+      ? { label: 'DRAFT PREVIEW', cls: 'bg-slate-200 text-slate-800 border-slate-300' }
+      : { label: 'PAID & VERIFIED', cls: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
+
+  const effectiveCashPaid =
+    cashPaid !== undefined
+      ? cashPaid
+      : normalizedPayMethod === 'cash'
+      ? Math.max(0, grandTotal - dueAmount)
+      : 0;
+  const effectiveCashTendered =
+    normalizedPayMethod === 'cash' && tenderedAmount > 0 ? tenderedAmount : effectiveCashPaid;
+  const effectiveChangeDue =
+    normalizedPayMethod === 'cash'
+      ? Math.max(0, changeDue > 0 ? changeDue : effectiveCashTendered - effectiveCashPaid)
+      : 0;
+
+  const effectiveCashier = cashierName || currentUser?.name || 'Duty Pharmacist';
+  const effectiveRole = cashierRole || currentUser?.roleName || 'Pharmacist';
+  const effectiveDiscountPct =
+    discountPercent !== undefined
+      ? discountPercent
+      : subtotal > 0
+      ? Number(((discount / subtotal) * 100).toFixed(1))
+      : 0;
+  const effectiveVatPct =
+    vatPercent !== undefined
+      ? vatPercent
+      : taxableNet > 0
+      ? Number(((tax / taxableNet) * 100).toFixed(1))
+      : 0;
+
+  const handlePrintMemo = (formatToPrint: '80mm' | 'a4' = paperFormat) => {
+    const popup = window.open('', '_blank', 'width=920,height=780');
+    if (!popup) {
+      window.print();
+      return;
+    }
+
+    const bars = buildBarcodeBars(orderNumber);
+    const lastBar = bars[bars.length - 1];
+    const barcodeWidth = Math.max(160, lastBar ? lastBar.x + lastBar.w + 4 : 160);
+    const barcodeSvgHtml = `<svg width="${barcodeWidth}" height="32" viewBox="0 0 ${barcodeWidth} 32" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="${barcodeWidth}" height="32" fill="#ffffff"/>${bars
+      .map((b) => `<rect x="${b.x}" y="2" width="${b.w}" height="28" fill="#0f172a"/>`)
+      .join('')}</svg>`;
+
+    const itemsRowsHtml = cart
+      .map((item, idx) => {
+        const lineGross = item.price * item.qty;
+        const lineNet = lineGross * (1 - (item.disc || 0) / 100);
+        const notes: string[] = [];
+        if (item.isRxRequired) notes.push('Rx Prescribed');
+        if (item.isColdChain) notes.push('Cold Chain 2°C–8°C');
+        if (item.isOphthalmic || item.afterOpeningDays) notes.push('Use within 28d of opening');
+
+        if (formatToPrint === 'a4') {
+          return `
+            <tr>
+              <td style="text-align:center;color:#475569;">${idx + 1}</td>
+              <td>
+                <div style="font-weight:700;color:#0f172a;">${escapeHtml(item.name)}</div>
+                <div style="font-size:10px;color:#475569;">${escapeHtml(item.sub)}${item.company ? ` • ${escapeHtml(item.company)}` : ''}</div>
+                ${notes.length ? `<div style="font-size:9px;color:#b45309;font-weight:600;margin-top:2px;">${escapeHtml(notes.join(' | '))}</div>` : ''}
+              </td>
+              <td style="font-family:monospace;font-size:10.5px;">
+                <div>Batch: <strong>${escapeHtml(item.batch || 'N/A')}</strong></div>
+                <div style="color:#475569;">Exp: ${escapeHtml(item.exp || 'N/A')}</div>
+              </td>
+              <td style="text-align:center;font-family:monospace;font-weight:700;">${item.qty}</td>
+              <td style="text-align:right;font-family:monospace;">Tk ${item.price.toFixed(2)}</td>
+              <td style="text-align:center;font-family:monospace;">${item.disc ? `${item.disc}%` : '—'}</td>
+              <td style="text-align:right;font-family:monospace;font-weight:700;color:#0f172a;">Tk ${lineNet.toFixed(2)}</td>
+            </tr>
+          `;
+        }
+
+        return `
+          <tr>
+            <td style="padding:5px 0;border-bottom:1px dotted #cbd5e1;">
+              <div style="display:flex;justify-content:space-between;font-weight:700;color:#0f172a;font-size:11px;">
+                <span>${idx + 1}. ${escapeHtml(item.name)}</span>
+                <span style="font-family:monospace;">Tk ${lineNet.toFixed(2)}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#475569;margin-top:1px;">
+                <span>${escapeHtml(item.sub)}${item.company ? ` • ${escapeHtml(item.company)}` : ''}</span>
+                <span style="font-family:monospace;">${item.qty} x ${item.price.toFixed(2)}${item.disc ? ` (-${item.disc}%)` : ''}</span>
+              </div>
+              <div style="font-size:9px;color:#334155;font-family:monospace;margin-top:1px;">
+                Batch: ${escapeHtml(item.batch || 'N/A')} | Exp: ${escapeHtml(item.exp || 'N/A')}
+              </div>
+              ${notes.length ? `<div style="font-size:8.5px;color:#b45309;font-weight:600;margin-top:1px;">* ${escapeHtml(notes.join(' • '))}</div>` : ''}
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    const html =
+      formatToPrint === 'a4'
+        ? `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Sales Memo - ${escapeHtml(orderNumber)}</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { margin: 0; color: #0f172a; background: #ffffff; font-size: 11.5px; line-height: 1.4; }
+    .toolbar { display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
+    .btn { padding:7px 14px; border-radius:6px; border:1px solid #059669; background:#059669; color:#fff; font-weight:700; font-size:12px; cursor:pointer; }
+    .btn-sec { background:#f1f5f9; color:#0f172a; border-color:#cbd5e1; }
+    @media print { .toolbar { display:none !important; } }
+    .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:12px; }
+    .title-pill { display:inline-block; background:#0f172a; color:#fff; font-size:10px; font-weight:800; letter-spacing:0.08em; padding:3px 10px; border-radius:4px; text-transform:uppercase; }
+    .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+    .meta-box { border:1px solid #cbd5e1; border-radius:6px; padding:8px 10px; background:#f8fafc; font-size:11px; }
+    .meta-row { display:flex; justify-content:space-between; margin-bottom:3px; }
+    .meta-row:last-child { margin-bottom:0; }
+    table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+    th { background:#0f172a; color:#fff; text-align:left; padding:6px 8px; font-size:10px; text-transform:uppercase; letter-spacing:0.04em; }
+    td { padding:6px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; font-size:11px; }
+    .bottom-grid { display:grid; grid-template-columns:1.15fr 0.85fr; gap:14px; margin-top:8px; }
+    .box { border:1px solid #cbd5e1; border-radius:6px; padding:10px; }
+    .tot-row { display:flex; justify-content:space-between; padding:3px 0; font-size:11.5px; }
+    .tot-net { border-top:2px solid #0f172a; border-bottom:1px solid #cbd5e1; padding:6px 0; margin:4px 0; font-size:14px; font-weight:800; color:#065f46; }
+    .sig-row { display:flex; justify-content:space-between; margin-top:28px; padding-top:6px; font-size:10.5px; color:#475569; }
+    .sig-line { width:190px; border-top:1px solid #64748b; text-align:center; padding-top:4px; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="btn btn-sec" onclick="window.close()">Close</button>
+    <button class="btn" onclick="window.print()">Print A4 Memo</button>
+  </div>
+  <div class="header">
+    <div>
+      <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:-0.01em;">${escapeHtml(orgName)}</div>
+      <div style="font-size:11.5px;font-weight:600;color:#334155;">${escapeHtml(displayBranchName)} (${escapeHtml(displayBranchCode)})</div>
+      <div style="font-size:10.5px;color:#475569;">${escapeHtml(displayAddress)} | Helpline: ${escapeHtml(displayPhone)}</div>
+      <div style="font-size:10px;color:#334155;font-family:monospace;margin-top:2px;">DGDA License: ${escapeHtml(displayLicense)} | VAT/BIN: ${escapeHtml(vatBinNo)}</div>
+    </div>
+    <div style="text-align:right;">
+      <span class="title-pill">OFFICIAL SALES MEMO / TAX INVOICE</span>
+      <div style="font-family:monospace;font-size:15px;font-weight:900;margin-top:6px;">${escapeHtml(orderNumber)}</div>
+      <div style="font-size:10.5px;color:#475569;">${escapeHtml(formattedDateTime)}</div>
+      <div style="margin-top:4px;font-size:10px;font-weight:800;color:${dueAmount > 0 ? '#be123c' : '#047857'};">${escapeHtml(statusBadge.label)}</div>
+    </div>
+  </div>
+
+  <div class="meta-grid">
+    <div class="meta-box">
+      <div style="font-weight:800;font-size:10px;text-transform:uppercase;color:#475569;margin-bottom:4px;">Patient & Prescriber Tracking</div>
+      <div class="meta-row"><span>Customer / Patient:</span><strong>${escapeHtml(customerName)}</strong></div>
+      ${customerPhone ? `<div class="meta-row"><span>Contact Phone:</span><span style="font-family:monospace;">${escapeHtml(customerPhone)}</span></div>` : ''}
+      ${customerCode ? `<div class="meta-row"><span>Customer Ref ID:</span><span style="font-family:monospace;">${escapeHtml(customerCode)}</span></div>` : ''}
+      <div class="meta-row"><span>Prescribing Doctor:</span><strong>${escapeHtml(doctor ? `${doctor.name} (${doctor.bmdcReg})` : 'Over-The-Counter (OTC)')}</strong></div>
+      ${doctor?.speciality ? `<div class="meta-row"><span>Speciality / Hospital:</span><span>${escapeHtml(doctor.speciality)}</span></div>` : ''}
+    </div>
+    <div class="meta-box">
+      <div style="font-weight:800;font-size:10px;text-transform:uppercase;color:#475569;margin-bottom:4px;">Counter & Audit Reference</div>
+      <div class="meta-row"><span>Dispensed By:</span><strong>${escapeHtml(effectiveCashier)} (${escapeHtml(effectiveRole)})</strong></div>
+      <div class="meta-row"><span>Payment Channel:</span><strong>${escapeHtml(paymentMethodLabel)}</strong></div>
+      ${mfsOrCardRef ? `<div class="meta-row"><span>Txn / Slip Reference:</span><span style="font-family:monospace;">${escapeHtml(mfsOrCardRef)}</span></div>` : ''}
+      <div class="meta-row"><span>Dispense Summary:</span><span>${cart.length} Line Item(s) • ${totalUnits} Total Units</span></div>
+      ${typeof customerLoyaltyPoints === 'number' ? `<div class="meta-row"><span>Loyalty Balance:</span><span>${customerLoyaltyPoints} pts</span></div>` : ''}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:32px;text-align:center;">#</th>
+        <th>Medicine Name, Generic & Manufacturer</th>
+        <th style="width:155px;">Batch & Expiry (FEFO)</th>
+        <th style="width:52px;text-align:center;">Qty</th>
+        <th style="width:82px;text-align:right;">Unit MRP</th>
+        <th style="width:56px;text-align:center;">Disc</th>
+        <th style="width:94px;text-align:right;">Net Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemsRowsHtml || '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:16px;">No items on invoice</td></tr>'}
+    </tbody>
+  </table>
+
+  <div class="bottom-grid">
+    <div class="box" style="display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div style="font-weight:800;font-size:10px;text-transform:uppercase;color:#0f172a;margin-bottom:4px;">Return, Traceability & Regulatory Terms</div>
+        <ul style="margin:0;padding-left:16px;font-size:10px;color:#475569;line-height:1.45;">
+          <li>Exchange or return accepted within <strong>7 days</strong> only with this original memo, intact seal, and matching Batch/Lot number.</li>
+          <li>Cold-chain (2°C–8°C), insulin, opened vials/drops, surgical consumables, and loose/cut strips are strictly non-returnable.</li>
+          <li>All medicines are DGDA-verified and dispensed under strict FEFO (First Expiry, First Out) tracking.</li>
+        </ul>
+      </div>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #cbd5e1;text-align:center;">
+        ${barcodeSvgHtml}
+        <div style="font-family:monospace;font-size:9.5px;font-weight:700;color:#334155;margin-top:2px;">TRACKING REF: ${escapeHtml(orderNumber)}</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div style="font-weight:800;font-size:10px;text-transform:uppercase;color:#0f172a;margin-bottom:6px;">Financial & Settlement Summary</div>
+      <div class="tot-row"><span>Gross MRP Subtotal:</span><span style="font-family:monospace;">Tk ${subtotal.toFixed(2)}</span></div>
+      <div class="tot-row" style="color:#c2410c;"><span>Total Discount${effectiveDiscountPct > 0 ? ` (${effectiveDiscountPct}%)` : ''}:</span><span style="font-family:monospace;">-Tk ${discount.toFixed(2)}</span></div>
+      <div class="tot-row"><span>Taxable Amount:</span><span style="font-family:monospace;">Tk ${taxableNet.toFixed(2)}</span></div>
+      <div class="tot-row"><span>Govt. VAT / Tax${effectiveVatPct > 0 ? ` (${effectiveVatPct}%)` : ''}:</span><span style="font-family:monospace;">+Tk ${tax.toFixed(2)}</span></div>
+      ${Math.abs(computedRoundOff) >= 0.005 ? `<div class="tot-row"><span>Round-Off Adjustment:</span><span style="font-family:monospace;">${computedRoundOff >= 0 ? '+' : '-'}Tk ${Math.abs(computedRoundOff).toFixed(2)}</span></div>` : ''}
+      <div class="tot-row tot-net"><span>NET PAYABLE (BDT):</span><span style="font-family:monospace;">Tk ${grandTotal.toFixed(2)}</span></div>
+      <div style="font-size:10px;color:#334155;font-style:italic;margin-bottom:6px;">In Words: <strong>${escapeHtml(amountToEnglishWords(grandTotal))}</strong></div>
+      ${effectiveCashPaid > 0 ? `<div class="tot-row"><span>Cash Tendered / Paid:</span><span style="font-family:monospace;">Tk ${effectiveCashTendered.toFixed(2)}</span></div>` : ''}
+      ${effectiveChangeDue > 0 ? `<div class="tot-row" style="color:#047857;font-weight:700;"><span>Change Returned:</span><span style="font-family:monospace;">Tk ${effectiveChangeDue.toFixed(2)}</span></div>` : ''}
+      ${mfsOrCardPaid > 0 ? `<div class="tot-row"><span>Digital / Card Paid:</span><span style="font-family:monospace;">Tk ${mfsOrCardPaid.toFixed(2)}</span></div>` : ''}
+      ${dueAmount > 0 ? `<div class="tot-row" style="color:#be123c;font-weight:800;"><span>Balance Due (Receivable):</span><span style="font-family:monospace;">Tk ${dueAmount.toFixed(2)}</span></div>` : ''}
+    </div>
+  </div>
+
+  <div class="sig-row">
+    <div class="sig-line">Customer / Receiver Signature</div>
+    <div class="sig-line">Authorized Pharmacist & Counter Seal</div>
+  </div>
+</body>
+</html>`
+        : `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>POS Memo - ${escapeHtml(orderNumber)}</title>
+  <style>
+    @page { size: 80mm auto; margin: 3mm; }
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { margin: 0 auto; width: 74mm; color: #0f172a; background: #ffffff; font-size: 10.5px; line-height: 1.35; }
+    .toolbar { display:flex; justify-content:space-between; margin-bottom:8px; }
+    .btn { padding:5px 10px; border-radius:4px; border:1px solid #059669; background:#059669; color:#fff; font-weight:700; font-size:11px; cursor:pointer; }
+    .btn-sec { background:#f1f5f9; color:#0f172a; border-color:#cbd5e1; }
+    @media print { .toolbar { display:none !important; } body { width: 100%; } }
+    .center { text-align:center; }
+    .divider { border-top:1px dashed #64748b; margin:6px 0; }
+    .row { display:flex; justify-content:space-between; margin-bottom:2px; }
+    table { width:100%; border-collapse:collapse; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="btn btn-sec" onclick="window.close()">Close</button>
+    <button class="btn" onclick="window.print()">Print 80mm Slip</button>
+  </div>
+  <div class="center">
+    <div style="font-size:12.5px;font-weight:900;text-transform:uppercase;">${escapeHtml(orgName)}</div>
+    <div style="font-size:10px;font-weight:600;">${escapeHtml(displayBranchName)} (${escapeHtml(displayBranchCode)})</div>
+    <div style="font-size:9px;color:#475569;">${escapeHtml(displayAddress)}</div>
+    <div style="font-size:9px;color:#475569;">Tel: ${escapeHtml(displayPhone)} | Lic: ${escapeHtml(displayLicense)}</div>
+    <div style="font-size:8.5px;color:#475569;">BIN/VAT: ${escapeHtml(vatBinNo)}</div>
+    <div style="margin-top:4px;font-size:10px;font-weight:900;border-top:1px solid #0f172a;border-bottom:1px solid #0f172a;padding:2px 0;">SALES MEMO / TAX INVOICE</div>
+  </div>
+  <div style="margin-top:6px;font-size:9.5px;">
+    <div class="row"><span>Invoice No:</span><strong style="font-family:monospace;">${escapeHtml(orderNumber)}</strong></div>
+    <div class="row"><span>Date & Time:</span><span>${escapeHtml(formattedDateTime)}</span></div>
+    <div class="row"><span>Served By:</span><span>${escapeHtml(effectiveCashier)}</span></div>
+    <div class="row"><span>Patient/Cust:</span><strong>${escapeHtml(customerName)}${customerPhone ? ` (${escapeHtml(customerPhone)})` : ''}</strong></div>
+    <div class="row"><span>Prescriber:</span><span>${escapeHtml(doctor ? `${doctor.name} (${doctor.bmdcReg})` : 'OTC Dispense')}</span></div>
+    <div class="row"><span>Payment:</span><strong>${escapeHtml(paymentMethodLabel)} [${escapeHtml(statusBadge.label)}]</strong></div>
+  </div>
+  <div class="divider"></div>
+  <table>
+    <tbody>${itemsRowsHtml}</tbody>
+  </table>
+  <div class="divider"></div>
+  <div style="font-size:10px;">
+    <div class="row"><span>Items / Total Qty:</span><span>${cart.length} item(s) / ${totalUnits} unit(s)</span></div>
+    <div class="row"><span>Gross MRP Subtotal:</span><span style="font-family:monospace;">Tk ${subtotal.toFixed(2)}</span></div>
+    <div class="row" style="color:#c2410c;"><span>Discount${effectiveDiscountPct > 0 ? ` (${effectiveDiscountPct}%)` : ''}:</span><span style="font-family:monospace;">-Tk ${discount.toFixed(2)}</span></div>
+    <div class="row"><span>Taxable Amount:</span><span style="font-family:monospace;">Tk ${taxableNet.toFixed(2)}</span></div>
+    <div class="row"><span>VAT / Tax${effectiveVatPct > 0 ? ` (${effectiveVatPct}%)` : ''}:</span><span style="font-family:monospace;">+Tk ${tax.toFixed(2)}</span></div>
+    ${Math.abs(computedRoundOff) >= 0.005 ? `<div class="row"><span>Round-Off:</span><span style="font-family:monospace;">${computedRoundOff >= 0 ? '+' : '-'}Tk ${Math.abs(computedRoundOff).toFixed(2)}</span></div>` : ''}
+    <div class="row" style="border-top:1px solid #0f172a;padding-top:3px;margin-top:3px;font-size:12px;font-weight:900;">
+      <span>NET PAYABLE:</span><span style="font-family:monospace;">Tk ${grandTotal.toFixed(2)}</span>
+    </div>
+    <div style="font-size:8.5px;color:#334155;font-style:italic;margin:2px 0 4px;">${escapeHtml(amountToEnglishWords(grandTotal))}</div>
+    ${effectiveCashPaid > 0 ? `<div class="row"><span>Cash Tendered:</span><span style="font-family:monospace;">Tk ${effectiveCashTendered.toFixed(2)}</span></div>` : ''}
+    ${effectiveChangeDue > 0 ? `<div class="row" style="font-weight:700;"><span>Change Due:</span><span style="font-family:monospace;">Tk ${effectiveChangeDue.toFixed(2)}</span></div>` : ''}
+    ${mfsOrCardPaid > 0 ? `<div class="row"><span>Digital / Card Paid:</span><span style="font-family:monospace;">Tk ${mfsOrCardPaid.toFixed(2)}</span></div>` : ''}
+    ${dueAmount > 0 ? `<div class="row" style="color:#be123c;font-weight:800;"><span>Balance Due:</span><span style="font-family:monospace;">Tk ${dueAmount.toFixed(2)}</span></div>` : ''}
+  </div>
+  <div class="divider"></div>
+  <div class="center">
+    ${barcodeSvgHtml}
+    <div style="font-family:monospace;font-size:8.5px;font-weight:700;margin-top:2px;">REF: ${escapeHtml(orderNumber)}</div>
+    <div style="font-size:8.5px;color:#334155;margin-top:4px;line-height:1.35;">
+      <strong>RETURN POLICY:</strong> Exchange within 7 days with original memo, intact seal &amp; matching Batch No. Cold-chain, insulin, opened bottles &amp; cut strips are non-returnable.<br/>
+      FEFO &amp; DGDA Quality Verified • Thank you for trusting us.
+    </div>
+  </div>
+</body>
+</html>`;
+
+    popup.document.open();
+    popup.document.write(html);
+    popup.document.close();
+    popup.focus();
+    setTimeout(() => {
+      try {
+        popup.print();
+      } catch {
+        // user can click Print button in preview window
+      }
+    }, 300);
+  };
 
   useEffect(() => {
     if (isOpen && autoPrint) {
       const timer = setTimeout(() => {
-        window.print();
-      }, 500);
+        handlePrintMemo(paperFormat);
+      }, 350);
       return () => clearTimeout(timer);
     }
   }, [isOpen, autoPrint]);
@@ -279,201 +776,423 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-      <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-5 flex flex-col gap-3 max-h-[90vh]">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
-          <div className="flex items-center gap-2 text-slate-800 dark:text-white font-bold text-xs">
-            <Printer className="w-4 h-4 text-emerald-600" />
-            <span>Thermal Bill (80mm ESC/POS)</span>
+    <div
+      data-no-translate="true"
+      data-english-memo="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+    >
+      <div
+        className={`w-full ${
+          paperFormat === 'a4' ? 'max-w-3xl' : 'max-w-md'
+        } bg-white dark:bg-[#111827] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-5 flex flex-col gap-3 max-h-[92vh] transition-all`}
+      >
+        {/* Top Modal Controls */}
+        <div className="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <Printer className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="font-extrabold text-xs text-slate-900 dark:text-white">
+                Official Sales Memo / Tax Invoice
+              </div>
+              <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                Pure English Format • Full Batch, Regulatory &amp; Audit Traceability
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Bengali/English Mode Switcher */}
+
+          <div className="flex items-center gap-1.5">
+            {/* Format Switcher: 80mm POS vs A4 Official Memo */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => setPaperFormat('80mm')}
+                className={`px-2.5 py-1 rounded-md transition cursor-pointer ${
+                  paperFormat === '80mm'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                80mm POS
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaperFormat('a4')}
+                className={`px-2.5 py-1 rounded-md transition cursor-pointer ${
+                  paperFormat === 'a4'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                A4 Memo
+              </button>
+            </div>
+
             <button
-              onClick={() => setIsBengali(!isBengali)}
-              className={`px-2 py-0.5 rounded text-[11px] font-bold border transition ${
-                isBengali
-                  ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300'
-              }`}
+              type="button"
+              onClick={onClose}
+              aria-label="Close receipt modal"
+              className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             >
-              {isBengali ? 'বাংলা রসিদ ✓' : 'English Receipt'}
-            </button>
-            <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600">
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Realistic Thermal Paper Roll Simulation */}
-        <div className="p-4 bg-slate-50 dark:bg-black rounded-xl border border-dashed border-slate-300 dark:border-slate-700 font-mono text-[11px] leading-tight text-slate-800 dark:text-slate-200 shadow-inner flex flex-col gap-2 overflow-y-auto">
-          {/* Header */}
-          <div className="text-center pb-2 border-b border-dashed border-slate-300 dark:border-slate-700">
-            {isBengali ? (
-              <>
-                <p className="font-bold text-sm tracking-wide text-slate-900 dark:text-white font-sans">
-                  মদিনা চক্ষু হাসপাতাল ও ফার্মাসিউটিক্যালস
-                </p>
-                <p className="text-[10px] text-slate-600 dark:text-slate-400">
-                  ফার্মাপালস ওএস এন্টারপ্রাইজ • ব্রাঞ্চ #০৪৮
-                </p>
-                <p className="text-[9px] text-slate-500">ডিজিডিএ রেজি: ৬৮৪১-ডিএইচ-২০২৬</p>
-                <p className="text-[10px] font-semibold mt-1">ইনভয়েস: {orderNumber}</p>
-                <p className="text-[9px] text-slate-400">
-                  তারিখ: {new Date().toLocaleDateString('en-GB')} {new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' })}
-                </p>
-                {doctor && (
-                  <div className="mt-1 pt-1 border-t border-dotted border-slate-300 dark:border-slate-700 text-[10px] text-left">
-                    <p className="font-bold text-slate-700 dark:text-slate-300 font-sans">
-                      চিকিৎসক: {doctor.name} ({doctor.bmdcReg})
-                    </p>
-                    <p className="text-[9px] text-slate-500">{doctor.speciality}</p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="font-bold text-xs uppercase tracking-wider text-slate-900 dark:text-white">
-                  PharmaPulse Enterprise
-                </p>
-                <p className="text-[10px] text-slate-500">
-                  Madina Eye Hospital Ltd. & Central Dispensary
-                </p>
-                <p className="text-[10px] text-slate-500">Store #048 • DGDA Reg: 6841-DH-2026</p>
-                <p className="text-[10px] font-semibold mt-1">Invoice: {orderNumber}</p>
-                <p className="text-[9px] text-slate-400">
-                  Date: {new Date().toLocaleDateString('en-GB')} {new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' })}
-                </p>
-                {doctor && (
-                  <div className="mt-1 pt-1 border-t border-dotted border-slate-300 dark:border-slate-700 text-[10px] text-left">
-                    <p className="font-bold text-slate-700 dark:text-slate-300">
-                      Prescriber: {doctor.name} ({doctor.bmdcReg})
-                    </p>
-                    <p className="text-[9px] text-slate-500">{doctor.speciality}</p>
-                  </div>
-                )}
-              </>
-            )}
+        {/* Crisp Paper Preview Sheet (Always clean light paper styling for true-to-print appearance) */}
+        <div className="p-5 bg-white text-slate-900 rounded-xl border border-slate-300 shadow-inner flex flex-col gap-3 overflow-y-auto text-[11px] leading-snug">
+          {/* Corporate Header */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 pb-3 border-b-2 border-slate-900">
+            <div className={paperFormat === '80mm' ? 'text-center sm:text-left' : 'text-left'}>
+              <h2 className="font-black text-sm tracking-tight uppercase text-slate-900">
+                {orgName}
+              </h2>
+              <p className="text-[11px] font-semibold text-slate-700">
+                {displayBranchName} <span className="memo-mono text-[10px] font-bold text-slate-500">({displayBranchCode})</span>
+              </p>
+              <p className="text-[10px] text-slate-600">{displayAddress}</p>
+              <p className="text-[10px] text-slate-600">
+                Helpline: <span className="memo-mono">{displayPhone}</span> • DGDA Lic:{' '}
+                <span className="memo-mono font-semibold">{displayLicense}</span>
+              </p>
+              <p className="text-[9.5px] text-slate-500 memo-mono">VAT / BIN: {vatBinNo}</p>
+            </div>
+
+            <div className={`${paperFormat === '80mm' ? 'text-center sm:text-right' : 'text-right'} shrink-0`}>
+              <span className="inline-block px-2 py-0.5 rounded bg-slate-900 text-white text-[9.5px] font-black tracking-wider uppercase">
+                OFFICIAL SALES MEMO / INVOICE
+              </span>
+              <div className="memo-mono text-sm font-black text-slate-900 mt-1">{orderNumber}</div>
+              <div className="text-[10px] text-slate-500">{formattedDateTime}</div>
+              <span
+                className={`inline-block mt-1 px-2 py-0.5 rounded border text-[9px] font-extrabold uppercase tracking-wide ${statusBadge.cls}`}
+              >
+                {statusBadge.label}
+              </span>
+            </div>
           </div>
 
-          {/* Itemized Table */}
-          <div className="flex flex-col gap-1.5 py-1 border-b border-dashed border-slate-300 dark:border-slate-700">
-            <div className="flex justify-between font-bold text-[10px] uppercase text-slate-500">
-              <span>{isBengali ? 'ওষুধের বিবরণ' : 'Item Description'}</span>
-              <span>{isBengali ? 'পরিমাণ x দর' : 'Qty x Price'}</span>
-              <span>{isBengali ? 'মোট' : 'Total'}</span>
-            </div>
-            {cart.map((item) => (
-              <div key={item.id} className="flex flex-col text-[10px] py-1 border-b border-slate-200/50 dark:border-slate-800/60 last:border-b-0">
-                <div className="flex justify-between items-baseline">
-                  <span className="font-bold text-slate-900 dark:text-white truncate max-w-[160px]">
-                    {item.name}
-                  </span>
-                  <div className="flex gap-2">
-                    <span className="text-slate-500">
-                      {item.qty} x ৳{item.price.toFixed(2)}
-                    </span>
-                    <span className="font-bold text-slate-900 dark:text-white font-mono">
-                      ৳{(item.price * item.qty).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Batch & Expiry */}
-                <div className="flex flex-wrap items-center gap-x-2 text-[9px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  <span>ব্যাচ: {item.batch} (মেয়াদ: {item.exp})</span>
-                </div>
-
-                {/* 28-Day After Opening Alert */}
-                {(item.afterOpeningDays || item.isOphthalmic) && (
-                  <div className="flex items-center gap-1 text-[9px] text-amber-600 dark:text-amber-400 font-sans font-semibold mt-0.5">
-                    <Clock className="w-2.5 h-2.5" />
-                    <span>
-                      {isBengali
-                        ? 'সতর্কতা: বোতল খোলার পর ২৮ দিনের মধ্যে ব্যবহার করুন।'
-                        : 'Notice: Use within 28 days after opening.'}
-                    </span>
-                  </div>
-                )}
-
-                {/* Cold Chain Storage Alert */}
-                {item.isColdChain && (
-                  <div className="flex items-center gap-1 text-[9px] text-sky-600 dark:text-sky-400 font-sans font-semibold mt-0.5">
-                    <Snowflake className="w-2.5 h-2.5" />
-                    <span>
-                      {isBengali
-                        ? 'সংরক্ষণ: ২°-৮° সে. তাপমাত্রায় ফ্রিজে রাখুন ও আইস-প্যাকে বহন করুন।'
-                        : 'Keep Refrigerated (2°C - 8°C). Pack with Ice-Pack.'}
-                    </span>
-                  </div>
-                )}
+          {/* Patient, Prescriber & Audit Metadata Block */}
+          <div className={`grid ${paperFormat === 'a4' ? 'grid-cols-2' : 'grid-cols-1'} gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[10.5px]`}>
+            <div className="space-y-1">
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 font-medium">Customer / Patient:</span>
+                <span className="font-bold text-slate-900 text-right">{customerName}</span>
               </div>
-            ))}
+              {customerPhone && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Contact Phone:</span>
+                  <span className="memo-mono font-semibold text-slate-800">{customerPhone}</span>
+                </div>
+              )}
+              {customerCode && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Customer ID:</span>
+                  <span className="memo-mono text-slate-700">{customerCode}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 font-medium">Prescribing Doctor:</span>
+                <span className="font-semibold text-slate-900 text-right">
+                  {doctor ? `${doctor.name} (${doctor.bmdcReg})` : 'Over-The-Counter (OTC)'}
+                </span>
+              </div>
+              {doctor?.speciality && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Speciality:</span>
+                  <span className="text-slate-700 text-right">{doctor.speciality}</span>
+                </div>
+              )}
+            </div>
+
+            <div className={`space-y-1 ${paperFormat === 'a4' ? 'sm:border-l sm:border-slate-200 sm:pl-3' : 'border-t border-slate-200 pt-1.5'}`}>
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 font-medium">Served By:</span>
+                <span className="font-semibold text-slate-900 text-right">
+                  {effectiveCashier} ({effectiveRole})
+                </span>
+              </div>
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 font-medium">Payment Mode:</span>
+                <span className="font-bold text-slate-900">{paymentMethodLabel}</span>
+              </div>
+              {mfsOrCardRef && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Txn / Card Ref:</span>
+                  <span className="memo-mono font-semibold text-slate-800">{mfsOrCardRef}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 font-medium">Items / Units:</span>
+                <span className="memo-mono font-semibold text-slate-800">
+                  {cart.length} Line(s) • {totalUnits} Units
+                </span>
+              </div>
+              {typeof customerLoyaltyPoints === 'number' && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Loyalty Points:</span>
+                  <span className="memo-mono font-semibold text-emerald-700">{customerLoyaltyPoints} pts</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Totals */}
-          <div className="flex flex-col gap-1 text-[11px] pt-1">
-            <div className="flex justify-between text-slate-600 dark:text-slate-400">
-              <span>{isBengali ? 'সাবটোটাল:' : 'Subtotal:'}</span>
-              <span className="font-mono">৳ {subtotal.toFixed(2)}</span>
+          {/* Itemized Medication & Batch Schedule */}
+          {paperFormat === 'a4' ? (
+            <div className="border border-slate-200 rounded-lg overflow-hidden">
+              <table className="w-full text-left border-collapse text-[10.5px]">
+                <thead>
+                  <tr className="bg-slate-900 text-white text-[9.5px] uppercase tracking-wider">
+                    <th className="py-2 px-2 text-center w-8">#</th>
+                    <th className="py-2 px-2.5">Medicine Description &amp; Generic</th>
+                    <th className="py-2 px-2.5">Batch &amp; Expiry</th>
+                    <th className="py-2 px-2 text-center">Qty</th>
+                    <th className="py-2 px-2 text-right">Unit MRP</th>
+                    <th className="py-2 px-2 text-center">Disc</th>
+                    <th className="py-2 px-2.5 text-right">Net Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {cart.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-5 text-center text-slate-400">
+                        No items present in this memo.
+                      </td>
+                    </tr>
+                  ) : (
+                    cart.map((item, idx) => {
+                      const lineNet = item.price * item.qty * (1 - (item.disc || 0) / 100);
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50/70">
+                          <td className="py-2 px-2 text-center text-slate-500 memo-mono">{idx + 1}</td>
+                          <td className="py-2 px-2.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-slate-900">{item.name}</span>
+                              {item.isRxRequired && (
+                                <span className="px-1 py-0.2 rounded bg-rose-100 text-rose-800 text-[8.5px] font-bold">
+                                  Rx
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[9.5px] text-slate-500">
+                              {item.sub}
+                              {item.company ? ` • ${item.company}` : ''}
+                            </div>
+                            {(item.afterOpeningDays || item.isOphthalmic) && (
+                              <div className="flex items-center gap-1 text-[9px] text-amber-700 font-semibold mt-0.5">
+                                <Clock className="w-2.5 h-2.5" />
+                                <span>Ophthalmic: Use within 28 days of opening.</span>
+                              </div>
+                            )}
+                            {item.isColdChain && (
+                              <div className="flex items-center gap-1 text-[9px] text-sky-700 font-semibold mt-0.5">
+                                <Snowflake className="w-2.5 h-2.5" />
+                                <span>Cold Chain: Store at 2°C–8°C (Pack with Ice-Pack).</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 px-2.5 memo-mono text-[10px]">
+                            <div className="font-bold text-slate-800">{item.batch || 'N/A'}</div>
+                            <div className="text-slate-500">Exp: {item.exp || 'N/A'}</div>
+                          </td>
+                          <td className="py-2 px-2 text-center memo-mono font-bold text-slate-900">
+                            {item.qty}
+                          </td>
+                          <td className="py-2 px-2 text-right memo-mono text-slate-700">
+                            Tk {item.price.toFixed(2)}
+                          </td>
+                          <td className="py-2 px-2 text-center memo-mono text-slate-600">
+                            {item.disc > 0 ? `${item.disc}%` : '—'}
+                          </td>
+                          <td className="py-2 px-2.5 text-right memo-mono font-bold text-slate-900">
+                            Tk {lineNet.toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="flex justify-between text-orange-600">
-              <span>{isBengali ? 'বিশেষ ছাড় (৫%):' : 'Discount (5%):'}</span>
-              <span className="font-mono">-৳ {discount.toFixed(2)}</span>
+          ) : (
+            <div className="flex flex-col divide-y divide-dotted divide-slate-300 border-y border-dashed border-slate-300 py-1">
+              <div className="flex justify-between font-bold text-[9.5px] uppercase text-slate-500 pb-1">
+                <span>Medicine / Batch &amp; Expiry</span>
+                <span>Qty x MRP</span>
+                <span>Net (Tk)</span>
+              </div>
+              {cart.length === 0 ? (
+                <div className="py-4 text-center text-slate-400 text-[10.5px]">
+                  No items present in this memo.
+                </div>
+              ) : (
+                cart.map((item, idx) => {
+                  const lineNet = item.price * item.qty * (1 - (item.disc || 0) / 100);
+                  return (
+                    <div key={item.id} className="py-1.5 flex flex-col gap-0.5">
+                      <div className="flex justify-between items-baseline gap-2">
+                        <span className="font-bold text-slate-900 truncate flex-1">
+                          {idx + 1}. {item.name}
+                          {item.isRxRequired ? ' [Rx]' : ''}
+                        </span>
+                        <span className="text-slate-500 memo-mono text-[10px] shrink-0">
+                          {item.qty} x {item.price.toFixed(2)}
+                          {item.disc > 0 ? ` (-${item.disc}%)` : ''}
+                        </span>
+                        <span className="font-bold text-slate-900 memo-mono shrink-0 w-16 text-right">
+                          {lineNet.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-[9.5px] text-slate-500 flex flex-wrap justify-between gap-x-2">
+                        <span>
+                          {item.sub}
+                          {item.company ? ` • ${item.company}` : ''}
+                        </span>
+                        <span className="memo-mono text-slate-600">
+                          Batch: {item.batch || 'N/A'} | Exp: {item.exp || 'N/A'}
+                        </span>
+                      </div>
+                      {(item.afterOpeningDays || item.isOphthalmic) && (
+                        <div className="flex items-center gap-1 text-[9px] text-amber-700 font-semibold">
+                          <Clock className="w-2.5 h-2.5" />
+                          <span>Ophthalmic Notice: Discard 28 days after opening.</span>
+                        </div>
+                      )}
+                      {item.isColdChain && (
+                        <div className="flex items-center gap-1 text-[9px] text-sky-700 font-semibold">
+                          <Snowflake className="w-2.5 h-2.5" />
+                          <span>Cold Chain: Keep refrigerated at 2°C–8°C.</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
-            <div className="flex justify-between text-slate-600 dark:text-slate-400">
-              <span>{isBengali ? 'ভ্যাট / কর (৫%):' : 'VAT / Tax (5%):'}</span>
-              <span className="font-mono">+৳ {tax.toFixed(2)}</span>
+          )}
+
+          {/* Totals & Settlement Reconciliation */}
+          <div className="flex flex-col gap-1 text-[10.5px] bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div className="flex justify-between text-slate-600">
+              <span>Gross MRP Subtotal:</span>
+              <span className="memo-mono font-semibold text-slate-900">Tk {subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between font-bold text-xs border-t border-dashed border-slate-300 dark:border-slate-700 pt-1 text-emerald-700 dark:text-emerald-400">
-              <span>{isBengali ? 'নিট প্রদেয়:' : 'NET PAYABLE:'}</span>
-              <span className="font-mono text-sm">৳ {grandTotal.toFixed(2)}</span>
+            <div className="flex justify-between text-amber-700">
+              <span>
+                Less: Total Discount{effectiveDiscountPct > 0 ? ` (${effectiveDiscountPct}%)` : ''}:
+              </span>
+              <span className="memo-mono font-semibold">-Tk {discount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-slate-600 dark:text-slate-400 pt-0.5 border-t border-dotted border-slate-200 dark:border-slate-800">
-              <span>{isBengali ? 'গৃহীত নগদ:' : 'Cash Tendered:'}</span>
-              <span className="font-mono">৳ {tenderedAmount.toFixed(2)}</span>
+            <div className="flex justify-between text-slate-600">
+              <span>Taxable Net Amount:</span>
+              <span className="memo-mono font-semibold text-slate-900">Tk {taxableNet.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between font-bold text-emerald-700 dark:text-emerald-300">
-              <span>{isBengali ? 'ফেরতযোগ্য টাকা (Change):' : 'Change Due:'}</span>
-              <span className="font-mono">৳ {changeDue.toFixed(2)}</span>
+            <div className="flex justify-between text-slate-600">
+              <span>Add: Govt. VAT / Tax{effectiveVatPct > 0 ? ` (${effectiveVatPct}%)` : ''}:</span>
+              <span className="memo-mono font-semibold text-slate-900">+Tk {tax.toFixed(2)}</span>
+            </div>
+            {Math.abs(computedRoundOff) >= 0.005 && (
+              <div className="flex justify-between text-slate-600">
+                <span>Round-Off Adjustment:</span>
+                <span className="memo-mono font-semibold text-slate-900">
+                  {computedRoundOff >= 0 ? '+' : '-'}Tk {Math.abs(computedRoundOff).toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-baseline font-black text-xs border-t-2 border-slate-900 pt-1.5 mt-1 text-emerald-800">
+              <span>NET PAYABLE (BDT):</span>
+              <span className="memo-mono text-sm">Tk {grandTotal.toFixed(2)}</span>
+            </div>
+
+            <div className="text-[9.5px] text-slate-600 italic border-b border-dotted border-slate-300 pb-1.5">
+              In Words: <span className="font-semibold text-slate-800">{amountToEnglishWords(grandTotal)}</span>
+            </div>
+
+            <div className="pt-1 space-y-0.5">
+              {effectiveCashPaid > 0 && (
+                <div className="flex justify-between text-slate-700">
+                  <span>Cash Tendered / Paid:</span>
+                  <span className="memo-mono font-semibold">Tk {effectiveCashTendered.toFixed(2)}</span>
+                </div>
+              )}
+              {effectiveChangeDue > 0 && (
+                <div className="flex justify-between font-bold text-emerald-700">
+                  <span>Change Returned:</span>
+                  <span className="memo-mono">Tk {effectiveChangeDue.toFixed(2)}</span>
+                </div>
+              )}
+              {mfsOrCardPaid > 0 && (
+                <div className="flex justify-between text-slate-700">
+                  <span>Digital / Card Settled:</span>
+                  <span className="memo-mono font-semibold">Tk {mfsOrCardPaid.toFixed(2)}</span>
+                </div>
+              )}
+              {dueAmount > 0 && (
+                <div className="flex justify-between font-extrabold text-rose-700">
+                  <span>Balance Due (Credit Receivable):</span>
+                  <span className="memo-mono">Tk {dueAmount.toFixed(2)}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="text-center pt-2 border-t border-dashed border-slate-300 dark:border-slate-700 text-[9px] text-slate-400">
-            {isBengali ? (
-              <>
-                <p className="font-bold text-slate-600 dark:text-slate-300 font-sans">
-                  *** আপনার দ্রুত আরোগ্য কাম্য ***
-                </p>
-                <p>ডিজিডিএ ও FEFO নীতি অনুযায়ী আসল ওষুধ নিশ্চিতকৃত।</p>
-                <p>মেয়াদোত্তীর্ণ ঔষধ ফেরত বা পরিবর্তনযোগ্য নয়।</p>
-              </>
-            ) : (
-              <>
-                <p className="font-bold text-slate-600 dark:text-slate-300">
-                  *** THANK YOU FOR YOUR VISIT ***
-                </p>
-                <p>FEFO Verified • Genuine Medicines Guaranteed</p>
-                <p>Strict Cold-Chain and Quality Ensured</p>
-              </>
+          {/* Tracking Barcode & Pharmacy Return Policy */}
+          <div className="pt-2 border-t border-dashed border-slate-300 text-center space-y-2">
+            <div>
+              <InvoiceBarcodeSvg value={orderNumber} />
+              <div className="memo-mono text-[9.5px] font-bold text-slate-700 mt-1">
+                TRACKING REF: {orderNumber}
+              </div>
+            </div>
+
+            <div className="text-[9px] text-slate-500 text-left bg-slate-50 px-2.5 py-2 rounded-lg border border-slate-200 leading-relaxed">
+              <div className="font-bold text-slate-700 uppercase tracking-wide mb-0.5">
+                Return, Exchange &amp; Quality Compliance Policy
+              </div>
+              <div>
+                • Exchange or return eligible within <strong>7 days</strong> with original sales memo,
+                unbroken seal, and matching Batch/Lot number.
+              </div>
+              <div>
+                • Cold-chain items (2°C–8°C), insulin, opened bottles/drops, surgicals &amp; cut
+                strips are non-returnable.
+              </div>
+              <div>
+                • Verified under strict DGDA authenticity &amp; FEFO (First Expiry, First Out) protocol.
+              </div>
+            </div>
+
+            {paperFormat === 'a4' && (
+              <div className="flex items-center justify-between pt-6 px-4 text-[10px] text-slate-600">
+                <div className="w-44 border-t border-slate-400 pt-1 text-center font-medium">
+                  Customer / Receiver Signature
+                </div>
+                <div className="w-44 border-t border-slate-400 pt-1 text-center font-medium">
+                  Authorized Pharmacist &amp; Seal
+                </div>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mt-1 shrink-0">
+        {/* Footer Actions */}
+        <div className="flex items-center gap-2 pt-1 shrink-0">
           <button
+            type="button"
             onClick={onClose}
-            className="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold"
+            className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold transition cursor-pointer"
           >
             Close
           </button>
           <button
-            onClick={() => {
-              window.print();
-            }}
-            className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20"
+            type="button"
+            onClick={() => handlePrintMemo(paperFormat)}
+            className="flex-[1.5] py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 transition cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print {isBengali ? 'বাংলা রসিদ' : 'Slip'}</span>
+            <span>{paperFormat === 'a4' ? 'Print Official A4 Memo' : 'Print 80mm POS Slip'}</span>
           </button>
         </div>
       </div>

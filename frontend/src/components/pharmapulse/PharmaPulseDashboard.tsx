@@ -145,12 +145,54 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     });
   }, []);
 
+  const createNextInvoiceNumber = () => {
+    const year = new Date().getFullYear();
+    const sales = PharmacyService.getSales();
+    let seq = 1001 + sales.length;
+    const existing = new Set(sales.map((s) => s.invoiceNumber));
+    let candidate = `INV-${year}-${seq}`;
+    while (existing.has(candidate)) {
+      seq += 1;
+      candidate = `INV-${year}-${seq}`;
+    }
+    return candidate;
+  };
+
   // Modals
   const [isAnomalyModalOpen, setIsAnomalyModalOpen] = useState(false);
   const [isF10ModalOpen, setIsF10ModalOpen] = useState(false);
   const [isHeldOrdersModalOpen, setIsHeldOrdersModalOpen] = useState(false);
   const [isThermalModalOpen, setIsThermalModalOpen] = useState(false);
   const [autoPrintThermal, setAutoPrintThermal] = useState(false);
+  const [draftInvoiceNumber, setDraftInvoiceNumber] = useState<string>(() => createNextInvoiceNumber());
+  const [lastCompletedMemo, setLastCompletedMemo] = useState<{
+    orderNumber: string;
+    invoiceDate: string;
+    cart: PharmaCartItem[];
+    subtotal: number;
+    discount: number;
+    discountPercent: number;
+    tax: number;
+    vatPercent: number;
+    roundOff: number;
+    grandTotal: number;
+    paymentMethod: string;
+    paymentStatus: 'paid' | 'partially_paid' | 'due';
+    tenderedAmount: number;
+    changeDue: number;
+    cashPaid: number;
+    mfsOrCardPaid: number;
+    dueAmount: number;
+    doctor: DoctorInfo | null;
+    customerName: string;
+    customerPhone: string;
+    customerCode?: string;
+    customerLoyaltyPoints?: number;
+    cashierName: string;
+    cashierRole: string;
+    branchId: string;
+    branchName: string;
+  } | null>(null);
   const [isRxWarningModalOpen, setIsRxWarningModalOpen] = useState(false);
   const [substituteTargetItem, setSubstituteTargetItem] = useState<PharmaCartItem | null>(null);
   const [isSmartBarcodeModalOpen, setIsSmartBarcodeModalOpen] = useState(false);
@@ -593,35 +635,78 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
   const handleConfirmF10Dispatch = async (method: string) => {
     setIsF10ModalOpen(false);
+    const invoiceNumber = draftInvoiceNumber;
+    const rawGrossSubtotal = Number(cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2));
+    const itemLevelDiscount = Number(Math.max(0, rawGrossSubtotal - subtotal).toFixed(2));
+    const totalDiscount = Number((itemLevelDiscount + discount).toFixed(2));
+    const resolvedCashTendered =
+      paymentMethod === 'cash'
+        ? tenderedAmount >= grandTotal
+          ? tenderedAmount
+          : grandTotal
+        : 0;
+    const resolvedChangeGiven =
+      paymentMethod === 'cash' ? Number(Math.max(0, resolvedCashTendered - grandTotal).toFixed(2)) : 0;
+    const resolvedTimestamp = new Date().toISOString();
+    const resolvedPaymentMethod =
+      paymentMethod === 'mfs'
+        ? 'bkash_nagad'
+        : paymentMethod === 'card'
+        ? 'card'
+        : paymentMethod === 'due_credit'
+        ? 'credit'
+        : 'cash';
+    const resolvedPaymentStatus: 'paid' | 'due' =
+      paymentMethod === 'due_credit' ? 'due' : 'paid';
+    const resolvedCashierName = currentUser?.name || 'Duty Pharmacist';
+    const resolvedBranchId = currentUser?.branchId || 'HQ-MAIN';
+    const resolvedBranchName = currentUser?.branchName || 'Main Branch';
+
+    const memoSnapshot = {
+      orderNumber: invoiceNumber,
+      invoiceDate: resolvedTimestamp,
+      cart: [...cart],
+      subtotal: rawGrossSubtotal,
+      discount: totalDiscount,
+      discountPercent: specialDiscPercent,
+      tax,
+      vatPercent: isVatEnabled ? vatPercent : 0,
+      roundOff,
+      grandTotal,
+      paymentMethod: resolvedPaymentMethod,
+      paymentStatus: resolvedPaymentStatus,
+      tenderedAmount: resolvedCashTendered,
+      changeDue: resolvedChangeGiven,
+      cashPaid: paymentMethod === 'cash' ? grandTotal : 0,
+      mfsOrCardPaid: paymentMethod === 'card' || paymentMethod === 'mfs' ? grandTotal : 0,
+      dueAmount: paymentMethod === 'due_credit' ? grandTotal : 0,
+      doctor: selectedDoctor,
+      customerName: selectedCustomer?.name || 'Walk-In Customer',
+      customerPhone: selectedCustomer?.phone || '',
+      customerCode: selectedCustomer?.id,
+      customerLoyaltyPoints: selectedCustomer?.loyaltyPoints,
+      cashierName: resolvedCashierName,
+      cashierRole: currentUser?.roleName || 'Pharmacist',
+      branchId: resolvedBranchId,
+      branchName: resolvedBranchName,
+    };
 
     try {
-      const invoiceNumber = `INV-2026-${Math.floor(9200 + Math.random() * 500)}`;
       const totalCost = cart.reduce((sum, item) => sum + ((item.purchasePrice || 0) * item.qty), 0);
-      const rawGrossSubtotal = Number(cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2));
-      const itemLevelDiscount = Number(Math.max(0, rawGrossSubtotal - subtotal).toFixed(2));
-      const totalDiscount = Number((itemLevelDiscount + discount).toFixed(2));
-      const resolvedCashTendered =
-        paymentMethod === 'cash'
-          ? tenderedAmount >= grandTotal
-            ? tenderedAmount
-            : grandTotal
-          : 0;
-      const resolvedChangeGiven =
-        paymentMethod === 'cash' ? Number(Math.max(0, resolvedCashTendered - grandTotal).toFixed(2)) : 0;
 
       const newSale: any = {
         id: `sale-${Date.now()}`,
         invoiceNumber,
-        date: new Date().toISOString().split('T')[0],
-        timestamp: new Date().toISOString(),
+        date: resolvedTimestamp.split('T')[0],
+        timestamp: resolvedTimestamp,
         customerId: selectedCustomer?.id,
-        customerName: selectedCustomer?.name || 'Walk-In Customer',
-        customerPhone: selectedCustomer?.phone || '',
-        dueAmount: paymentMethod === 'due_credit' ? grandTotal : 0,
+        customerName: memoSnapshot.customerName,
+        customerPhone: memoSnapshot.customerPhone,
+        dueAmount: memoSnapshot.dueAmount,
         cashTendered: resolvedCashTendered,
         changeGiven: resolvedChangeGiven,
         roundOff,
-        notes: `METHOD:${paymentMethod === 'mfs' ? 'bkash_nagad' : paymentMethod === 'due_credit' ? 'credit' : paymentMethod}`,
+        notes: `METHOD:${resolvedPaymentMethod}`,
         items: cart.map(item => ({
           medicineId: item.medicineId || 'unknown-med',
           medicineName: item.name,
@@ -645,19 +730,12 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         grandTotal,
         totalCost,
         grossProfit: grandTotal - tax - totalCost,
-        paymentMethod:
-          paymentMethod === 'mfs'
-            ? 'bkash_nagad'
-            : paymentMethod === 'card'
-            ? 'card'
-            : paymentMethod === 'due_credit'
-            ? 'credit'
-            : 'cash',
-        paymentStatus: paymentMethod === 'due_credit' ? 'due' : 'paid',
+        paymentMethod: resolvedPaymentMethod,
+        paymentStatus: resolvedPaymentStatus,
         cashierId: currentUser?.id || 'user-super-admin-01',
-        cashierName: currentUser?.name || 'Duty Pharmacist',
-        branchId: currentUser?.branchId || 'HQ-MAIN',
-        branchName: currentUser?.branchName || 'Main Branch',
+        cashierName: resolvedCashierName,
+        branchId: resolvedBranchId,
+        branchName: resolvedBranchName,
       };
 
       await PharmacyService.completeSale(newSale);
@@ -693,7 +771,7 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
       AuditService.recordAuditLog({
         userId: currentUser?.id || 'usr-cashier-01',
-        userName: currentUser?.name || 'Duty Pharmacist',
+        userName: resolvedCashierName,
         userRole: currentUser?.roleName || 'Cashier',
         action: 'DISPENSE',
         module: 'pos',
@@ -717,14 +795,15 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       console.error("Checkout processing failed", error);
     }
 
+    setLastCompletedMemo(memoSnapshot);
+    setDraftInvoiceNumber(createNextInvoiceNumber());
+    setCart([]);
+
     addToast(`Dispensed verified! Receipt dispatched via ${method.toUpperCase()}`, 'success');
-    
+
     if (method === 'print' || method === 'both') {
       setAutoPrintThermal(true);
       setIsThermalModalOpen(true);
-      // Cart will be cleared when the modal is closed
-    } else {
-      setCart([]);
     }
   };
 
@@ -1260,34 +1339,91 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       <F10DispatchModal
         isOpen={isF10ModalOpen}
         onClose={() => setIsF10ModalOpen(false)}
-        orderNumber="Order #RX-2026-9041"
+        orderNumber={draftInvoiceNumber}
         totalAmount={grandTotal}
-        customerPhone="+880 1712-9842"
+        customerPhone={selectedCustomer?.phone || ''}
         onConfirmDispatch={handleConfirmF10Dispatch}
       />
 
-      {/* Bengali / English Thermal Receipt Modal */}
-      <ThermalReceiptModal
-        isOpen={isThermalModalOpen}
-        onClose={() => {
-          setIsThermalModalOpen(false);
-          if (autoPrintThermal) {
-            setCart([]);
-            setAutoPrintThermal(false);
-          }
-        }}
-        cart={cart}
-        subtotal={subtotal}
-        discount={discount}
-        tax={tax}
-        grandTotal={grandTotal}
-        orderNumber="RX-2026-9041"
-        isBengaliDefault={isBengaliReceipt}
-        tenderedAmount={tenderedAmount}
-        changeDue={changeDue}
-        doctor={selectedDoctor}
-        autoPrint={autoPrintThermal}
-      />
+      {/* Official English Sales Memo / Tax Invoice Modal */}
+      {(() => {
+        const useCompleted = Boolean(lastCompletedMemo && (autoPrintThermal || cart.length === 0));
+        const liveGrossSubtotal = Number(cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2));
+        const liveItemDisc = Number(Math.max(0, liveGrossSubtotal - subtotal).toFixed(2));
+        const liveTotalDisc = Number((liveItemDisc + discount).toFixed(2));
+
+        const memoProps = useCompleted && lastCompletedMemo
+          ? {
+              cart: lastCompletedMemo.cart,
+              subtotal: lastCompletedMemo.subtotal,
+              discount: lastCompletedMemo.discount,
+              discountPercent: lastCompletedMemo.discountPercent,
+              tax: lastCompletedMemo.tax,
+              vatPercent: lastCompletedMemo.vatPercent,
+              roundOff: lastCompletedMemo.roundOff,
+              grandTotal: lastCompletedMemo.grandTotal,
+              orderNumber: lastCompletedMemo.orderNumber,
+              invoiceDate: lastCompletedMemo.invoiceDate,
+              paymentMethod: lastCompletedMemo.paymentMethod,
+              paymentStatus: lastCompletedMemo.paymentStatus,
+              tenderedAmount: lastCompletedMemo.tenderedAmount,
+              changeDue: lastCompletedMemo.changeDue,
+              cashPaid: lastCompletedMemo.cashPaid,
+              mfsOrCardPaid: lastCompletedMemo.mfsOrCardPaid,
+              dueAmount: lastCompletedMemo.dueAmount,
+              doctor: lastCompletedMemo.doctor,
+              customerName: lastCompletedMemo.customerName,
+              customerPhone: lastCompletedMemo.customerPhone,
+              customerCode: lastCompletedMemo.customerCode,
+              customerLoyaltyPoints: lastCompletedMemo.customerLoyaltyPoints,
+              cashierName: lastCompletedMemo.cashierName,
+              cashierRole: lastCompletedMemo.cashierRole,
+              branchId: lastCompletedMemo.branchId,
+              branchName: lastCompletedMemo.branchName,
+            }
+          : {
+              cart,
+              subtotal: liveGrossSubtotal,
+              discount: liveTotalDisc,
+              discountPercent: specialDiscPercent,
+              tax,
+              vatPercent: isVatEnabled ? vatPercent : 0,
+              roundOff,
+              grandTotal,
+              orderNumber: draftInvoiceNumber,
+              invoiceDate: new Date().toISOString(),
+              paymentMethod,
+              paymentStatus: 'draft' as const,
+              tenderedAmount: paymentMethod === 'cash' ? tenderedAmount : 0,
+              changeDue,
+              cashPaid: paymentMethod === 'cash' ? grandTotal : 0,
+              mfsOrCardPaid: paymentMethod === 'card' || paymentMethod === 'mfs' ? grandTotal : 0,
+              dueAmount: paymentMethod === 'due_credit' ? grandTotal : 0,
+              doctor: selectedDoctor,
+              customerName: selectedCustomer?.name || 'Walk-In Customer',
+              customerPhone: selectedCustomer?.phone || '',
+              customerCode: selectedCustomer?.id,
+              customerLoyaltyPoints: selectedCustomer?.loyaltyPoints,
+              cashierName: currentUser?.name || 'Duty Pharmacist',
+              cashierRole: currentUser?.roleName || 'Pharmacist',
+              branchId: currentUser?.branchId || 'HQ-MAIN',
+              branchName: currentUser?.branchName || 'Main Branch',
+            };
+
+        return (
+          <ThermalReceiptModal
+            isOpen={isThermalModalOpen}
+            onClose={() => {
+              setIsThermalModalOpen(false);
+              if (autoPrintThermal) {
+                setAutoPrintThermal(false);
+              }
+            }}
+            autoPrint={autoPrintThermal}
+            {...memoProps}
+          />
+        );
+      })()}
 
       {/* DGDA Scheduled Medicine / Prescription Guardrail Warning Modal */}
       <RxWarningModal

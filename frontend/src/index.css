@@ -126,6 +126,18 @@ html[lang="bn"] textarea {
   font-family: var(--font-bn) !important;
 }
 
+/* ── Official Sales Memo / Tax Invoice: Always Crisp English & Tabular Monospace ── */
+[data-english-memo="true"],
+[data-english-memo="true"] *:not(.memo-mono):not(.memo-mono *) {
+  font-family: var(--font-en) !important;
+}
+
+[data-english-memo="true"] .memo-mono,
+[data-english-memo="true"] .memo-mono * {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Smooth theme transitions ── */
 *, *::before, *::after {
   transition-property: background-color, border-color, color, fill, stroke;
