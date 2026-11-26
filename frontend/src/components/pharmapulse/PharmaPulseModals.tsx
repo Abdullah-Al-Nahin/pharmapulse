@@ -536,23 +536,25 @@ export const GenericSubstitutionModal: React.FC<GenericSubstitutionModalProps> =
       return genLower && (querySub.includes(genLower) || genLower.includes(querySub));
     });
 
-    substitutes = matches.map((m) => {
-      const fefoInfo = PharmacyService.getFefoBatchForMedicine(m.id);
-      return {
-        id: m.id,
-        brandName: m.name,
-        genericName: m.genericName || currentItem.sub,
-        strength: m.strength || '',
-        company: m.manufacturer || 'Approved Manufacturer',
-        price: fefoInfo.batch ? Number(fefoInfo.batch.sellingPrice) : 0,
-        purchasePrice: fefoInfo.batch ? Number(fefoInfo.batch.purchasePrice) : 0,
-        stock: fefoInfo.totalStock || 0,
-        batch: fefoInfo.batch?.batchNumber || 'OOS',
-        exp: fefoInfo.batch?.expiryDate || 'N/A',
-        form: m.dosageForm || 'Tablet',
-        isRxRequired: m.requiresPrescription,
-      };
-    });
+    substitutes = matches
+      .map((m) => {
+        const fefoInfo = PharmacyService.getFefoBatchForMedicine(m.id);
+        return {
+          id: m.id,
+          brandName: m.name,
+          genericName: m.genericName || currentItem.sub,
+          strength: m.strength || '',
+          company: m.manufacturer || 'Approved Manufacturer',
+          price: fefoInfo.batch ? Number(fefoInfo.batch.sellingPrice) : 0,
+          purchasePrice: fefoInfo.batch ? Number(fefoInfo.batch.purchasePrice) : 0,
+          stock: fefoInfo.totalStock || 0,
+          batch: fefoInfo.batch?.batchNumber || 'OOS',
+          exp: fefoInfo.batch?.expiryDate || 'N/A',
+          form: m.dosageForm || 'Tablet',
+          isRxRequired: m.requiresPrescription,
+        };
+      })
+      .filter((s) => s.stock > 0);
   }
 
   const { currentUser } = useAuth();
@@ -829,17 +831,10 @@ export const GenericSubstitutionModal: React.FC<GenericSubstitutionModalProps> =
                   <label className="text-[10px] font-bold uppercase text-slate-500">
                     Pharmacist Security PIN (পাসওয়ার্ড/পিন) *
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setPharmacistPin('1234')}
-                    className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
-                  >
-                    Quick PIN (1234)
-                  </button>
                 </div>
                 <input
                   type="password"
-                  placeholder="Enter 4-digit PIN (e.g. 1234)..."
+                  placeholder="Enter Pharmacist Security PIN..."
                   value={pharmacistPin}
                   onChange={(e) => {
                     setPharmacistPin(e.target.value);

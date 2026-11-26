@@ -479,14 +479,20 @@ export const DatabaseControlView: React.FC = () => {
     }
   };
 
+  const isConfirmAuthorized = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    return (
+      trimmed.toUpperCase() === 'CLEAR' ||
+      trimmed === '1800' ||
+      trimmed === '9999' ||
+      Boolean(currentUser?.password && trimmed === currentUser.password)
+    );
+  };
+
   const handleExecuteConfirmedPurge = async () => {
     if (!activeConfirmAction) return;
-    const isValidConfirm =
-      confirmInput.trim().toUpperCase() === 'CLEAR' ||
-      confirmInput.trim() === '1800' ||
-      confirmInput.trim() === '9999';
-
-    if (!isValidConfirm) return;
+    if (!isConfirmAuthorized(confirmInput)) return;
 
     setIsExecuting(true);
     try {
@@ -852,14 +858,15 @@ export const DatabaseControlView: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Type <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-rose-600 font-black">CLEAR</code> or enter Super Admin PIN (<code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">1800</code>) to authorize:
+                  Enter Super Admin Password or PIN to authorize:
                 </label>
                 <input
-                  type="text"
+                  type="password"
                   autoFocus
+                  autoComplete="new-password"
                   value={confirmInput}
                   onChange={(e) => setConfirmInput(e.target.value)}
-                  placeholder="Type CLEAR or 1800"
+                  placeholder="Enter Super Admin password or PIN..."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-rose-500"
                 />
               </div>
@@ -874,12 +881,7 @@ export const DatabaseControlView: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  disabled={
-                    isExecuting ||
-                    (confirmInput.trim().toUpperCase() !== 'CLEAR' &&
-                      confirmInput.trim() !== '1800' &&
-                      confirmInput.trim() !== '9999')
-                  }
+                  disabled={isExecuting || !isConfirmAuthorized(confirmInput)}
                   onClick={handleExecuteConfirmedPurge}
                   className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white text-xs font-black flex items-center gap-1.5 transition cursor-pointer"
                 >

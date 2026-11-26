@@ -27,7 +27,6 @@ import {
   INITIAL_RETURNS, 
   INITIAL_ACCOUNTING_TRANSACTIONS 
 } from '../lib/initialData';
-import { SMART_BARCODE_DATABASE } from '../components/pharmapulse/data/smartPharmaData';
 import { batchApi, supplierApi, inventoryApi, saleApi, purchaseOrderApi, systemApi } from '../lib/api';
 import { AuditService } from './auditService';
 import { BranchService } from './branchService';
@@ -681,115 +680,95 @@ export class PharmacyService {
 
   // --- Real-time Backend Sync ---
   public static async fetchLiveCatalog(): Promise<any[]> {
-    try {
-      const [medsData, batchesData] = await Promise.all([
-        inventoryApi.getMedicines().catch(() => []),
-        batchApi.getBatches().catch(() => [])
-      ]);
-
+    const buildCatalogFrom = (medsList: any[], batchesList: any[]) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const catalog: any[] = (medsData || []).map((m: any) => {
-        // Find fefo batch directly from live backend data
-        const medBatches = (batchesData || []).filter((b: any) => (b.productId === m.id || b.medicineId === m.id) && b.currentStock > 0 && b.status !== 'QUARANTINED');
-        const unexpired = medBatches.filter((b: any) => new Date(b.expiryDate) > today);
-        unexpired.sort((a: any, b: any) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
-        
-        const fefoBatch = unexpired.length > 0 ? unexpired[0] : null;
-        // Exclude expired batches from sellable totalStock in POS
-        const totalStock = unexpired.reduce((sum: number, b: any) => sum + (Number(b.currentStock) || 0), 0);
-        let nearestExpiryDays = null;
+      return (medsList || [])
+        .map((m: any) => {
+          const medBatches = (batchesList || []).filter(
+            (b: any) =>
+              (b.productId === m.id || b.medicineId === m.id) &&
+              Number(b.currentStock) > 0 &&
+              b.status !== 'QUARANTINED' &&
+              b.status !== 'quarantined'
+          );
+          const unexpired = medBatches.filter((b: any) => new Date(b.expiryDate) > today);
+          unexpired.sort(
+            (a: any, b: any) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
+          );
 
-        if (fefoBatch) {
-           nearestExpiryDays = Math.ceil((new Date(fefoBatch.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-        }
+          const fefoBatch = unexpired.length > 0 ? unexpired[0] : null;
+          const totalStock = unexpired.reduce(
+            (sum: number, b: any) => sum + (Number(b.currentStock) || 0),
+            0
+          );
+          let nearestExpiryDays: number | null = null;
 
-        return {
-          medicineId: m.id,
-          batchId: fefoBatch ? fefoBatch.id : undefined,
-          name: m.name,
-          sub: m.generic?.name || m.genericName || 'Unknown Formulation',
-          company: m.manufacturer?.name || m.manufacturer || 'Unknown',
-          batch: fefoBatch ? fefoBatch.batchNumber : 'OOS',
-          exp: fefoBatch ? new Date(fefoBatch.expiryDate).toISOString().split('T')[0] : 'N/A',
-          price: fefoBatch ? Number(fefoBatch.unitSellingPrice || fefoBatch.sellingPrice) : (Number(m.sellingPrice || m.mrp) || 0),
-          purchasePrice: fefoBatch ? Number(fefoBatch.purchasePrice) : (Number(m.purchasePrice) || 0),
-          stock: totalStock,
-          barcode: m.barcode || m.sku || '',
-          sku: m.sku || '',
-          strength: m.strength || '',
-          isUrgent: nearestExpiryDays !== null && nearestExpiryDays < 30,
-          isColdChain: (m.defaultRackLocation || m.rackLocation || '').toLowerCase().includes('fridge'),
-          storageTemp: m.defaultRackLocation || m.rackLocation || 'Room Temp',
-          isOphthalmic: (m.dosageForm || '').toLowerCase().includes('drop') || (m.category?.name || m.category || '').toLowerCase().includes('eye'),
-          afterOpeningDays: 28,
-          isRxRequired: m.requiresPrescription || false,
-          dosageEn: m.description || '',
-          dosageBn: m.description || '',
-        };
-      });
+          if (fefoBatch) {
+            nearestExpiryDays = Math.ceil(
+              (new Date(fefoBatch.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+            );
+          }
 
-      // Augment catalog with verified smart barcode items so standard UPC/EAN barcodes scan reliably
-      const existingBarcodes = new Set(catalog.map((c: any) => (c.barcode || '').trim().toLowerCase()).filter(Boolean));
-      const existingNames = new Set(catalog.map((c: any) => (c.name || '').trim().toLowerCase()));
+          return {
+            medicineId: m.id,
+            batchId: fefoBatch ? fefoBatch.id : undefined,
+            name: m.name,
+            sub: m.generic?.name || m.genericName || 'Unknown Formulation',
+            company: m.manufacturer?.name || m.manufacturer || 'Unknown',
+            batch: fefoBatch ? fefoBatch.batchNumber : 'OOS',
+            exp: fefoBatch ? new Date(fefoBatch.expiryDate).toISOString().split('T')[0] : 'N/A',
+            price: fefoBatch
+              ? Number(fefoBatch.unitSellingPrice || fefoBatch.sellingPrice)
+              : Number(m.sellingPrice || m.mrp) || 0,
+            purchasePrice: fefoBatch
+              ? Number(fefoBatch.purchasePrice)
+              : Number(m.purchasePrice) || 0,
+            stock: totalStock,
+            barcode: m.barcode || m.sku || '',
+            sku: m.sku || '',
+            strength: m.strength || '',
+            isUrgent: nearestExpiryDays !== null && nearestExpiryDays < 30,
+            isColdChain: (m.defaultRackLocation || m.rackLocation || '').toLowerCase().includes('fridge'),
+            storageTemp: m.defaultRackLocation || m.rackLocation || 'Room Temp',
+            isOphthalmic:
+              (m.dosageForm || '').toLowerCase().includes('drop') ||
+              (m.category?.name || m.category || '').toLowerCase().includes('eye'),
+            afterOpeningDays: 28,
+            isRxRequired: m.requiresPrescription || false,
+            dosageEn: m.description || '',
+            dosageBn: m.description || '',
+          };
+        })
+        .filter((c: any) => (Number(c.stock) || 0) > 0);
+    };
 
-      SMART_BARCODE_DATABASE.forEach((s, idx) => {
-        const bCode = (s.barcode || '').trim().toLowerCase();
-        const bName = (s.brandName || '').trim().toLowerCase();
-        if ((bCode && !existingBarcodes.has(bCode)) || !existingNames.has(bName)) {
-          catalog.push({
-            medicineId: `smart-${s.barcode || idx}`,
-            batchId: `batch-${s.batch || idx}`,
-            name: s.brandName,
-            sub: `${s.genericName} ${s.strength}`.trim(),
-            company: s.company,
-            batch: s.batch,
-            exp: s.exp,
-            price: s.sellingPrice,
-            purchasePrice: s.purchasePrice,
-            stock: s.stock,
-            barcode: s.barcode,
-            sku: s.barcode,
-            strength: s.strength,
-            isUrgent: false,
-            isColdChain: s.isColdChain || false,
-            storageTemp: s.storageTemp || 'Room Temp',
-            isOphthalmic: s.isOphthalmic || false,
-            afterOpeningDays: s.afterOpeningDays || 28,
-            isRxRequired: s.isRxRequired || false,
-            dosageEn: s.dosageEn || '',
-            dosageBn: s.dosageBn || '',
-          });
-        }
-      });
+    const cleared = getClearedScopes();
+    try {
+      const [apiMeds, apiBatches] = await Promise.all([
+        inventoryApi.getMedicines().catch(() => null),
+        batchApi.getBatches().catch(() => null),
+      ]);
 
-      return catalog;
+      const medsData =
+        apiMeds !== null
+          ? apiMeds
+          : cleared.medicines
+          ? []
+          : this.getMedicines();
+      const batchesData =
+        apiBatches !== null
+          ? apiBatches
+          : cleared.batches
+          ? []
+          : this.getBatches();
+
+      return buildCatalogFrom(medsData, batchesData);
     } catch {
-      // Fall back entirely to smart barcode database on error
-      return SMART_BARCODE_DATABASE.map((s, idx) => ({
-        medicineId: `smart-${s.barcode || idx}`,
-        batchId: `batch-${s.batch || idx}`,
-        name: s.brandName,
-        sub: `${s.genericName} ${s.strength}`.trim(),
-        company: s.company,
-        batch: s.batch,
-        exp: s.exp,
-        price: s.sellingPrice,
-        purchasePrice: s.purchasePrice,
-        stock: s.stock,
-        barcode: s.barcode,
-        sku: s.barcode,
-        strength: s.strength,
-        isUrgent: false,
-        isColdChain: s.isColdChain || false,
-        storageTemp: s.storageTemp || 'Room Temp',
-        isOphthalmic: s.isOphthalmic || false,
-        afterOpeningDays: s.afterOpeningDays || 28,
-        isRxRequired: s.isRxRequired || false,
-        dosageEn: s.dosageEn || '',
-        dosageBn: s.dosageBn || '',
-      }));
+      const medsData = cleared.medicines ? [] : this.getMedicines();
+      const batchesData = cleared.batches ? [] : this.getBatches();
+      return buildCatalogFrom(medsData, batchesData);
     }
   }
 

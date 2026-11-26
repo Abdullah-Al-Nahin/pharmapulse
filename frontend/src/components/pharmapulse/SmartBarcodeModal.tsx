@@ -19,7 +19,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { SmartBarcodeItem, PharmaCartItem } from '../../types/pharmapulse';
-import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 import { PharmacyService } from '../../services/pharmacyService';
 import { useAuth } from '../../context/AuthContext';
 import { playScannerBeep } from '../../utils/scannerAudio';
@@ -43,23 +42,27 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
 }) => {
   const { currentUser } = useAuth();
   const liveMedicines = PharmacyService.getMedicines();
-  const medicinesWithBarcodes = liveMedicines.filter((m) => m.barcode);
+  const inStockMedicines = liveMedicines.filter(
+    (m) => PharmacyService.getFefoBatchForMedicine(m.id, currentUser?.branchId).totalStock > 0
+  );
+  const medicinesWithBarcodes = inStockMedicines.filter((m) => m.barcode);
 
   const [barcodeInput, setBarcodeInput] = useState('');
   const [scannedItem, setScannedItem] = useState<SmartBarcodeItem | null>(() => {
-    const firstMed = medicinesWithBarcodes[0] || liveMedicines[0];
+    const firstMed = medicinesWithBarcodes[0] || inStockMedicines[0];
     if (!firstMed) return null;
-    const fefoInfo = PharmacyService.getFefoBatchForMedicine(firstMed.id);
+    const fefoInfo = PharmacyService.getFefoBatchForMedicine(firstMed.id, currentUser?.branchId);
+    if (!fefoInfo.batch || fefoInfo.totalStock <= 0) return null;
     return {
-      barcode: firstMed.barcode || 'N/A',
+      barcode: firstMed.barcode || firstMed.sku || 'N/A',
       brandName: firstMed.name,
       genericName: firstMed.genericName || '',
       strength: firstMed.strength || '',
-      batch: fefoInfo.batch?.batchNumber || 'LOT-2026',
-      exp: fefoInfo.batch?.expiryDate || 'N/A',
-      stock: fefoInfo.batch ? fefoInfo.batch.currentStock : 0,
-      sellingPrice: fefoInfo.batch ? Number(fefoInfo.batch.sellingPrice) : 0,
-      purchasePrice: fefoInfo.batch ? Number(fefoInfo.batch.purchasePrice) : 0,
+      batch: fefoInfo.batch.batchNumber,
+      exp: fefoInfo.batch.expiryDate,
+      stock: fefoInfo.totalStock,
+      sellingPrice: Number(fefoInfo.batch.sellingPrice) || 0,
+      purchasePrice: Number(fefoInfo.batch.purchasePrice) || 0,
       company: firstMed.manufacturer || '',
       isRxRequired: firstMed.requiresPrescription,
       dosageEn: firstMed.description,
@@ -69,7 +72,9 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
     };
   });
   const [addQty, setAddQty] = useState(1);
-  const [scanStatus, setScanStatus] = useState<'idle' | 'found' | 'not_found'>('found');
+  const [scanStatus, setScanStatus] = useState<'idle' | 'found' | 'not_found'>(() =>
+    inStockMedicines.length > 0 ? 'found' : 'idle'
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -85,23 +90,27 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
   const handleScanOrSubmit = (codeToSearch?: string) => {
     const code = (codeToSearch || barcodeInput).trim();
     if (!code) return;
-    
+
     const searchLower = code.toLowerCase();
 
     // 1. Search in real database
     const realMedicines = PharmacyService.getMedicines();
-    let matchedMedicine = realMedicines.find(
-      (m) => (m.barcode && m.barcode.toLowerCase() === searchLower) || 
-             (m.sku && m.sku.toLowerCase() === searchLower) ||
-             (m.name && m.name.toLowerCase().includes(searchLower)) ||
-             (m.genericName && m.genericName.toLowerCase().includes(searchLower)) ||
-             (m.brandName && m.brandName.toLowerCase().includes(searchLower))
+    const matchedMedicine = realMedicines.find(
+      (m) =>
+        (m.barcode && m.barcode.toLowerCase() === searchLower) ||
+        (m.sku && m.sku.toLowerCase() === searchLower) ||
+        (m.name && m.name.toLowerCase().includes(searchLower)) ||
+        (m.genericName && m.genericName.toLowerCase().includes(searchLower)) ||
+        (m.brandName && m.brandName.toLowerCase().includes(searchLower))
     );
-    
+
     let matched: SmartBarcodeItem | undefined;
 
     if (matchedMedicine) {
-      const fefoInfo = PharmacyService.getFefoBatchForMedicine(matchedMedicine.id, currentUser?.branchId);
+      const fefoInfo = PharmacyService.getFefoBatchForMedicine(
+        matchedMedicine.id,
+        currentUser?.branchId
+      );
       matched = {
         barcode: matchedMedicine.barcode || matchedMedicine.sku || 'N/A',
         brandName: matchedMedicine.name,
@@ -109,7 +118,7 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
         strength: matchedMedicine.strength || '',
         batch: fefoInfo.batch?.batchNumber || 'OOS',
         exp: fefoInfo.batch?.expiryDate || 'N/A',
-        stock: fefoInfo.batch ? fefoInfo.batch.currentStock : 0,
+        stock: fefoInfo.totalStock || 0,
         sellingPrice: fefoInfo.batch ? Number(fefoInfo.batch.sellingPrice) : 0,
         purchasePrice: fefoInfo.batch ? Number(fefoInfo.batch.purchasePrice) : 0,
         company: matchedMedicine.manufacturer || '',
@@ -119,16 +128,6 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
         isColdChain: (matchedMedicine.rackLocation || '').toLowerCase().includes('fridge'),
         storageTemp: matchedMedicine.rackLocation,
       };
-    } else {
-      // 2. Fall back to SMART_BARCODE_DATABASE catalog
-      const smartMatch = SMART_BARCODE_DATABASE.find(
-        (b) => (b.barcode && b.barcode.toLowerCase() === searchLower) ||
-               (b.brandName && b.brandName.toLowerCase().includes(searchLower)) ||
-               (b.genericName && b.genericName.toLowerCase().includes(searchLower))
-      );
-      if (smartMatch) {
-        matched = smartMatch;
-      }
     }
 
     if (matched) {
@@ -142,17 +141,6 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
     } else {
       setScanStatus('not_found');
       playScannerBeep('alert');
-    }
-  };
-
-  const handleQuickScan = (item: SmartBarcodeItem) => {
-    setBarcodeInput(item.barcode);
-    setScannedItem(item);
-    setScanStatus('found');
-    if (item.stock <= 0) {
-      playScannerBeep('alert');
-    } else {
-      playScannerBeep('success');
     }
   };
 
@@ -254,25 +242,39 @@ export const SmartBarcodeModal: React.FC<SmartBarcodeModalProps> = ({
           {/* Quick Real Barcode Scan Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] scrollbar-none">
             <span className="text-slate-400 shrink-0 font-medium">ইনভেন্টরি বারকোড:</span>
-            {medicinesWithBarcodes.slice(0, 6).map((med) => (
-              <button
-                key={med.id}
-                onClick={() => handleScanOrSubmit(med.barcode)}
-                className={`px-2 py-0.5 rounded-lg border font-mono whitespace-nowrap transition ${
-                  scannedItem?.barcode === med.barcode
-                    ? 'bg-emerald-600 text-white border-emerald-600 font-bold'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-400'
-                }`}
-              >
-                {med.name} ({med.barcode})
-              </button>
-            ))}
+            {medicinesWithBarcodes.length === 0 ? (
+              <span className="text-slate-400 italic">No in-stock barcodes available</span>
+            ) : (
+              medicinesWithBarcodes.slice(0, 6).map((med) => (
+                <button
+                  key={med.id}
+                  onClick={() => handleScanOrSubmit(med.barcode)}
+                  className={`px-2 py-0.5 rounded-lg border font-mono whitespace-nowrap transition ${
+                    scannedItem?.barcode === med.barcode
+                      ? 'bg-emerald-600 text-white border-emerald-600 font-bold'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-400'
+                  }`}
+                >
+                  {med.name} ({med.barcode})
+                </button>
+              ))
+            )}
           </div>
         </div>
 
         {/* Identified Drug Presentation Area */}
         <div className="p-5 overflow-y-auto flex-1 flex flex-col gap-4">
-          {scanStatus === 'not_found' ? (
+          {scanStatus === 'idle' && !scannedItem ? (
+            <div className="p-8 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 flex flex-col items-center justify-center text-center">
+              <Barcode className="w-10 h-10 text-slate-400 mb-2" />
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                No In-Stock Medicines Selected
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1">
+                Scan a registered barcode to inspect active inventory and batch pricing.
+              </p>
+            </div>
+          ) : scanStatus === 'not_found' ? (
             <div className="p-8 rounded-2xl border border-dashed border-rose-300 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 flex flex-col items-center justify-center text-center">
               <AlertTriangle className="w-10 h-10 text-rose-500 mb-2" />
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">

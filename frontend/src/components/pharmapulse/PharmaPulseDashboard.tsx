@@ -47,7 +47,6 @@ import { CustomerService } from '../../services/customerService';
 import { Customer } from '../../types/customer';
 import { getCurrentLocale, setLocale, subscribeLocale } from '../../utils/i18nFormatter';
 import { useBarcodeScanner } from '../../hooks/useBarcodeScanner';
-import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 
 interface Toast {
   id: string;
@@ -187,6 +186,18 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
     }, 3500);
   };
 
+  // Synchronize with PharmacyService purges/stock changes and clear cart if inventory is empty
+  useEffect(() => {
+    return PharmacyService.subscribe(() => {
+      setRefreshTrigger((t) => t + 1);
+      setHeldCount(PharmacyService.getHeldSales().length);
+      const hasAnyStock = PharmacyService.getBatches().some((b) => (Number(b.currentStock) || 0) > 0);
+      if (!hasAnyStock) {
+        setCart((prev) => (prev.length > 0 ? [] : prev));
+      }
+    });
+  }, []);
+
   // Synchronize Dark Mode with DOM and localStorage
   useEffect(() => {
     if (isDarkMode) {
@@ -301,23 +312,37 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
       addToast(`Incremented quantity for ${name}`, 'info');
     } else {
       const allMeds = PharmacyService.getMedicines();
-      const allBatches = PharmacyService.getBatches();
-      const matchedMed = extra?.medicineId 
-        ? allMeds.find(m => m.id === extra.medicineId)
-        : allMeds.find(m => m.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(m.name.toLowerCase())) || allMeds[0];
+      const matchedMed = extra?.medicineId
+        ? allMeds.find((m) => m.id === extra.medicineId)
+        : allMeds.find(
+            (m) =>
+              m.name.toLowerCase() === name.toLowerCase() ||
+              m.name.toLowerCase().includes(name.toLowerCase()) ||
+              name.toLowerCase().includes(m.name.toLowerCase())
+          );
 
       const medId = extra?.medicineId || matchedMed?.id;
-      const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-      const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+      const fefoResult = medId
+        ? PharmacyService.getFefoBatchForMedicine(medId, currentUser?.branchId)
+        : null;
+      const resolvedBatch = fefoResult?.batch || null;
+      const availableStock = resolvedBatch
+        ? fefoResult?.totalStock ?? resolvedBatch.currentStock ?? 0
+        : extra?.stock ?? 0;
+
+      if ((!resolvedBatch && !extra?.batchId) || availableStock <= 0) {
+        addToast(`"${name}" is out of stock — no active inventory batch available`, 'error');
+        return;
+      }
 
       const newItem: PharmaCartItem = {
         id: Date.now(),
         name,
         sub: extra?.sub || matchedMed?.genericName || 'Formulation Molecule',
-        company: extra?.company || matchedMed?.manufacturer || 'Certified Lab Pharma',
-        batch: batch || fallbackBatch?.batchNumber || 'BAT-MAIN-01',
-        exp: exp || fallbackBatch?.expiryDate || '12/2026',
-        price,
+        company: extra?.company || matchedMed?.manufacturer || 'Approved Pharma',
+        batch: resolvedBatch?.batchNumber || batch || '',
+        exp: resolvedBatch?.expiryDate || exp || '',
+        price: resolvedBatch ? Number(resolvedBatch.sellingPrice) || price : price,
         qty: 1,
         disc: 0,
         isUrgent,
@@ -329,10 +354,13 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
         dosageEn: extra?.dosageEn,
         dosageBn: extra?.dosageBn,
         medicineId: medId,
-        batchId: extra?.batchId || fallbackBatch?.id,
-        purchasePrice: extra?.purchasePrice || fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || 0,
-        stock: extra?.stock || fallbackBatch?.currentStock,
-        barcode: extra?.barcode
+        batchId: extra?.batchId || resolvedBatch?.id,
+        purchasePrice:
+          extra?.purchasePrice ??
+          (resolvedBatch ? Number(resolvedBatch.purchasePrice) : matchedMed?.purchasePrice) ??
+          0,
+        stock: availableStock,
+        barcode: extra?.barcode,
       };
       setCart((prev) => [...prev, newItem]);
       addToast(`Added ${name} to active cart`, 'success');
@@ -341,75 +369,93 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
   const handleSwitchAlternative = (alt: AlternativeDrug) => {
     const allMeds = PharmacyService.getMedicines();
-    const allBatches = PharmacyService.getBatches();
-    
-    // Find matching medicine in database/cache
     const matchedMed = allMeds.find(
-      (m) => m.name.toLowerCase().includes(alt.name.toLowerCase()) || 
-             alt.name.toLowerCase().includes(m.name.toLowerCase()) ||
-             (m.genericName && m.genericName.toLowerCase().includes('esomeprazole'))
-    ) || allMeds[0];
+      (m) => m.id === alt.id || m.name.toLowerCase() === alt.name.toLowerCase()
+    );
 
-    const medId = matchedMed?.id;
-    const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-    const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+    const fefoResult = matchedMed
+      ? PharmacyService.getFefoBatchForMedicine(matchedMed.id, currentUser?.branchId)
+      : null;
+
+    if (!matchedMed || !fefoResult?.batch || fefoResult.totalStock <= 0) {
+      addToast(`"${alt.name}" is out of stock`, 'error');
+      return;
+    }
+
+    const activeBatch = fefoResult.batch;
+    const targetGeneric = (matchedMed.genericName || '').toLowerCase().trim();
 
     setCart((prev) => {
-      const filtered = prev.filter((i) => !i.name.toLowerCase().includes('sergel'));
+      const filtered = targetGeneric
+        ? prev.filter((i) => !i.sub.toLowerCase().includes(targetGeneric))
+        : prev;
       const switchedItem: PharmaCartItem = {
         id: Date.now(),
-        name: alt.name,
-        sub: matchedMed?.genericName || 'Esomeprazole 20mg',
-        company: alt.company || matchedMed?.manufacturer || 'Square Pharmaceuticals',
-        batch: fallbackBatch?.batchNumber || `SW-${Math.floor(1000 + Math.random() * 9000)}`,
-        exp: fallbackBatch?.expiryDate || '10/2026',
-        price: alt.price || matchedMed?.sellingPrice || 7,
-        qty: 30,
+        name: matchedMed.name,
+        sub: matchedMed.genericName || matchedMed.strength || '',
+        company: alt.company || matchedMed.manufacturer || 'Approved Pharma',
+        batch: activeBatch.batchNumber,
+        exp: activeBatch.expiryDate,
+        price: alt.price || Number(activeBatch.sellingPrice) || matchedMed.sellingPrice || 0,
+        qty: Math.min(1, activeBatch.currentStock),
         disc: 0,
         isUrgent: false,
-        medicineId: medId,
-        batchId: fallbackBatch?.id,
-        purchasePrice: fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || 5,
-        stock: fallbackBatch?.currentStock || 100,
-        dosageEn: '1 capsule daily 30 min before breakfast',
-        dosageBn: '১টি ক্যাপসুল প্রতিদিন সকালে খাবার ৩০ মিনিট আগে',
+        medicineId: matchedMed.id,
+        batchId: activeBatch.id,
+        purchasePrice: Number(activeBatch.purchasePrice) || matchedMed.purchasePrice || 0,
+        stock: fefoResult.totalStock,
+        dosageEn: matchedMed.description || '',
+        dosageBn: matchedMed.description || '',
       };
       return [...filtered, switchedItem];
     });
-    addToast(`Switched molecule to ${alt.name} (${alt.company})`, 'success');
+    addToast(`Switched molecule to ${matchedMed.name} (${alt.company})`, 'success');
   };
 
   // Handle generic substitute selection from GenericSubstitutionModal with Pharmacist Confirmation Gate
   const handleSelectSubstitute = (originalItem: PharmaCartItem, alt: GenericSubstituteOption) => {
     const allMeds = PharmacyService.getMedicines();
-    const allBatches = PharmacyService.getBatches();
 
     const matchedMed = allMeds.find(
-      (m) => m.name.toLowerCase().includes(alt.brandName.toLowerCase()) ||
-             alt.brandName.toLowerCase().includes(m.name.toLowerCase()) ||
-             (alt.genericName && m.genericName && m.genericName.toLowerCase().includes(alt.genericName.toLowerCase()))
-    ) || allMeds[0];
+      (m) =>
+        (alt.medicineId && m.id === alt.medicineId) ||
+        m.name.toLowerCase() === alt.brandName.toLowerCase() ||
+        m.name.toLowerCase().includes(alt.brandName.toLowerCase()) ||
+        alt.brandName.toLowerCase().includes(m.name.toLowerCase())
+    );
 
     const medId = alt.medicineId || matchedMed?.id;
-    const fefoResult = medId ? PharmacyService.getFefoBatchForMedicine(medId) : null;
-    const fallbackBatch = fefoResult?.batch || allBatches.find(b => b.currentStock > 0) || allBatches[0];
+    const fefoResult = medId
+      ? PharmacyService.getFefoBatchForMedicine(medId, currentUser?.branchId)
+      : null;
 
+    if (!fefoResult?.batch || fefoResult.totalStock <= 0) {
+      addToast(`"${alt.brandName}" is out of stock`, 'error');
+      return;
+    }
+
+    const activeBatch = fefoResult.batch;
     const isInCart = cart.some((i) => i.id === originalItem.id);
+    const desiredQty = Math.min(originalItem.qty || 1, fefoResult.totalStock);
     const newSubItem: PharmaCartItem = {
       id: isInCart ? originalItem.id : Date.now(),
       name: `${alt.brandName} ${alt.strength}`.trim(),
       sub: `${alt.genericName} • ${alt.strength}`,
-      company: alt.company || alt.manufacturer || matchedMed?.manufacturer || 'Pharma Lab',
-      price: alt.price || matchedMed?.sellingPrice || originalItem.price,
-      batch: alt.batch || fallbackBatch?.batchNumber || `SUB-${Math.floor(1000 + Math.random() * 9000)}`,
-      exp: alt.exp || fallbackBatch?.expiryDate || originalItem.exp || '12/2027',
-      qty: originalItem.qty || 1,
+      company: alt.company || alt.manufacturer || matchedMed?.manufacturer || 'Approved Pharma',
+      price: alt.price || Number(activeBatch.sellingPrice) || matchedMed?.sellingPrice || originalItem.price,
+      batch: activeBatch.batchNumber,
+      exp: activeBatch.expiryDate,
+      qty: desiredQty,
       disc: 0,
       isUrgent: false,
       medicineId: medId,
-      batchId: fallbackBatch?.id,
-      stock: fallbackBatch?.currentStock,
-      purchasePrice: alt.purchasePrice || fallbackBatch?.purchasePrice || matchedMed?.purchasePrice || originalItem.purchasePrice,
+      batchId: activeBatch.id,
+      stock: fefoResult.totalStock,
+      purchasePrice:
+        alt.purchasePrice ||
+        Number(activeBatch.purchasePrice) ||
+        matchedMed?.purchasePrice ||
+        originalItem.purchasePrice,
       isColdChain: alt.isColdChain ?? originalItem.isColdChain,
       storageTemp: alt.storageTemp ?? originalItem.storageTemp,
       isOphthalmic: alt.isOphthalmic ?? originalItem.isOphthalmic,
@@ -735,15 +781,19 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
 
       if (matched) {
         const fefo = PharmacyService.getFefoBatchForMedicine(matched.id, currentUser?.branchId);
+        if (!fefo.batch || fefo.totalStock <= 0) {
+          addToast(`"${matched.name}" is out of stock`, 'error');
+          return false;
+        }
         itemToAdd = {
           name: matched.name,
-          price: fefo.batch ? Number(fefo.batch.sellingPrice) : (matched.sellingPrice || 10),
-          batch: fefo.batch?.batchNumber || 'GEN-01',
-          exp: fefo.batch?.expiryDate || '2026-12-31',
+          price: Number(fefo.batch.sellingPrice) || matched.sellingPrice || 0,
+          batch: fefo.batch.batchNumber,
+          exp: fefo.batch.expiryDate,
           isUrgent: false,
           extra: {
             medicineId: matched.id,
-            batchId: fefo.batch?.id,
+            batchId: fefo.batch.id,
             sub: matched.genericName || matched.strength || '',
             company: matched.manufacturer || '',
             isColdChain: (matched.rackLocation || '').toLowerCase().includes('fridge'),
@@ -751,43 +801,11 @@ export const PharmaPulseDashboard: React.FC<PharmaPulseDashboardProps> = ({
             isRxRequired: matched.requiresPrescription || false,
             dosageEn: matched.description || '',
             dosageBn: matched.description || '',
-            purchasePrice: fefo.batch ? Number(fefo.batch.purchasePrice) : (matched.purchasePrice || 8),
-            stock: fefo.batch ? fefo.batch.currentStock : 100,
+            purchasePrice: Number(fefo.batch.purchasePrice) || matched.purchasePrice || 0,
+            stock: fefo.totalStock,
             barcode: matched.barcode || matched.sku || code,
-          }
+          },
         };
-      } else {
-        // 2. Check SMART_BARCODE_DATABASE verified catalog
-        const smart = SMART_BARCODE_DATABASE.find(
-          (s) =>
-            (s.barcode && s.barcode.toLowerCase() === code) ||
-            s.brandName.toLowerCase() === code
-        );
-        if (smart) {
-          itemToAdd = {
-            name: smart.brandName,
-            price: smart.sellingPrice,
-            batch: smart.batch,
-            exp: smart.exp,
-            isUrgent: false,
-            extra: {
-              medicineId: `smart-${smart.barcode}`,
-              batchId: `batch-${smart.batch}`,
-              sub: `${smart.genericName} ${smart.strength}`,
-              company: smart.company,
-              isColdChain: smart.isColdChain,
-              storageTemp: smart.storageTemp,
-              isOphthalmic: smart.isOphthalmic,
-              afterOpeningDays: smart.afterOpeningDays || 28,
-              isRxRequired: smart.isRxRequired,
-              dosageEn: smart.dosageEn,
-              dosageBn: smart.dosageBn,
-              purchasePrice: smart.purchasePrice,
-              stock: smart.stock,
-              barcode: smart.barcode,
-            }
-          };
-        }
       }
 
       if (itemToAdd) {

@@ -25,8 +25,8 @@ const BN_TO_EN_PHRASES: Record<string, string> = {
   'বাংলা ON': 'BN Mode',
   'EN Only': 'EN Mode',
   'ADMIN প্যানেল ব্যাতিত অন্য কেউ বাকিতে বিল করতে পারবে না।': 'Only Admin accounts are authorized to process credit/due bills.',
-  'ক্যাশিয়ার বা স্টাফ একাউন্ট থেকে বাকিতে বিল করা নিষিদ্ধ। বাকিতে বিল সম্পন্ন করতে অ্যাডমিন পিন (PIN: 9999) দিন অথবা অ্যাডমিন রোলে লগইন করুন।':
-    'Cashier/staff accounts cannot issue credit bills without authorization. Enter Admin PIN (9999) or log in as Admin.',
+  'ক্যাশিয়ার বা স্টাফ একাউন্ট থেকে বাকিতে বিল করা নিষিদ্ধ। বাকিতে বিল সম্পন্ন করতে অ্যাডমিন পিন দিন অথবা অ্যাডমিন রোলে লগইন করুন।':
+    'Cashier/staff accounts cannot issue credit bills without authorization. Enter Admin PIN or log in as Admin.',
   'ভুল অ্যাডমিন পিন! শুধুমাত্র অ্যাডমিন প্যানেল বাকিতে বিল অনুমোদন করতে পারে।':
     'Invalid Admin PIN! Only Admin can authorize credit billing.',
   'অ্যাডমিন অনুমোদিত: বাকিতে বিল সক্রিয়': 'Admin Authorized: Credit Billing Active',
@@ -147,6 +147,8 @@ const EN_TO_BN_PHRASES: Record<string, string> = {
   'clear now': 'এখনই মুছুন',
   'ready to execute': 'কার্যকর করার জন্য প্রস্তুত',
   'confirm destructive database operation': 'ডাটাবেস মুছে ফেলার চূড়ান্ত নিশ্চিতকরণ',
+  'enter super admin password or pin to authorize:': 'অনুমোদনের জন্য সুপার অ্যাডমিন পাসওয়ার্ড বা পিন দিন:',
+  'enter super admin password or pin...': 'সুপার অ্যাডমিন পাসওয়ার্ড বা পিন লিখুন...',
   'authorize & clear': 'অনুমোদন ও ক্লিয়ার করুন',
   'executing purge...': 'মুছে ফেলা হচ্ছে...',
   'clear only transactions (all financials)': 'শুধুমাত্র সকল লেনদেন মুছুন',

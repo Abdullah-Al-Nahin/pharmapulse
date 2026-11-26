@@ -23,7 +23,6 @@ import { PharmacyService } from '../../services/pharmacyService';
 import { useAuth } from '../../context/AuthContext';
 import { getCurrentLocale, subscribeLocale } from '../../utils/i18nFormatter';
 import { playScannerBeep } from '../../utils/scannerAudio';
-import { SMART_BARCODE_DATABASE } from './data/smartPharmaData';
 
 interface PharmaPulseCartProps {
   cart: PharmaCartItem[];
@@ -101,49 +100,90 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
   const totalCartProfit = totalCartRevenue - totalCartCost;
   const overallCartMargin = totalCartRevenue > 0 ? ((totalCartProfit / totalCartRevenue) * 100) : 0;
 
-  const alternativeDrugs: AlternativeDrug[] = [
-    {
-      id: 'nexum-20',
-      name: 'Nexum 20',
-      company: 'Square Pharmaceuticals',
-      inStock: 380,
-      price: 7.00,
-      unit: 'cap',
-    },
-    {
-      id: 'maxpro-20',
-      name: 'Maxpro 20',
-      company: 'Renata Limited',
-      inStock: 120,
-      price: 7.00,
-      unit: 'cap',
-    },
-    {
-      id: 'sergel-20',
-      name: 'Sergel 20 (Current)',
-      company: 'Healthcare Pharma',
-      inStock: 30,
-      price: 7.00,
-      unit: 'cap',
-      isActive: true,
-    },
-  ];
+  const [stockTick, setStockTick] = useState(0);
+  React.useEffect(() => {
+    return PharmacyService.subscribe(() => setStockTick((t) => t + 1));
+  }, []);
+
+  const { alternativeDrugs, activeMoleculeLabel } = useMemo(() => {
+    const meds = PharmacyService.getMedicines();
+    const inStockEntries = meds
+      .map((m) => ({
+        med: m,
+        fefo: PharmacyService.getFefoBatchForMedicine(m.id),
+      }))
+      .filter((entry) => entry.fefo.hasStock && entry.fefo.totalStock > 0 && entry.fefo.batch);
+
+    if (inStockEntries.length === 0) {
+      return {
+        alternativeDrugs: [] as AlternativeDrug[],
+        activeMoleculeLabel: 'No Active Stock',
+      };
+    }
+
+    const activeCartItem = cart[cart.length - 1];
+    const activeCartMed = activeCartItem?.medicineId
+      ? meds.find((m) => m.id === activeCartItem.medicineId)
+      : undefined;
+
+    const moleculeRaw =
+      activeCartMed?.genericName ||
+      activeCartItem?.sub?.split('•')[0]?.trim() ||
+      inStockEntries[0].med.genericName ||
+      '';
+    const moleculeKey = moleculeRaw.toLowerCase().trim();
+
+    let matching = moleculeKey
+      ? inStockEntries.filter((entry) => {
+          const gen = (entry.med.genericName || '').toLowerCase();
+          return gen && (gen.includes(moleculeKey) || moleculeKey.includes(gen));
+        })
+      : inStockEntries;
+
+    if (matching.length === 0 && !activeCartItem) {
+      matching = inStockEntries;
+    }
+
+    const mapped: AlternativeDrug[] = matching.slice(0, 3).map(({ med, fefo }) => {
+      const inCart = cart.some(
+        (c) => c.medicineId === med.id || c.name.toLowerCase() === med.name.toLowerCase()
+      );
+      return {
+        id: med.id,
+        name: med.name,
+        company: med.manufacturer || 'Approved Pharma',
+        inStock: fefo.totalStock,
+        price: Number(fefo.batch?.sellingPrice) || Number(med.sellingPrice) || 0,
+        unit: (med.dosageForm || 'unit').toLowerCase().slice(0, 4),
+        isActive: inCart,
+      };
+    });
+
+    return {
+      alternativeDrugs: mapped,
+      activeMoleculeLabel: moleculeRaw || 'Inventory Stock',
+    };
+  }, [cart, stockTick, refreshTrigger]);
 
   // Live catalog from backend
   const [searchCatalog, setSearchCatalog] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     let mounted = true;
-    PharmacyService.fetchLiveCatalog().then(data => {
+    PharmacyService.fetchLiveCatalog().then((data) => {
       if (mounted) {
-        setSearchCatalog(data);
+        setSearchCatalog((data || []).filter((m) => (Number(m.stock) || 0) > 0));
       }
     });
-    return () => { mounted = false; };
-  }, [refreshTrigger]);
+    return () => {
+      mounted = false;
+    };
+  }, [refreshTrigger, stockTick]);
+
+  const inStockCatalog = searchCatalog.filter((m) => (Number(m.stock) || 0) > 0);
 
   const filteredCatalog = searchQuery.trim()
-    ? searchCatalog.filter((m) => {
+    ? inStockCatalog.filter((m) => {
         const q = searchQuery.trim().toLowerCase();
         return (
           m.name.toLowerCase().includes(q) ||
@@ -153,7 +193,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
           (m.sku && m.sku.toLowerCase().includes(q))
         );
       })
-    : searchCatalog;
+    : inStockCatalog;
 
   return (
     <div className="flex flex-col gap-4">
@@ -282,8 +322,8 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                   if (!query) return;
                   e.preventDefault();
 
-                  // 1. Exact match by barcode or SKU
-                  let matched = searchCatalog.find(
+                  // 1. Exact match by barcode or SKU among in-stock items
+                  let matched = inStockCatalog.find(
                     (m) =>
                       (m.barcode && m.barcode.toLowerCase() === query) ||
                       (m.sku && m.sku.toLowerCase() === query)
@@ -294,39 +334,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                     matched = filteredCatalog[0];
                   }
 
-                  // 3. Fall back to SMART_BARCODE_DATABASE
-                  if (!matched) {
-                    const smart = SMART_BARCODE_DATABASE.find(
-                      (s) =>
-                        (s.barcode && s.barcode.toLowerCase() === query) ||
-                        s.brandName.toLowerCase() === query
-                    );
-                    if (smart) {
-                      matched = {
-                        medicineId: `smart-${smart.barcode}`,
-                        batchId: `batch-${smart.batch}`,
-                        name: smart.brandName,
-                        sub: `${smart.genericName} ${smart.strength}`,
-                        company: smart.company,
-                        batch: smart.batch,
-                        exp: smart.exp,
-                        price: smart.sellingPrice,
-                        purchasePrice: smart.purchasePrice,
-                        stock: smart.stock,
-                        barcode: smart.barcode,
-                        sku: smart.barcode,
-                        isColdChain: smart.isColdChain,
-                        storageTemp: smart.storageTemp,
-                        isOphthalmic: smart.isOphthalmic,
-                        afterOpeningDays: smart.afterOpeningDays || 28,
-                        isRxRequired: smart.isRxRequired,
-                        dosageEn: smart.dosageEn,
-                        dosageBn: smart.dosageBn,
-                      };
-                    }
-                  }
-
-                  if (matched) {
+                  if (matched && (Number(matched.stock) || 0) > 0) {
                     onFastAddItem(matched.name, matched.price, matched.batch, matched.exp, matched.isUrgent, {
                       medicineId: (matched as any).medicineId,
                       batchId: (matched as any).batchId,
@@ -932,12 +940,22 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
             </span>
           </div>
           <span className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-            Active Molecule: Esomeprazole 20mg
+            Active Molecule: {activeMoleculeLabel}
           </span>
         </div>
 
+        {alternativeDrugs.length === 0 ? (
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
+            No in-stock generic alternatives available in inventory.
+          </div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {alternativeDrugs.map((drug, idx) => (
+          {alternativeDrugs.map((drug, idx) => {
+            const activeCartQty =
+              cart.find(
+                (c) => c.medicineId === drug.id || c.name.toLowerCase() === drug.name.toLowerCase()
+              )?.qty || 0;
+            return (
             <div
               key={drug.id}
               id={`alt-drug-${idx}`}
@@ -995,7 +1013,7 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                         : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    {drug.isActive ? 'In Cart (30)' : `In Stock (${drug.inStock})`}
+                    {drug.isActive ? `In Cart (${activeCartQty})` : `In Stock (${drug.inStock})`}
                   </span>
                 </div>
                 <span className="text-[10px] text-slate-400">{drug.company}</span>
@@ -1019,8 +1037,10 @@ export const PharmaPulseCart: React.FC<PharmaPulseCartProps> = ({
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
+        )}
       </div>
     </div>
   );
