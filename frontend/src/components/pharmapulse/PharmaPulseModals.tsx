@@ -460,15 +460,23 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
       : { label: 'PAID & VERIFIED', cls: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
 
   const effectiveCashPaid =
-    cashPaid !== undefined
+    grandTotal <= 0
+      ? 0
+      : cashPaid !== undefined
       ? cashPaid
       : normalizedPayMethod === 'cash'
       ? Math.max(0, grandTotal - dueAmount)
       : 0;
   const effectiveCashTendered =
-    normalizedPayMethod === 'cash' && tenderedAmount > 0 ? tenderedAmount : effectiveCashPaid;
+    grandTotal <= 0
+      ? 0
+      : normalizedPayMethod === 'cash' && tenderedAmount > 0
+      ? tenderedAmount
+      : effectiveCashPaid;
   const effectiveChangeDue =
-    normalizedPayMethod === 'cash'
+    grandTotal <= 0
+      ? 0
+      : normalizedPayMethod === 'cash'
       ? Math.max(0, changeDue > 0 ? changeDue : effectiveCashTendered - effectiveCashPaid)
       : 0;
 
@@ -555,13 +563,14 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
     const html =
       formatToPrint === 'a4'
         ? `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Sales Memo - ${escapeHtml(orderNumber)}</title>
   <style>
     @page { size: A4 portrait; margin: 12mm; }
-    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    * { box-sizing: border-box; }
+    body, button, input, select, textarea, table, th, td { font-family: Arial, Helvetica, sans-serif; }
     body { margin: 0; color: #0f172a; background: #ffffff; font-size: 11.5px; line-height: 1.4; }
     .toolbar { display:flex; justify-content:flex-end; gap:8px; margin-bottom:12px; }
     .btn { padding:7px 14px; border-radius:6px; border:1px solid #059669; background:#059669; color:#fff; font-weight:700; font-size:12px; cursor:pointer; }
@@ -679,13 +688,14 @@ export const ThermalReceiptModal: React.FC<ThermalReceiptModalProps> = ({
 </body>
 </html>`
         : `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>POS Memo - ${escapeHtml(orderNumber)}</title>
   <style>
     @page { size: 80mm auto; margin: 3mm; }
-    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    * { box-sizing: border-box; }
+    body, button, table, th, td { font-family: Arial, Helvetica, sans-serif; }
     body { margin: 0 auto; width: 74mm; color: #0f172a; background: #ffffff; font-size: 10.5px; line-height: 1.35; }
     .toolbar { display:flex; justify-content:space-between; margin-bottom:8px; }
     .btn { padding:5px 10px; border-radius:4px; border:1px solid #059669; background:#059669; color:#fff; font-weight:700; font-size:11px; cursor:pointer; }
